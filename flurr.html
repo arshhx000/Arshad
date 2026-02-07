@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fiuer | System.1</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- PDF Generation Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        te: {
+                            bg: '#e4e4e4',
+                            paper: '#f2f2f2',
+                            orange: '#ff4d00',
+                            dark: '#1a1a1a',
+                            border: '#888888',
+                            grid: '#d1d1d1'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Space Mono', 'monospace'],
+                    },
+                    boxShadow: {
+                        'hard': '4px 4px 0px 0px rgba(0,0,0,1)',
+                        'hard-sm': '2px 2px 0px 0px rgba(0,0,0,1)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { 
+            background-color: #e4e4e4; 
+            color: #1a1a1a;
+            cursor: crosshair;
+        }
+
+        /* Technical Grid Background */
+        .bg-grid {
+            background-size: 40px 40px;
+            background-image:
+                linear-gradient(to right, #d1d1d1 1px, transparent 1px),
+                linear-gradient(to bottom, #d1d1d1 1px, transparent 1px);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: #e4e4e4; border-left: 1px solid #000; }
+        ::-webkit-scrollbar-thumb { background: #ff4d00; border: 1px solid #000; }
+
+        /* TE Button */
+        .btn-te {
+            background: #fff;
+            border: 1px solid #000;
+            box-shadow: 4px 4px 0px 0px rgba(0,0,0,1);
+            font-family: 'Space Mono', monospace;
+            text-transform: uppercase;
+            font-weight: bold;
+            font-size: 0.75rem;
+            transition: all 0.1s;
+        }
+        .btn-te:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px 0px rgba(0,0,0,1);
+        }
+        .btn-te:hover {
+            background-color: #ff4d00;
+            color: white;
+        }
+
+        /* Inputs */
+        .input-te {
+            background: #f2f2f2;
+            border: 1px solid #000;
+            font-family: 'Space Mono', monospace;
+            border-radius: 0;
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.05);
+        }
+        .input-te:focus {
+            background: #fff;
+            outline: 2px solid #ff4d00;
+        }
+
+        /* Marquee */
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        .animate-marquee {
+            animation: marquee 20s linear infinite;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden font-sans">
+
+    <!-- === SYSTEM HEADER === -->
+    <header class="h-12 bg-black text-white flex items-center justify-between px-4 border-b border-white z-50 shrink-0">
+        <div class="flex items-center space-x-4">
+            <div class="w-3 h-3 bg-te-orange rounded-full animate-pulse"></div>
+            <span class="font-mono text-xs tracking-widest">FIUER.SYS.V1</span>
+        </div>
+        <div class="font-mono text-[10px] hidden md:block opacity-50">
+            // MEMORY: OK // AUDIO: OFF // NETWORK: CONNECTED
+        </div>
+        <div class="font-mono text-xs">
+            <span id="clock">00:00:00</span>
+        </div>
+    </header>
+
+    <!-- === APP STATE & ROUTER === -->
+    <div id="app" class="flex-1 w-full relative overflow-hidden flex bg-grid">
+        <!-- Content injected via JS -->
+    </div>
+
+    <!-- === JAVASCRIPT LOGIC === -->
+    <script>
+        // --- UTILS ---
+        setInterval(() => {
+            const now = new Date();
+            const time = now.toLocaleTimeString('en-GB', { hour12: false });
+            const el = document.getElementById('clock');
+            if(el) el.innerText = time;
+        }, 1000);
+
+        // --- MOCK DATABASE (LocalStorage) ---
+        const DB = {
+            get: (key) => JSON.parse(localStorage.getItem(`fiuer_${key}`) || '[]'),
+            set: (key, val) => localStorage.setItem(`fiuer_${key}`, JSON.stringify(val)),
+            getUser: () => JSON.parse(localStorage.getItem('fiuer_user')),
+            setUser: (user) => localStorage.setItem('fiuer_user', JSON.stringify(user)),
+            logout: () => localStorage.removeItem('fiuer_user')
+        };
+
+        // --- STATE MANAGEMENT ---
+        const State = {
+            view: 'home', 
+            user: DB.getUser(),
+            certificates: DB.get('certificates'),
+            currentTemplate: 0,
+            templates: [
+                { id: 1, name: "Engineering", bg: "#f0f0f0", border: "#000000", font: "monospace", accent: "#ff4d00" },
+                { id: 2, name: "Dark Mode", bg: "#111111", border: "#ffffff", font: "sans-serif", accent: "#00ff00" },
+                { id: 3, name: "Swiss", bg: "#ffffff", border: "#ff0000", font: "sans-serif", accent: "#000000" }
+            ]
+        };
+
+        function init() { render(); }
+        function navigate(view) { State.view = view; render(); }
+        function logout() { DB.logout(); State.user = null; navigate('home'); }
+
+        // --- RENDER ENGINE ---
+        function render() {
+            const app = document.getElementById('app');
+            app.innerHTML = '';
+
+            if (State.view === 'home') renderHome(app);
+            else if (State.view === 'login') renderLogin(app);
+            else if (State.view === 'verify') renderVerify(app);
+            
+            else if (State.user) {
+                renderLayout(app, () => {
+                    if (State.view === 'dashboard') renderDashboard();
+                    else if (State.view === 'create') renderCreateWizard();
+                    else if (State.view === 'certificates') renderCertificateList();
+                });
+            } else {
+                navigate('login');
+            }
+        }
+
+        // 1. HOME / LANDING (TE STYLE)
+        function renderHome(container) {
+            container.innerHTML = `
+                <div class="flex flex-col w-full h-full overflow-y-auto">
+                    <!-- Hero Section -->
+                    <div class="flex-1 flex flex-col items-center justify-center p-8 relative">
+                        <div class="absolute top-0 left-0 w-full border-b border-black bg-white/80 p-2 font-mono text-[10px] marquee-container overflow-hidden whitespace-nowrap">
+                            <div class="animate-marquee inline-block">
+                                /// CERTIFICATE GENERATOR /// BATCH PROCESSING /// QR VERIFICATION /// PDF EXPORT /// TE-INSPIRED UX /// READY FOR INPUT ///
+                            </div>
+                        </div>
+
+                        <div class="max-w-4xl w-full border-2 border-black bg-white p-8 md:p-16 shadow-hard relative">
+                            <!-- Screws -->
+                            <div class="absolute top-2 left-2 w-3 h-3 border border-black rounded-full flex items-center justify-center"><div class="w-2 h-[1px] bg-black rotate-45"></div></div>
+                            <div class="absolute top-2 right-2 w-3 h-3 border border-black rounded-full flex items-center justify-center"><div class="w-2 h-[1px] bg-black rotate-45"></div></div>
+                            <div class="absolute bottom-2 left-2 w-3 h-3 border border-black rounded-full flex items-center justify-center"><div class="w-2 h-[1px] bg-black rotate-45"></div></div>
+                            <div class="absolute bottom-2 right-2 w-3 h-3 border border-black rounded-full flex items-center justify-center"><div class="w-2 h-[1px] bg-black rotate-45"></div></div>
+
+                            <div class="text-left mb-12">
+                                <h1 class="text-6xl md:text-8xl font-black tracking-tighter leading-none mb-4">FIUER<br><span class="text-te-orange">SYSTEM.</span></h1>
+                                <p class="font-mono text-sm max-w-md border-l-4 border-te-orange pl-4">
+                                    DIGITAL CREDENTIAL SYNTHESIZER.<br>
+                                    DESIGN. GENERATE. VERIFY.
+                                </p>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <button onclick="navigate('login')" class="btn-te py-4 px-8 text-lg">
+                                    [ ENTER_SYSTEM ]
+                                </button>
+                                <button onclick="navigate('verify')" class="btn-te py-4 px-8 bg-gray-200 hover:bg-gray-300 hover:text-black">
+                                    VERIFY_ID //
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Technical Footer -->
+                        <div class="mt-12 font-mono text-[10px] opacity-60 text-center">
+                            COPYRIGHT 2026 FIUER INC. <br>
+                            DESIGNED IN GUNTUR.
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 2. LOGIN (TE STYLE)
+        function renderLogin(container) {
+            container.innerHTML = `
+                <div class="w-full h-full flex items-center justify-center p-4">
+                    <div class="bg-white border-2 border-black p-8 shadow-hard max-w-sm w-full relative">
+                        <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-black text-white px-2 font-mono text-xs">AUTH_MODULE</div>
+                        
+                        <div class="mb-8 text-center">
+                            <h2 class="font-bold text-2xl uppercase tracking-tighter">Access Control</h2>
+                            <p class="font-mono text-[10px] text-gray-500 mt-1">PLEASE IDENTIFY YOURSELF</p>
+                        </div>
+                        
+                        <form onsubmit="handleLogin(event)" class="space-y-4">
+                            <div>
+                                <label class="block font-mono text-[10px] uppercase mb-1">User_ID (Email)</label>
+                                <input type="email" value="demo@fiuer.com" class="input-te w-full p-3 text-sm" required>
+                            </div>
+                            <div>
+                                <label class="block font-mono text-[10px] uppercase mb-1">Passcode</label>
+                                <input type="password" value="password" class="input-te w-full p-3 text-sm" required>
+                            </div>
+                            <button type="submit" class="btn-te w-full py-3 mt-4">
+                                AUTHENTICATE >
+                            </button>
+                        </form>
+                        
+                        <div class="mt-6 border-t border-dashed border-gray-400 pt-4 text-center">
+                             <button onclick="navigate('home')" class="font-mono text-[10px] hover:text-te-orange hover:underline">< BACK TO ROOT</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const user = { 
+                id: 'USR-' + Math.floor(Math.random()*1000), 
+                name: 'OPERATOR_1', 
+                email: 'demo@fiuer.com', 
+                plan: 'PRO_AUDIO' 
+            };
+            DB.setUser(user);
+            State.user = user;
+            navigate('dashboard');
+        }
+
+        // 3. DASHBOARD LAYOUT (TE STYLE)
+        function renderLayout(container, contentCallback) {
+            container.innerHTML = `
+                <!-- Sidebar Control Strip -->
+                <aside class="hidden md:flex flex-col w-20 bg-[#f2f2f2] border-r border-black h-full shrink-0 items-center py-4 z-20">
+                    <div class="mb-8 font-black text-xl tracking-tighter rotate-90 origin-center whitespace-nowrap mt-4">FIUER</div>
+                    
+                    <nav class="flex-1 flex flex-col space-y-6 w-full items-center">
+                        <button onclick="navigate('dashboard')" class="w-12 h-12 border border-black bg-white flex items-center justify-center hover:bg-te-orange hover:text-white transition-colors shadow-hard-sm ${State.view === 'dashboard' ? 'bg-black text-white' : ''}">
+                            <i class="fa-solid fa-chart-simple"></i>
+                        </button>
+                        <button onclick="navigate('create')" class="w-12 h-12 border border-black bg-white flex items-center justify-center hover:bg-te-orange hover:text-white transition-colors shadow-hard-sm ${State.view === 'create' ? 'bg-black text-white' : ''}">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                         <button onclick="navigate('certificates')" class="w-12 h-12 border border-black bg-white flex items-center justify-center hover:bg-te-orange hover:text-white transition-colors shadow-hard-sm ${State.view === 'certificates' ? 'bg-black text-white' : ''}">
+                            <i class="fa-solid fa-list-ul"></i>
+                        </button>
+                    </nav>
+
+                    <div class="mt-auto flex flex-col gap-4">
+                        <div class="w-12 h-1 bg-gray-300 mx-auto"></div>
+                        <div class="w-12 h-1 bg-gray-300 mx-auto"></div>
+                        <button onclick="logout()" class="w-10 h-10 rounded-full border border-black flex items-center justify-center text-red-600 hover:bg-red-600 hover:text-white transition-colors text-xs">
+                            PWR
+                        </button>
+                    </div>
+                </aside>
+
+                <!-- Main Content Area -->
+                <main class="flex-1 h-full overflow-y-auto relative scroll-smooth">
+                     <!-- Mobile Nav -->
+                    <div class="md:hidden bg-black text-white p-4 flex justify-between items-center sticky top-0 z-30 border-b border-white">
+                        <span class="font-bold">FIUER.SYS</span>
+                        <div class="flex gap-4">
+                            <button onclick="navigate('dashboard')"><i class="fa-solid fa-chart-simple"></i></button>
+                            <button onclick="navigate('create')"><i class="fa-solid fa-plus"></i></button>
+                            <button onclick="logout()"><i class="fa-solid fa-power-off"></i></button>
+                        </div>
+                    </div>
+
+                    <div id="page-content" class="p-6 md:p-12 max-w-7xl mx-auto min-h-full">
+                        <!-- Dynamic Page Content -->
+                    </div>
+                </main>
+            `;
+            
+            contentCallback();
+        }
+
+        // 4. DASHBOARD PAGE (TE STYLE)
+        function renderDashboard() {
+            const certs = State.certificates;
+            const total = certs.length;
+            const content = document.getElementById('page-content');
+            
+            content.innerHTML = `
+                <div class="mb-12 border-b border-black pb-4 flex justify-between items-end">
+                    <div>
+                        <h1 class="text-4xl font-black uppercase tracking-tighter">Overview</h1>
+                        <p class="font-mono text-xs mt-1 text-gray-500">SYSTEM_STATUS: NORMAL</p>
+                    </div>
+                    <div class="font-mono text-xs bg-black text-white px-2 py-1">USR: ${State.user.name}</div>
+                </div>
+
+                <!-- Stats Modules -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+                    <!-- Module 1 -->
+                    <div class="bg-white border border-black p-4 relative shadow-hard">
+                        <div class="absolute top-2 right-2 w-2 h-2 rounded-full bg-green-500 border border-black"></div>
+                        <p class="font-mono text-[10px] uppercase mb-2">Total_Output</p>
+                        <div class="font-mono text-5xl font-bold tracking-tighter">${total.toString().padStart(3, '0')}</div>
+                        <div class="w-full bg-gray-200 h-2 mt-4 border border-black">
+                            <div class="bg-black h-full" style="width: ${(total/100)*100}%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Module 2 -->
+                    <div class="bg-white border border-black p-4 relative shadow-hard">
+                         <div class="absolute top-2 right-2 w-2 h-2 rounded-full bg-te-orange border border-black"></div>
+                        <p class="font-mono text-[10px] uppercase mb-2">Quota_Remaining</p>
+                        <div class="font-mono text-5xl font-bold tracking-tighter">${(100 - total).toString().padStart(3, '0')}</div>
+                         <div class="flex gap-1 mt-4">
+                            <div class="h-2 w-2 bg-black"></div>
+                            <div class="h-2 w-2 bg-black"></div>
+                            <div class="h-2 w-2 bg-black"></div>
+                            <div class="h-2 w-2 bg-gray-300"></div>
+                        </div>
+                    </div>
+
+                    <!-- Module 3 -->
+                    <div class="bg-te-orange border border-black p-4 relative shadow-hard text-white">
+                        <p class="font-mono text-[10px] uppercase mb-2 text-black">Current_Plan</p>
+                        <div class="font-mono text-4xl font-bold tracking-tighter uppercase">PRO_AUDIO</div>
+                        <p class="font-mono text-[10px] mt-4 text-black border-t border-black pt-2">EXP: 2027-12-31</p>
+                    </div>
+                </div>
+
+                <!-- Data Log -->
+                <div class="bg-white border border-black">
+                    <div class="bg-black text-white px-4 py-2 font-mono text-xs flex justify-between">
+                        <span>LATEST_OPERATIONS_LOG</span>
+                        <span>[READ_ONLY]</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left font-mono text-xs uppercase">
+                            <thead class="bg-gray-100 border-b border-black">
+                                <tr>
+                                    <th class="px-4 py-3 border-r border-black">ID_TAG</th>
+                                    <th class="px-4 py-3 border-r border-black">RECIPIENT</th>
+                                    <th class="px-4 py-3 border-r border-black">MODULE</th>
+                                    <th class="px-4 py-3">TIMESTAMP</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-300">
+                                ${total === 0 ? `
+                                    <tr>
+                                        <td colspan="4" class="px-4 py-8 text-center text-gray-400">
+                                            // NO_DATA_FOUND <br>
+                                            <button onclick="navigate('create')" class="text-te-orange hover:underline mt-2">INITIATE_SEQUENCE ></button>
+                                        </td>
+                                    </tr>
+                                ` : certs.slice(0, 5).reverse().map(cert => `
+                                    <tr class="hover:bg-te-orange hover:text-white transition-colors cursor-default">
+                                        <td class="px-4 py-3 border-r border-gray-300 border-dashed">${cert.id}</td>
+                                        <td class="px-4 py-3 border-r border-gray-300 border-dashed font-bold">${cert.recipientName}</td>
+                                        <td class="px-4 py-3 border-r border-gray-300 border-dashed">${cert.courseName}</td>
+                                        <td class="px-4 py-3">${cert.issueDate}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 5. CERTIFICATE WIZARD (TE STYLE)
+        function renderCreateWizard() {
+            const content = document.getElementById('page-content');
+            content.innerHTML = `
+                <div class="flex flex-col xl:flex-row gap-12 h-full">
+                    <!-- Config Panel -->
+                    <div class="w-full xl:w-1/3 space-y-8">
+                        <div>
+                            <h1 class="text-4xl font-black uppercase tracking-tighter mb-2">Construct</h1>
+                            <div class="h-1 w-20 bg-te-orange"></div>
+                        </div>
+
+                        <!-- Panel -->
+                        <div class="bg-[#f2f2f2] p-6 border border-black shadow-hard relative">
+                            <div class="absolute -left-1 -top-1 w-2 h-2 bg-black"></div>
+                            <div class="absolute -right-1 -bottom-1 w-2 h-2 bg-black"></div>
+                            
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="block font-mono text-[10px] uppercase mb-1">Target_Name</label>
+                                    <input type="text" id="inp-name" value="Amit Kumar" oninput="updatePreview()" class="input-te w-full p-3 text-sm">
+                                </div>
+                                <div>
+                                    <label class="block font-mono text-[10px] uppercase mb-1">Project_Title</label>
+                                    <input type="text" id="inp-course" value="System Engineering" oninput="updatePreview()" class="input-te w-full p-3 text-sm">
+                                </div>
+                                <div>
+                                    <label class="block font-mono text-[10px] uppercase mb-1">Date_Stamp</label>
+                                    <input type="date" id="inp-date" oninput="updatePreview()" class="input-te w-full p-3 text-sm">
+                                </div>
+                                
+                                <div>
+                                    <label class="block font-mono text-[10px] uppercase mb-2">Style_Mode</label>
+                                    <div class="flex gap-4">
+                                        <button onclick="setTemplate(0)" class="w-12 h-12 border border-black bg-[#f0f0f0] hover:bg-black hover:text-white font-mono text-xs flex items-center justify-center focus:ring-2 focus:ring-te-orange ring-offset-2">A</button>
+                                        <button onclick="setTemplate(1)" class="w-12 h-12 border border-black bg-[#111] text-white hover:opacity-80 font-mono text-xs flex items-center justify-center focus:ring-2 focus:ring-te-orange ring-offset-2">B</button>
+                                        <button onclick="setTemplate(2)" class="w-12 h-12 border border-black bg-white font-bold font-mono text-xs flex items-center justify-center focus:ring-2 focus:ring-te-orange ring-offset-2" style="color:red">C</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button onclick="generateCertificate()" class="btn-te w-full py-4 text-sm flex items-center justify-center gap-2 bg-black text-white hover:bg-te-orange border-none">
+                            <i class="fa-solid fa-print"></i>
+                            <span>EXECUTE_PRINT_JOB</span>
+                        </button>
+                    </div>
+
+                    <!-- Live Preview (Canvas) -->
+                    <div class="w-full xl:w-2/3 flex flex-col">
+                        <div class="flex justify-between items-end mb-2 font-mono text-[10px] uppercase">
+                            <span>Viewport [100%]</span>
+                            <span>RES: 800x600</span>
+                        </div>
+                        
+                        <div class="bg-[#333] p-8 border-2 border-black shadow-hard flex items-center justify-center relative">
+                            <!-- Bezel screws -->
+                            <div class="absolute top-3 left-3 w-2 h-2 bg-[#111] rounded-full border border-gray-600"></div>
+                            <div class="absolute top-3 right-3 w-2 h-2 bg-[#111] rounded-full border border-gray-600"></div>
+                            <div class="absolute bottom-3 left-3 w-2 h-2 bg-[#111] rounded-full border border-gray-600"></div>
+                            <div class="absolute bottom-3 right-3 w-2 h-2 bg-[#111] rounded-full border border-gray-600"></div>
+                            
+                            <div id="canvas-wrapper" class="bg-white shadow-2xl relative max-w-full">
+                                <canvas id="certCanvas" width="800" height="600" class="w-full h-auto block"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('inp-date').valueAsDate = new Date();
+            setTimeout(() => { updatePreview(); }, 100);
+        }
+
+        // --- CERTIFICATE LOGIC (UNCHANGED) ---
+        let currentCertData = {};
+
+        function setTemplate(index) {
+            State.currentTemplate = index;
+            updatePreview();
+        }
+
+        function updatePreview() {
+            const canvas = document.getElementById('certCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const name = document.getElementById('inp-name').value;
+            const course = document.getElementById('inp-course').value;
+            const date = document.getElementById('inp-date').value;
+            const tpl = State.templates[State.currentTemplate];
+
+            currentCertData = { name, course, date, tpl };
+
+            // Clear
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Background
+            ctx.fillStyle = tpl.bg;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Border & Decorations
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = tpl.border;
+            ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+
+            // Grid overlay for Template A
+            if (tpl.id === 1) {
+                ctx.strokeStyle = "rgba(0,0,0,0.05)";
+                ctx.lineWidth = 1;
+                for(let i=0; i<canvas.width; i+=40) {
+                    ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
+                }
+                for(let i=0; i<canvas.height; i+=40) {
+                    ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(canvas.width, i); ctx.stroke();
+                }
+            }
+
+            // Config Fonts
+            const isDark = tpl.bg === "#111111";
+            const textColor = isDark ? "#FFFFFF" : "#000000";
+            const accentColor = tpl.accent;
+
+            // Header
+            ctx.fillStyle = accentColor;
+            ctx.font = "bold 20px monospace";
+            ctx.textAlign = "left";
+            ctx.fillText("/// OFFICIAL_RECORD", 40, 60);
+
+            // Title
+            ctx.fillStyle = textColor;
+            ctx.textAlign = "center";
+            ctx.font = isDark ? "bold 60px sans-serif" : "bold 60px 'Space Mono', monospace";
+            ctx.fillText("CERTIFICATE", canvas.width / 2, 160);
+
+            ctx.font = "20px monospace";
+            ctx.fillText("OF COMPLETION", canvas.width / 2, 190);
+
+            // Name
+            ctx.fillStyle = textColor;
+            ctx.font = "bold 50px " + tpl.font;
+            ctx.fillText(name, canvas.width / 2, 300);
+            
+            // Line
+            ctx.beginPath();
+            ctx.moveTo(canvas.width/2 - 150, 320);
+            ctx.lineTo(canvas.width/2 + 150, 320);
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = accentColor;
+            ctx.stroke();
+
+            // Course
+            ctx.fillStyle = isDark ? "#888" : "#555";
+            ctx.font = "16px monospace";
+            ctx.fillText("HAS DEMONSTRATED PROFICIENCY IN", canvas.width / 2, 360);
+
+            ctx.fillStyle = textColor;
+            ctx.font = "bold 30px " + tpl.font;
+            ctx.fillText(course, canvas.width / 2, 400);
+
+            // Footer Info
+            ctx.textAlign = "left";
+            ctx.fillStyle = textColor;
+            ctx.font = "14px monospace";
+            ctx.fillText("DATE: " + date, 40, 550);
+            ctx.fillText("SIG: ________________", 400, 550);
+
+            // QR Box
+            ctx.fillStyle = "white";
+            ctx.fillRect(canvas.width - 100, canvas.height - 100, 60, 60);
+            ctx.strokeStyle = "black";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(canvas.width - 100, canvas.height - 100, 60, 60);
+        }
+
+        async function generateCertificate() {
+            const id = "FIU-" + Math.floor(100000 + Math.random() * 900000);
+            const newCert = {
+                id: id,
+                recipientName: currentCertData.name,
+                courseName: currentCertData.course,
+                issueDate: currentCertData.date,
+                templateId: State.currentTemplate,
+                createdAt: new Date().toISOString()
+            };
+            
+            const certs = DB.get('certificates');
+            certs.push(newCert);
+            DB.set('certificates', certs);
+            State.certificates = certs;
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'landscape', unit: 'px', format: [800, 600] });
+            const canvas = document.getElementById('certCanvas');
+            const imgData = canvas.toDataURL('image/jpeg', 1.0);
+            
+            doc.addImage(imgData, 'JPEG', 0, 0, 800, 600);
+            doc.setFont("courier");
+            doc.setFontSize(10);
+            doc.text(`ID_REF: ${id}`, 20, 580);
+            doc.save(`CERT_${id}.pdf`);
+
+            alert(`PROCESS COMPLETE.\nFILE: CERT_${id}.pdf`);
+            navigate('dashboard');
+        }
+
+        // 6. CERTIFICATE HISTORY (TE STYLE)
+        function renderCertificateList() {
+             const content = document.getElementById('page-content');
+             const certs = State.certificates;
+             
+             content.innerHTML = `
+                <div class="mb-8">
+                    <h1 class="text-4xl font-black uppercase tracking-tighter mb-2">History</h1>
+                    <div class="h-1 w-full bg-black"></div>
+                </div>
+                
+                <div class="bg-white border border-black p-1 shadow-hard">
+                    <table class="w-full text-left font-mono text-xs uppercase">
+                        <thead class="bg-black text-white">
+                            <tr>
+                                <th class="px-4 py-3">ID_REF</th>
+                                <th class="px-4 py-3">TARGET</th>
+                                <th class="px-4 py-3">PROJECT</th>
+                                <th class="px-4 py-3">DATE</th>
+                                <th class="px-4 py-3">OP</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                             ${certs.length === 0 ? `<tr><td colspan="5" class="p-8 text-center text-gray-400">// EMPTY_BUFFER</td></tr>` : 
+                             certs.map(c => `
+                                <tr class="hover:bg-gray-100">
+                                    <td class="px-4 py-3 font-bold text-te-orange select-all">${c.id}</td>
+                                    <td class="px-4 py-3 font-bold">${c.recipientName}</td>
+                                    <td class="px-4 py-3">${c.courseName}</td>
+                                    <td class="px-4 py-3">${c.issueDate}</td>
+                                    <td class="px-4 py-3">
+                                        <button onclick="navigate('verify')" class="hover:bg-black hover:text-white px-2 border border-black">VIEW</button>
+                                    </td>
+                                </tr>
+                             `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+             `;
+        }
+
+        // 7. PUBLIC VERIFICATION (TE STYLE)
+        function renderVerify(container) {
+            container.innerHTML = `
+                <div class="w-full h-full flex flex-col">
+                    <!-- Nav -->
+                    <nav class="h-16 border-b border-black bg-white flex justify-between items-center px-6">
+                        <div onclick="navigate('home')" class="cursor-pointer font-black text-xl tracking-tighter hover:text-te-orange">
+                             FIUER.SYS // VERIFY
+                        </div>
+                        <button onclick="navigate('home')" class="font-mono text-xs hover:underline">[ ESCAPE ]</button>
+                    </nav>
+
+                    <div class="flex-1 flex flex-col items-center justify-center p-6 bg-grid">
+                        <div class="w-full max-w-lg">
+                            <h1 class="text-4xl font-black text-center uppercase tracking-tighter mb-8">Credential<br>Check</h1>
+                            
+                            <div class="bg-white p-6 border-2 border-black shadow-hard mb-8">
+                                <label class="font-mono text-xs uppercase block mb-2">Input_Sequence (Certificate ID)</label>
+                                <div class="flex gap-2">
+                                    <input type="text" id="verify-input" placeholder="FIU-XXXXXX" class="input-te flex-1 p-4 text-lg uppercase font-bold">
+                                    <button onclick="checkCertificate()" class="btn-te px-6 bg-black text-white hover:bg-te-orange border-none">SCAN</button>
+                                </div>
+                            </div>
+
+                            <!-- Result Container -->
+                            <div id="verify-result" class="hidden">
+                                <!-- Injected via JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function checkCertificate() {
+            const input = document.getElementById('verify-input').value.trim();
+            const resultDiv = document.getElementById('verify-result');
+            const certs = DB.get('certificates');
+            const found = certs.find(c => c.id === input);
+            
+            resultDiv.classList.remove('hidden');
+            
+            if (found) {
+                resultDiv.innerHTML = `
+                    <div class="bg-[#f0fdf4] border-2 border-green-600 p-6 shadow-hard relative overflow-hidden">
+                        <div class="absolute -right-4 -top-4 w-16 h-16 bg-green-600 rotate-45"></div>
+                        
+                        <div class="flex items-center gap-4 mb-4 border-b border-green-600 pb-4">
+                            <div class="w-8 h-8 bg-green-600 text-white flex items-center justify-center font-bold">✓</div>
+                            <div>
+                                <h3 class="font-bold text-green-900 uppercase">Valid_Signature</h3>
+                                <p class="font-mono text-[10px] text-green-700">AUTH_KEY_MATCHED</p>
+                            </div>
+                        </div>
+                        <div class="font-mono text-xs space-y-2 uppercase">
+                            <div class="flex justify-between"><span>Subject:</span> <span class="font-bold">${found.recipientName}</span></div>
+                            <div class="flex justify-between"><span>Module:</span> <span class="font-bold">${found.courseName}</span></div>
+                            <div class="flex justify-between"><span>Date:</span> <span>${found.issueDate}</span></div>
+                            <div class="mt-4 pt-2 border-t border-green-600/30 text-center text-[10px] opacity-50">
+                                FIUER.VERIFICATION.SYSTEM
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                resultDiv.innerHTML = `
+                    <div class="bg-[#fef2f2] border-2 border-red-600 p-6 shadow-hard text-center">
+                        <div class="w-12 h-12 bg-red-600 text-white flex items-center justify-center mx-auto mb-4 font-bold text-2xl">!</div>
+                        <h3 class="font-bold text-red-900 uppercase mb-1">Error_404</h3>
+                        <p class="font-mono text-xs text-red-700">ID_SEQUENCE_NOT_FOUND</p>
+                    </div>
+                `;
+            }
+        }
+
+        init();
+
+    </script>
+</body>
+</html>
