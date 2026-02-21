@@ -448,6 +448,15 @@
                             
                             <div class="space-y-4">
                                 <div>
+                                    <label class="block font-mono text-[10px] uppercase mb-1">Base_Design</label>
+                                    <select id="design-select" onchange="changeDesign(this.value)" class="input-te w-full p-3 text-sm font-mono uppercase cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:12px_12px] bg-[right_1rem_center] bg-no-repeat">
+                                        <option value="Certificate base.png" ${EditorState.baseImage === 'Certificate base.png' ? 'selected' : ''}>Design 1</option>
+                                        <option value="base2.png" ${EditorState.baseImage === 'base2.png' ? 'selected' : ''}>Design 2</option>
+                                        <option value="base3.png" ${EditorState.baseImage === 'base3.png' ? 'selected' : ''}>Design 3</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
                                     <label class="block font-mono text-[10px] uppercase mb-1">Upload_Logo (PNG)</label>
                                     <input type="file" accept="image/png, image/jpeg" onchange="handleImageUpload(event, 'logo')" class="w-full text-xs font-mono file:mr-4 file:py-2 file:px-4 file:border file:border-black file:bg-white file:font-mono hover:file:bg-te-orange hover:file:text-white cursor-pointer">
                                 </div>
@@ -499,7 +508,7 @@
                             <div id="workspace-container" class="bg-[#f0f0f0] aspect-[4/3] border-2 border-black shadow-2xl relative overflow-hidden w-full max-w-4xl cursor-crosshair">
                                 
                                 <!-- Background Layer -->
-                                <div id="workspace-bg" class="absolute inset-0 bg-contain bg-center bg-no-repeat" style="background-image: url('Certificate base.png'); background-color: #ffffff;">
+                                <div id="workspace-bg" class="absolute inset-0 bg-contain bg-center bg-no-repeat" style="background-image: url('${EditorState.baseImage}'); background-color: #ffffff;">
                                 </div>
                                 
                                 <!-- Draggable Layers -->
@@ -533,6 +542,14 @@
         }
 
         // --- DRAG & DROP EDITOR LOGIC ---
+        function changeDesign(url) {
+            EditorState.baseImage = url;
+            const bgEl = document.getElementById('workspace-bg');
+            if (bgEl) {
+                bgEl.style.backgroundImage = `url('${url}')`;
+            }
+        }
+
         function updateEditorText() {
             document.getElementById('display-name').innerText = document.getElementById('inp-name').value || 'PARTICIPANT NAME';
             document.getElementById('display-desc').innerText = document.getElementById('inp-desc').value || 'Description text...';
