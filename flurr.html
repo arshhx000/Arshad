@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Pinyon+Script&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
@@ -34,6 +34,9 @@
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
                         mono: ['Space Mono', 'monospace'],
+                        pinyon: ['"Pinyon Script"', 'cursive'],
+                        playfair: ['"Playfair Display"', 'serif'],
+                        signature: ['"Great Vibes"', 'cursive']
                     },
                     boxShadow: {
                         'hard': '4px 4px 0px 0px rgba(0,0,0,1)',
@@ -158,6 +161,18 @@
                 { id: 2, name: "Dark Mode", bg: "#111111", border: "#ffffff", font: "sans-serif", accent: "#00ff00" },
                 { id: 3, name: "Swiss", bg: "#ffffff", border: "#ff0000", font: "sans-serif", accent: "#000000" }
             ]
+        };
+
+        const EditorState = {
+            baseImage: 'Certificate base.png',
+            logoImage: null,
+            elements: {
+                name: { x: 50, y: 45 },
+                desc: { x: 50, y: 55 },
+                sig1: { x: 25, y: 80 },
+                sig2: { x: 75, y: 80 },
+                logo: { x: 50, y: 15 }
+            }
         };
 
         function init() { render(); }
@@ -422,7 +437,7 @@
                     <!-- Config Panel -->
                     <div class="w-full xl:w-1/3 space-y-8">
                         <div>
-                            <h1 class="text-4xl font-black uppercase tracking-tighter mb-2">Construct</h1>
+                            <h1 class="text-4xl font-black uppercase tracking-tighter mb-2">Editor</h1>
                             <div class="h-1 w-20 bg-te-orange"></div>
                         </div>
 
@@ -431,26 +446,30 @@
                             <div class="absolute -left-1 -top-1 w-2 h-2 bg-black"></div>
                             <div class="absolute -right-1 -bottom-1 w-2 h-2 bg-black"></div>
                             
-                            <div class="space-y-6">
+                            <div class="space-y-4">
                                 <div>
-                                    <label class="block font-mono text-[10px] uppercase mb-1">Target_Name</label>
-                                    <input type="text" id="inp-name" value="Amit Kumar" oninput="updatePreview()" class="input-te w-full p-3 text-sm">
-                                </div>
-                                <div>
-                                    <label class="block font-mono text-[10px] uppercase mb-1">Project_Title</label>
-                                    <input type="text" id="inp-course" value="System Engineering" oninput="updatePreview()" class="input-te w-full p-3 text-sm">
-                                </div>
-                                <div>
-                                    <label class="block font-mono text-[10px] uppercase mb-1">Date_Stamp</label>
-                                    <input type="date" id="inp-date" oninput="updatePreview()" class="input-te w-full p-3 text-sm">
+                                    <label class="block font-mono text-[10px] uppercase mb-1">Upload_Logo (PNG)</label>
+                                    <input type="file" accept="image/png, image/jpeg" onchange="handleImageUpload(event, 'logo')" class="w-full text-xs font-mono file:mr-4 file:py-2 file:px-4 file:border file:border-black file:bg-white file:font-mono hover:file:bg-te-orange hover:file:text-white cursor-pointer">
                                 </div>
                                 
+                                <div class="h-[1px] w-full bg-black my-4 opacity-20"></div>
+
                                 <div>
-                                    <label class="block font-mono text-[10px] uppercase mb-2">Style_Mode</label>
-                                    <div class="flex gap-4">
-                                        <button onclick="setTemplate(0)" class="w-12 h-12 border border-black bg-[#f0f0f0] hover:bg-black hover:text-white font-mono text-xs flex items-center justify-center focus:ring-2 focus:ring-te-orange ring-offset-2">A</button>
-                                        <button onclick="setTemplate(1)" class="w-12 h-12 border border-black bg-[#111] text-white hover:opacity-80 font-mono text-xs flex items-center justify-center focus:ring-2 focus:ring-te-orange ring-offset-2">B</button>
-                                        <button onclick="setTemplate(2)" class="w-12 h-12 border border-black bg-white font-bold font-mono text-xs flex items-center justify-center focus:ring-2 focus:ring-te-orange ring-offset-2" style="color:red">C</button>
+                                    <label class="block font-mono text-[10px] uppercase mb-1">Participant_Name</label>
+                                    <input type="text" id="inp-name" value="Amit Kumar" oninput="updateEditorText()" class="input-te w-full p-3 text-sm">
+                                </div>
+                                <div>
+                                    <label class="block font-mono text-[10px] uppercase mb-1">Description / Course</label>
+                                    <textarea id="inp-desc" rows="2" oninput="updateEditorText()" class="input-te w-full p-3 text-sm resize-none">For successful completion of Advanced System Engineering.</textarea>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block font-mono text-[10px] uppercase mb-1">Signature_1</label>
+                                        <input type="text" id="inp-sig1" value="Director" oninput="updateEditorText()" class="input-te w-full p-3 text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="block font-mono text-[10px] uppercase mb-1">Signature_2</label>
+                                        <input type="text" id="inp-sig2" value="Instructor" oninput="updateEditorText()" class="input-te w-full p-3 text-sm">
                                     </div>
                                 </div>
                             </div>
@@ -462,140 +481,133 @@
                         </button>
                     </div>
 
-                    <!-- Live Preview (Canvas) -->
+                    <!-- WYSIWYG Live Preview -->
                     <div class="w-full xl:w-2/3 flex flex-col">
                         <div class="flex justify-between items-end mb-2 font-mono text-[10px] uppercase">
-                            <span>Viewport [100%]</span>
-                            <span>RES: 800x600</span>
+                            <span>Interactive_Viewport [Drag text to reposition]</span>
+                            <span>ASPECT: 4:3</span>
                         </div>
                         
-                        <div class="bg-[#333] p-8 border-2 border-black shadow-hard flex items-center justify-center relative">
+                        <div class="bg-[#333] p-4 md:p-8 border-2 border-black shadow-hard flex items-center justify-center relative w-full">
                             <!-- Bezel screws -->
                             <div class="absolute top-3 left-3 w-2 h-2 bg-[#111] rounded-full border border-gray-600"></div>
                             <div class="absolute top-3 right-3 w-2 h-2 bg-[#111] rounded-full border border-gray-600"></div>
                             <div class="absolute bottom-3 left-3 w-2 h-2 bg-[#111] rounded-full border border-gray-600"></div>
                             <div class="absolute bottom-3 right-3 w-2 h-2 bg-[#111] rounded-full border border-gray-600"></div>
                             
-                            <div id="canvas-wrapper" class="bg-white shadow-2xl relative max-w-full">
-                                <canvas id="certCanvas" width="800" height="600" class="w-full h-auto block"></canvas>
+                            <!-- Editor Workspace -->
+                            <div id="workspace-container" class="bg-[#f0f0f0] aspect-[4/3] border-2 border-black shadow-2xl relative overflow-hidden w-full max-w-4xl cursor-crosshair">
+                                
+                                <!-- Background Layer -->
+                                <div id="workspace-bg" class="absolute inset-0 bg-contain bg-center bg-no-repeat" style="background-image: url('Certificate base.png'); background-color: #ffffff;">
+                                </div>
+                                
+                                <!-- Draggable Layers -->
+                                <div id="drag-logo" class="draggable absolute p-2 border border-transparent hover:border-te-orange hover:border-dashed cursor-move select-none ${EditorState.logoImage ? '' : 'hidden'}" style="left: ${EditorState.elements.logo.x}%; top: ${EditorState.elements.logo.y}%; transform: translate(-50%, -50%);" onmousedown="initDrag(event, 'logo')">
+                                    <img id="display-logo" src="${EditorState.logoImage || ''}" class="h-16 w-auto pointer-events-none">
+                                </div>
+
+                                <div id="drag-name" class="draggable absolute p-2 border border-transparent hover:border-te-orange hover:border-dashed cursor-move whitespace-nowrap select-none" style="left: ${EditorState.elements.name.x}%; top: ${EditorState.elements.name.y}%; transform: translate(-50%, -50%);" onmousedown="initDrag(event, 'name')">
+                                    <span id="display-name" class="text-5xl md:text-7xl font-pinyon text-black pointer-events-none drop-shadow-sm leading-none">Amit Kumar</span>
+                                </div>
+
+                                <div id="drag-desc" class="draggable absolute p-2 border border-transparent hover:border-te-orange hover:border-dashed cursor-move whitespace-nowrap text-center select-none" style="left: ${EditorState.elements.desc.x}%; top: ${EditorState.elements.desc.y}%; transform: translate(-50%, -50%);" onmousedown="initDrag(event, 'desc')">
+                                    <span id="display-desc" class="text-lg md:text-2xl font-playfair italic font-medium text-gray-800 pointer-events-none drop-shadow-sm">For successful completion of Advanced System Engineering.</span>
+                                </div>
+
+                                <div id="drag-sig1" class="draggable absolute p-2 border border-transparent hover:border-te-orange hover:border-dashed cursor-move whitespace-nowrap select-none" style="left: ${EditorState.elements.sig1.x}%; top: ${EditorState.elements.sig1.y}%; transform: translate(-50%, -50%);" onmousedown="initDrag(event, 'sig1')">
+                                    <span id="display-sig1" class="text-3xl md:text-4xl font-signature text-black border-t-2 border-black pt-2 pointer-events-none block text-center min-w-[120px] md:min-w-[150px]">Director</span>
+                                </div>
+
+                                <div id="drag-sig2" class="draggable absolute p-2 border border-transparent hover:border-te-orange hover:border-dashed cursor-move whitespace-nowrap select-none" style="left: ${EditorState.elements.sig2.x}%; top: ${EditorState.elements.sig2.y}%; transform: translate(-50%, -50%);" onmousedown="initDrag(event, 'sig2')">
+                                    <span id="display-sig2" class="text-3xl md:text-4xl font-signature text-black border-t-2 border-black pt-2 pointer-events-none block text-center min-w-[120px] md:min-w-[150px]">Instructor</span>
+                                </div>
+
                             </div>
                         </div>
                     </div>
                 </div>
             `;
             
-            document.getElementById('inp-date').valueAsDate = new Date();
-            setTimeout(() => { updatePreview(); }, 100);
+            setTimeout(() => { updateEditorText(); }, 100);
         }
 
-        // --- CERTIFICATE LOGIC (UNCHANGED) ---
-        let currentCertData = {};
-
-        function setTemplate(index) {
-            State.currentTemplate = index;
-            updatePreview();
+        // --- DRAG & DROP EDITOR LOGIC ---
+        function updateEditorText() {
+            document.getElementById('display-name').innerText = document.getElementById('inp-name').value || 'PARTICIPANT NAME';
+            document.getElementById('display-desc').innerText = document.getElementById('inp-desc').value || 'Description text...';
+            document.getElementById('display-sig1').innerText = document.getElementById('inp-sig1').value || 'Signature 1';
+            document.getElementById('display-sig2').innerText = document.getElementById('inp-sig2').value || 'Signature 2';
         }
 
-        function updatePreview() {
-            const canvas = document.getElementById('certCanvas');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            const name = document.getElementById('inp-name').value;
-            const course = document.getElementById('inp-course').value;
-            const date = document.getElementById('inp-date').value;
-            const tpl = State.templates[State.currentTemplate];
-
-            currentCertData = { name, course, date, tpl };
-
-            // Clear
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Background
-            ctx.fillStyle = tpl.bg;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Border & Decorations
-            ctx.lineWidth = 4;
-            ctx.strokeStyle = tpl.border;
-            ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
-
-            // Grid overlay for Template A
-            if (tpl.id === 1) {
-                ctx.strokeStyle = "rgba(0,0,0,0.05)";
-                ctx.lineWidth = 1;
-                for(let i=0; i<canvas.width; i+=40) {
-                    ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
+        function handleImageUpload(event, type) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                if (type === 'logo') {
+                    EditorState.logoImage = e.target.result;
+                    const logoEl = document.getElementById('display-logo');
+                    logoEl.src = e.target.result;
+                    document.getElementById('drag-logo').classList.remove('hidden');
                 }
-                for(let i=0; i<canvas.height; i+=40) {
-                    ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(canvas.width, i); ctx.stroke();
-                }
-            }
+            };
+            reader.readAsDataURL(file);
+        }
 
-            // Config Fonts
-            const isDark = tpl.bg === "#111111";
-            const textColor = isDark ? "#FFFFFF" : "#000000";
-            const accentColor = tpl.accent;
+        let activeDrag = null;
+        function initDrag(e, id) {
+            e.preventDefault();
+            activeDrag = {
+                id: id,
+                startX: e.clientX,
+                startY: e.clientY,
+                startLeft: EditorState.elements[id].x,
+                startTop: EditorState.elements[id].y
+            };
+            document.addEventListener('mousemove', onDrag);
+            document.addEventListener('mouseup', stopDrag);
+        }
 
-            // Header
-            ctx.fillStyle = accentColor;
-            ctx.font = "bold 20px monospace";
-            ctx.textAlign = "left";
-            ctx.fillText("/// OFFICIAL_RECORD", 40, 60);
-
-            // Title
-            ctx.fillStyle = textColor;
-            ctx.textAlign = "center";
-            ctx.font = isDark ? "bold 60px sans-serif" : "bold 60px 'Space Mono', monospace";
-            ctx.fillText("CERTIFICATE", canvas.width / 2, 160);
-
-            ctx.font = "20px monospace";
-            ctx.fillText("OF COMPLETION", canvas.width / 2, 190);
-
-            // Name
-            ctx.fillStyle = textColor;
-            ctx.font = "bold 50px " + tpl.font;
-            ctx.fillText(name, canvas.width / 2, 300);
+        function onDrag(e) {
+            if (!activeDrag) return;
+            const workspace = document.getElementById('workspace-container');
+            const rect = workspace.getBoundingClientRect();
             
-            // Line
-            ctx.beginPath();
-            ctx.moveTo(canvas.width/2 - 150, 320);
-            ctx.lineTo(canvas.width/2 + 150, 320);
-            ctx.lineWidth = 2;
-            ctx.strokeStyle = accentColor;
-            ctx.stroke();
+            const dx = ((e.clientX - activeDrag.startX) / rect.width) * 100;
+            const dy = ((e.clientY - activeDrag.startY) / rect.height) * 100;
+            
+            let newX = activeDrag.startLeft + dx;
+            let newY = activeDrag.startTop + dy;
+            
+            newX = Math.max(0, Math.min(100, newX));
+            newY = Math.max(0, Math.min(100, newY));
+            
+            EditorState.elements[activeDrag.id].x = newX;
+            EditorState.elements[activeDrag.id].y = newY;
+            
+            const el = document.getElementById('drag-' + activeDrag.id);
+            el.style.left = newX + '%';
+            el.style.top = newY + '%';
+        }
 
-            // Course
-            ctx.fillStyle = isDark ? "#888" : "#555";
-            ctx.font = "16px monospace";
-            ctx.fillText("HAS DEMONSTRATED PROFICIENCY IN", canvas.width / 2, 360);
-
-            ctx.fillStyle = textColor;
-            ctx.font = "bold 30px " + tpl.font;
-            ctx.fillText(course, canvas.width / 2, 400);
-
-            // Footer Info
-            ctx.textAlign = "left";
-            ctx.fillStyle = textColor;
-            ctx.font = "14px monospace";
-            ctx.fillText("DATE: " + date, 40, 550);
-            ctx.fillText("SIG: ________________", 400, 550);
-
-            // QR Box
-            ctx.fillStyle = "white";
-            ctx.fillRect(canvas.width - 100, canvas.height - 100, 60, 60);
-            ctx.strokeStyle = "black";
-            ctx.lineWidth = 2;
-            ctx.strokeRect(canvas.width - 100, canvas.height - 100, 60, 60);
+        function stopDrag() {
+            activeDrag = null;
+            document.removeEventListener('mousemove', onDrag);
+            document.removeEventListener('mouseup', stopDrag);
         }
 
         async function generateCertificate() {
+            const name = document.getElementById('inp-name').value;
+            const desc = document.getElementById('inp-desc').value;
             const id = "FIU-" + Math.floor(100000 + Math.random() * 900000);
+            
             const newCert = {
                 id: id,
-                recipientName: currentCertData.name,
-                courseName: currentCertData.course,
-                issueDate: currentCertData.date,
-                templateId: State.currentTemplate,
+                recipientName: name,
+                courseName: "Custom Certification",
+                issueDate: new Date().toISOString().split('T')[0],
+                templateId: 'CUSTOM',
                 createdAt: new Date().toISOString()
             };
             
@@ -604,15 +616,91 @@
             DB.set('certificates', certs);
             State.certificates = certs;
 
+            // Generate via offscreen canvas
+            const canvas = document.createElement('canvas');
+            canvas.width = 1600; // High resolution 4:3
+            canvas.height = 1200;
+            const ctx = canvas.getContext('2d');
+
+            // Draw Background
+            if (EditorState.baseImage) {
+                const img = new Image();
+                img.src = EditorState.baseImage;
+                await new Promise((resolve) => {
+                    img.onload = resolve;
+                    img.onerror = resolve; // Prevents hanging if image is missing in directory
+                });
+                try {
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                } catch(e) {
+                    // Fallback if image wasn't found
+                    ctx.fillStyle = "#ffffff";
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                }
+            } else {
+                ctx.fillStyle = "#ffffff";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.strokeStyle = "#000000";
+                ctx.lineWidth = 10;
+                ctx.strokeRect(20, 20, canvas.width-40, canvas.height-40);
+            }
+
+            // Draw Logo
+            if (EditorState.logoImage) {
+                const logo = new Image();
+                logo.src = EditorState.logoImage;
+                await new Promise(r => logo.onload = r);
+                const l = EditorState.elements.logo;
+                const h = 150; 
+                const w = (logo.width / logo.height) * h; 
+                ctx.drawImage(logo, (l.x/100)*canvas.width - w/2, (l.y/100)*canvas.height - h/2, w, h);
+            }
+
+            // Setup Text Context
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillStyle = "#000000";
+
+            // Draw Texts
+            const drawText = (idStr, text, font) => {
+                const pos = EditorState.elements[idStr];
+                ctx.font = font;
+                ctx.fillText(text, (pos.x/100)*canvas.width, (pos.y/100)*canvas.height);
+            };
+
+            const drawSig = (idStr, text, font) => {
+                const pos = EditorState.elements[idStr];
+                const x = (pos.x/100)*canvas.width;
+                const y = (pos.y/100)*canvas.height;
+                
+                // Signature line
+                ctx.beginPath();
+                ctx.moveTo(x - 120, y - 25);
+                ctx.lineTo(x + 120, y - 25);
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = "#000000";
+                ctx.stroke();
+
+                ctx.font = font;
+                ctx.fillText(text, x, y + 15);
+            };
+
+            drawText('name', name, "normal 110px 'Pinyon Script'");
+            drawText('desc', desc, "italic 40px 'Playfair Display'");
+            drawSig('sig1', document.getElementById('inp-sig1').value, "normal 55px 'Great Vibes'");
+            drawSig('sig2', document.getElementById('inp-sig2').value, "normal 55px 'Great Vibes'");
+
+            // Generate PDF using jsPDF
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({ orientation: 'landscape', unit: 'px', format: [800, 600] });
-            const canvas = document.getElementById('certCanvas');
-            const imgData = canvas.toDataURL('image/jpeg', 1.0);
+            const doc = new jsPDF({ orientation: 'landscape', unit: 'px', format: [1600, 1200] });
+            const imgData = canvas.toDataURL('image/jpeg', 0.95);
             
-            doc.addImage(imgData, 'JPEG', 0, 0, 800, 600);
+            doc.addImage(imgData, 'JPEG', 0, 0, 1600, 1200);
+            
             doc.setFont("courier");
-            doc.setFontSize(10);
-            doc.text(`ID_REF: ${id}`, 20, 580);
+            doc.setFontSize(24);
+            doc.text(`ID_REF: ${id}`, 50, 1150);
+            
             doc.save(`CERT_${id}.pdf`);
 
             alert(`PROCESS COMPLETE.\nFILE: CERT_${id}.pdf`);
