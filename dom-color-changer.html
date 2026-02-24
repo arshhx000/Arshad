@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOM Color Changer</title>
+    <style>
+    footer {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        background-color: white;
+        padding: 10px;
+        border: 1px solid black;
+    }
+
+    p {
+        font-size: 100%;
+        text-align: center;
+        font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande',
+            'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    }
+
+    button {
+       
+        position:
+ 
+        font-size: 100%;
+        padding: 15px 30px;
+        margin: 7px;
+        border-radius: 13px;
+        border: none;
+        cursor: pointer;
+    }
+    .button-container {
+     display: flex;
+     justify-content: center;   /* center horizontally */
+     gap: 12px;                 /* space between buttons */
+}
+</style>
+
+</head>
+<body>
+    <h1 id="title">This Is Red</h1>
+    <p class="para">Click on any color button to change the color of the heading</p>
+
+    <div class="button-container">
+    <button id="btn">Blue</button>
+    <button id="btn2">Pink</button>
+    <button id="btn3">Yellow</button>
+    <button id="btn4">Brown</button>
+    <button id="btn5">Orange</button>
+    <button id="btn6">Green</button>
+   </div>
+
+    
+
+    <footer>
+        <p>By Md Arshad Alam</p>
+    </footer>
+
+
+    <script>
+        //DOM --> document object Model
+//without dom --> static
+//with DOM --> interactive
+//every reload it convert the web page into tree like structure 
+//it is uesd to change content ,change  color ,remove 
+//javascript driectly not change html elements 
+//it changes the DOM Representation in the broswer
+let heading = document.getElementById("title")
+console.log(heading)
+
+
+// let para = document.getElementsByclassName("para")
+// console.log(para)
+
+//changing the text
+
+// heading.innerText ="welcome to javascript"
+//inner html
+
+
+heading.style.color="Red"
+heading.style.fontSize = "1000%";
+heading.style.textAlign="center";
+heading.style.fontFamily="Sans Sarif ";
+heading.style.marginTop="50px";
+//inline events 
+// function changetext(){
+//     heading.innerText="arshad alam"
+
+// }
+
+
+
+let button = document.getElementById("btn");
+let button2 = document.getElementById("btn2");
+let button3 = document.getElementById("btn3");
+let button4 = document.getElementById("btn4");
+let button5 = document.getElementById("btn5");
+let button6 = document.getElementById("btn6");
+
+button.addEventListener("click", function () {
+    heading.innerText = "This Is Blue";
+    heading.style.color = "blue";
+});
+
+button2.addEventListener("click", function () {
+    heading.innerText = "This Is Pink";
+    heading.style.color = "pink";
+});
+
+button3.addEventListener("click", function () {
+    heading.innerText = "This Is Yellow";
+    heading.style.color = "#FFFF00";
+});
+
+button4.addEventListener("click", function () {
+    heading.innerText = "This Is Brown";
+    heading.style.color = "brown";
+});
+
+button5.addEventListener("click", function () {
+    heading.innerText = "This Is Orange";
+    heading.style.color = "orange";
+});
+
+button6.addEventListener("click", function () {
+    heading.innerText = "This Is Green";
+    heading.style.color = "green";
+    
+});
+    </script>
+</body>
+</html>
