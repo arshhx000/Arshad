@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>LINKS</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --white: #f5f4f0;
+    --off: #ece9e3;
+    --border: #c8c4bc;
+    --mid: #9c9890;
+    --dark: #2a2825;
+    --black: #1a1917;
+    --orange: #ff4d00;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--white);
+    color: var(--black);
+    font-family: var(--sans);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    border-bottom: 1.5px solid var(--black);
+    padding: 0 28px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .brand {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--black);
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--mid);
+  }
+  .header-right span:last-child {
+    color: var(--orange);
+    font-weight: 600;
+  }
+
+  /* ── SUB HEADER ── */
+  .subheader {
+    border-bottom: 1px solid var(--border);
+    padding: 9px 28px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .subheader-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--mid);
+  }
+  .count {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--orange);
+    letter-spacing: .1em;
+  }
+  .line { flex: 1; height: 1px; background: var(--border); }
+
+  /* ── GRID ── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    border-left: 1px solid var(--border);
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── CARD ── */
+  a.card {
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 20px;
+    text-decoration: none;
+    color: var(--black);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: var(--white);
+    transition: background .12s ease;
+    position: relative;
+  }
+  a.card:hover {
+    background: var(--off);
+  }
+  a.card:hover .arrow { opacity: 1; }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .logo-wrap {
+    width: 32px; height: 32px;
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+    background: var(--off);
+    flex-shrink: 0;
+  }
+  .logo-wrap img { width: 20px; height: 20px; object-fit: contain; }
+
+  .arrow {
+    font-size: 12px;
+    color: var(--mid);
+    opacity: 0;
+    transition: opacity .12s;
+    font-family: var(--mono);
+    margin-top: 2px;
+  }
+
+  .card-name {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--black);
+    line-height: 1.3;
+  }
+
+  .card-url {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--mid);
+    letter-spacing: .06em;
+    margin-top: 2px;
+  }
+
+  .card-desc {
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 300;
+    color: #5a5752;
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+  }
+
+  .tag {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--mid);
+    border: 1px solid var(--border);
+    padding: 2px 7px;
+  }
+
+  .tag.orange { color: var(--orange); border-color: var(--orange); }
+
+  .index {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--border);
+    letter-spacing: .08em;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1.5px solid var(--black);
+    padding: 12px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  footer span {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--mid);
+  }
+
+  .card-date {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--border);
+    letter-spacing: .06em;
+    margin-top: 6px;
+  }
+
+  @media (max-width: 600px) {
+    .grid { grid-template-columns: repeat(2, 1fr); }
+    header { padding: 0 16px; }
+    .subheader { padding: 9px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">Links</div>
+  <div class="header-right">
+    <span>Index</span>
+    <span>v1.0</span>
+  </div>
+</header>
+
+<div class="subheader">
+  <span class="subheader-label">All Sites</span>
+  <span class="count" id="cnt"></span>
+  <div class="line"></div>
+  <span class="subheader-label">2026</span>
+</div>
+
+<div class="grid" id="grid">
+
+  <a class="card" href="https://arshhx000.github.io/Bulk-Gmail-Sender/" target="_blank">
+    <div class="card-top">
+      <div class="logo-wrap"><img src="https://www.google.com/s2/favicons?domain=github.com&sz=64"/></div>
+      <span class="arrow">↗</span>
+    </div>
+    <div>
+      <div class="card-name">flurr Mail</div>
+      <div class="card-url">Arshad/</div>
+    </div>
+    <div class="card-desc">bulk Mail sender from csv file </div>
+    <div class="card-bottom">
+      <span class="tag">SAAS</span>
+      <span class="index">01</span>
+    </div>
+    <div class="card-date">09 APR 2026</div>
+  </a>
+
+  <a class="card" href="https://vercel.com" target="_blank">
+    <div class="card-top">
+      <div class="logo-wrap"><img src="https://www.google.com/s2/favicons?domain=vercel.com&sz=64"/></div>
+      <span class="arrow">↗</span>
+    </div>
+    <div>
+      <div class="card-name">Vercel</div>
+      <div class="card-url">vercel.com</div>
+    </div>
+    <div class="card-desc">Deploy frontend apps instantly with zero config and global CDN.</div>
+    <div class="card-bottom">
+      <span class="tag">Hosting</span>
+      <span class="index">02</span>
+    </div>
+    <div class="card-date">09 APR 2026</div>
+  </a>
+
+  <a class="card" href="https://figma.com" target="_blank">
+    <div class="card-top">
+      <div class="logo-wrap"><img src="https://www.google.com/s2/favicons?domain=figma.com&sz=64"/></div>
+      <span class="arrow">↗</span>
+    </div>
+    <div>
+      <div class="card-name">Figma</div>
+      <div class="card-url">figma.com</div>
+    </div>
+    <div class="card-desc">Collaborative UI/UX design and prototyping tool in the browser.</div>
+    <div class="card-bottom">
+      <span class="tag orange">Design</span>
+      <span class="index">03</span>
+    </div>
+    <div class="card-date">09 APR 2026</div>
+  </a>
+
+  <a class="card" href="https://chatgpt.com" target="_blank">
+    <div class="card-top">
+      <div class="logo-wrap"><img src="https://www.google.com/s2/favicons?domain=chatgpt.com&sz=64"/></div>
+      <span class="arrow">↗</span>
+    </div>
+    <div>
+      <div class="card-name">ChatGPT</div>
+      <div class="card-url">chatgpt.com</div>
+    </div>
+    <div class="card-desc">AI assistant by OpenAI for writing, coding, and research.</div>
+    <div class="card-bottom">
+      <span class="tag">AI</span>
+      <span class="index">04</span>
+    </div>
+    <div class="card-date">09 APR 2026</div>
+  </a>
+
+  <a class="card" href="https://notion.so" target="_blank">
+    <div class="card-top">
+      <div class="logo-wrap"><img src="https://www.google.com/s2/favicons?domain=notion.so&sz=64"/></div>
+      <span class="arrow">↗</span>
+    </div>
+    <div>
+      <div class="card-name">Notion</div>
+      <div class="card-url">notion.so</div>
+    </div>
+    <div class="card-desc">All-in-one workspace for notes, docs, and project management.</div>
+    <div class="card-bottom">
+      <span class="tag">Productivity</span>
+      <span class="index">05</span>
+    </div>
+    <div class="card-date">09 APR 2026</div>
+  </a>
+
+  <a class="card" href="https://stackoverflow.com" target="_blank">
+    <div class="card-top">
+      <div class="logo-wrap"><img src="https://www.google.com/s2/favicons?domain=stackoverflow.com&sz=64"/></div>
+      <span class="arrow">↗</span>
+    </div>
+    <div>
+      <div class="card-name">Stack Overflow</div>
+      <div class="card-url">stackoverflow.com</div>
+    </div>
+    <div class="card-desc">Q&amp;A community for developers solving coding problems.</div>
+    <div class="card-bottom">
+      <span class="tag">Dev</span>
+      <span class="index">06</span>
+    </div>
+    <div class="card-date">09 APR 2026</div>
+  </a>
+
+  <a class="card" href="https://dribbble.com" target="_blank">
+    <div class="card-top">
+      <div class="logo-wrap"><img src="https://www.google.com/s2/favicons?domain=dribbble.com&sz=64"/></div>
+      <span class="arrow">↗</span>
+    </div>
+    <div>
+      <div class="card-name">Dribbble</div>
+      <div class="card-url">dribbble.com</div>
+    </div>
+    <div class="card-desc">Design inspiration and portfolio showcase platform for creatives.</div>
+    <div class="card-bottom">
+      <span class="tag orange">Design</span>
+      <span class="index">07</span>
+    </div>
+    <div class="card-date">09 APR 2026</div>
+  </a>
+
+  <a class="card" href="https://codepen.io" target="_blank">
+    <div class="card-top">
+      <div class="logo-wrap"><img src="https://www.google.com/s2/favicons?domain=codepen.io&sz=64"/></div>
+      <span class="arrow">↗</span>
+    </div>
+    <div>
+      <div class="card-name">CodePen</div>
+      <div class="card-url">codepen.io</div>
+    </div>
+    <div class="card-desc">Online code editor and front-end playground for HTML, CSS, JS.</div>
+    <div class="card-bottom">
+      <span class="tag">Dev</span>
+      <span class="index">08</span>
+    </div>
+    <div class="card-date">09 APR 2026</div>
+  </a>
+
+  <a class="card" href="https://fonts.google.com" target="_blank">
+    <div class="card-top">
+      <div class="logo-wrap"><img src="https://www.google.com/s2/favicons?domain=fonts.google.com&sz=64"/></div>
+      <span class="arrow">↗</span>
+    </div>
+    <div>
+      <div class="card-name">Google Fonts</div>
+      <div class="card-url">fonts.google.com</div>
+    </div>
+    <div class="card-desc">Free, open-source fonts for web and app projects.</div>
+    <div class="card-bottom">
+      <span class="tag orange">Design</span>
+      <span class="index">09</span>
+    </div>
+    <div class="card-date">09 APR 2026</div>
+  </a>
+
+  <a class="card" href="https://unsplash.com" target="_blank">
+    <div class="card-top">
+      <div class="logo-wrap"><img src="https://www.google.com/s2/favicons?domain=unsplash.com&sz=64"/></div>
+      <span class="arrow">↗</span>
+    </div>
+    <div>
+      <div class="card-name">Unsplash</div>
+      <div class="card-url">unsplash.com</div>
+    </div>
+    <div class="card-desc">Free high-resolution photos for any creative project.</div>
+    <div class="card-bottom">
+      <span class="tag">Assets</span>
+      <span class="index">10</span>
+    </div>
+    <div class="card-date">09 APR 2026</div>
+  </a>
+
+  <a class="card" href="https://coolors.co" target="_blank">
+    <div class="card-top">
+      <div class="logo-wrap"><img src="https://www.google.com/s2/favicons?domain=coolors.co&sz=64"/></div>
+      <span class="arrow">↗</span>
+    </div>
+    <div>
+      <div class="card-name">Coolors</div>
+      <div class="card-url">coolors.co</div>
+    </div>
+    <div class="card-desc">Fast color palette generator and explorer for designers.</div>
+    <div class="card-bottom">
+      <span class="tag orange">Design</span>
+      <span class="index">11</span>
+    </div>
+    <div class="card-date">09 APR 2026</div>
+  </a>
+
+  <a class="card" href="https://iconscout.com" target="_blank">
+    <div class="card-top">
+      <div class="logo-wrap"><img src="https://www.google.com/s2/favicons?domain=iconscout.com&sz=64"/></div>
+      <span class="arrow">↗</span>
+    </div>
+    <div>
+      <div class="card-name">Iconscout</div>
+      <div class="card-url">iconscout.com</div>
+    </div>
+    <div class="card-desc">Icons, illustrations, and 3D assets for design projects.</div>
+    <div class="card-bottom">
+      <span class="tag">Assets</span>
+      <span class="index">12</span>
+    </div>
+    <div class="card-date">09 APR 2026</div>
+  </a>
+
+  <a class="card" href="https://tailwindcss.com" target="_blank">
+    <div class="card-top">
+      <div class="logo-wrap"><img src="https://www.google.com/s2/favicons?domain=tailwindcss.com&sz=64"/></div>
+      <span class="arrow">↗</span>
+    </div>
+    <div>
+      <div class="card-name">Tailwind CSS</div>
+      <div class="card-url">tailwindcss.com</div>
+    </div>
+    <div class="card-desc">Utility-first CSS framework for rapid UI development.</div>
+    <div class="card-bottom">
+      <span class="tag">Dev</span>
+      <span class="index">13</span>
+    </div>
+    <div class="card-date">09 APR 2026</div>
+  </a>
+
+  <a class="card" href="https://developer.mozilla.org" target="_blank">
+    <div class="card-top">
+      <div class="logo-wrap"><img src="https://www.google.com/s2/favicons?domain=developer.mozilla.org&sz=64"/></div>
+      <span class="arrow">↗</span>
+    </div>
+    <div>
+      <div class="card-name">MDN Docs</div>
+      <div class="card-url">developer.mozilla.org</div>
+    </div>
+    <div class="card-desc">The definitive HTML, CSS, and JavaScript reference by Mozilla.</div>
+    <div class="card-bottom">
+      <span class="tag">Docs</span>
+      <span class="index">14</span>
+    </div>
+    <div class="card-date">09 APR 2026</div>
+  </a>
+
+  <a class="card" href="https://supabase.com" target="_blank">
+    <div class="card-top">
+      <div class="logo-wrap"><img src="https://www.google.com/s2/favicons?domain=supabase.com&sz=64"/></div>
+      <span class="arrow">↗</span>
+    </div>
+    <div>
+      <div class="card-name">Supabase</div>
+      <div class="card-url">supabase.com</div>
+    </div>
+    <div class="card-desc">Open source Firebase alternative with Postgres database.</div>
+    <div class="card-bottom">
+      <span class="tag">Backend</span>
+      <span class="index">15</span>
+    </div>
+    <div class="card-date">09 APR 2026</div>
+  </a>
+
+  <a class="card" href="https://react.dev" target="_blank">
+    <div class="card-top">
+      <div class="logo-wrap"><img src="https://www.google.com/s2/favicons?domain=react.dev&sz=64"/></div>
+      <span class="arrow">↗</span>
+    </div>
+    <div>
+      <div class="card-name">React</div>
+      <div class="card-url">react.dev</div>
+    </div>
+    <div class="card-desc">Official React documentation, tutorials, and API reference.</div>
+    <div class="card-bottom">
+      <span class="tag">Dev</span>
+      <span class="index">16</span>
+    </div>
+    <div class="card-date">09 APR 2026</div>
+  </a>
+
+  <a class="card" href="https://adobe.com" target="_blank">
+    <div class="card-top">
+      <div class="logo-wrap"><img src="https://www.google.com/s2/favicons?domain=adobe.com&sz=64"/></div>
+      <span class="arrow">↗</span>
+    </div>
+    <div>
+      <div class="card-name">Adobe</div>
+      <div class="card-url">adobe.com</div>
+    </div>
+    <div class="card-desc">Industry standard tools for design, video, and creative work.</div>
+    <div class="card-bottom">
+      <span class="tag orange">Design</span>
+      <span class="index">17</span>
+    </div>
+    <div class="card-date">09 APR 2026</div>
+  </a>
+
+  <a class="card" href="https://youtube.com" target="_blank">
+    <div class="card-top">
+      <div class="logo-wrap"><img src="https://www.google.com/s2/favicons?domain=youtube.com&sz=64"/></div>
+      <span class="arrow">↗</span>
+    </div>
+    <div>
+      <div class="card-name">YouTube</div>
+      <div class="card-url">youtube.com</div>
+    </div>
+    <div class="card-desc">Video platform for tutorials, entertainment, and learning.</div>
+    <div class="card-bottom">
+      <span class="tag">Learn</span>
+      <span class="index">18</span>
+    </div>
+    <div class="card-date">09 APR 2026</div>
+  </a>
+
+  <a class="card" href="https://perplexity.ai" target="_blank">
+    <div class="card-top">
+      <div class="logo-wrap"><img src="https://www.google.com/s2/favicons?domain=perplexity.ai&sz=64"/></div>
+      <span class="arrow">↗</span>
+    </div>
+    <div>
+      <div class="card-name">Perplexity AI</div>
+      <div class="card-url">perplexity.ai</div>
+    </div>
+    <div class="card-desc">AI-powered search engine with cited, real-time answers.</div>
+    <div class="card-bottom">
+      <span class="tag">AI</span>
+      <span class="index">19</span>
+    </div>
+    <div class="card-date">09 APR 2026</div>
+  </a>
+
+  <a class="card" href="https://v0.dev" target="_blank">
+    <div class="card-top">
+      <div class="logo-wrap"><img src="https://www.google.com/s2/favicons?domain=v0.dev&sz=64"/></div>
+      <span class="arrow">↗</span>
+    </div>
+    <div>
+      <div class="card-name">v0 by Vercel</div>
+      <div class="card-url">v0.dev</div>
+    </div>
+    <div class="card-desc">AI-powered UI component generator built by Vercel.</div>
+    <div class="card-bottom">
+      <span class="tag">AI</span>
+      <span class="index">20</span>
+    </div>
+    <div class="card-date">09 APR 2026</div>
+  </a>
+
+</div>
+
+<footer>
+  <span>teenage engineering style — links index</span>
+  <span id="foot-count"></span>
+</footer>
+
+<script>
+  const cards = document.querySelectorAll('.card');
+  document.getElementById('cnt').textContent = cards.length + ' items';
+  document.getElementById('foot-count').textContent = cards.length + ' entries';
+</script>
+</body>
+</html>
