@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRM Menu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --card-bg: #111111;
+            --accent-green: #22c55e;
+            --accent-orange: #ff4d29;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: #ffffff;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .glass-header {
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .meal-card {
+            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: var(--card-bg);
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        .meal-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .active-glow {
+            border: 1px solid rgba(34, 197, 94, 0.4) !important;
+            box-shadow: 0 20px 50px rgba(34, 197, 94, 0.1);
+            background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+            transform: scale(1.02) !important;
+            z-index: 10;
+        }
+
+        .next-glow {
+            border: 1px solid rgba(255, 77, 41, 0.3) !important;
+            background: #141414;
+        }
+
+        .passed-style {
+            opacity: 0.3 !important;
+            filter: grayscale(0.8);
+        }
+
+        .tab-indicator {
+            height: 2px;
+            background: white;
+            position: absolute;
+            bottom: 0;
+            left: 1rem;
+            right: 1rem;
+            border-radius: 99px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        @keyframes pulse-dot {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .animate-pulse-dot {
+            animation: pulse-dot 2s infinite;
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-24">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 glass-header pb-2">
+        <div class="max-w-xl mx-auto px-6 pt-6 pb-4">
+            <div class="flex justify-between items-end mb-6">
+                <div>
+                    <p class="text-[10px] font-black tracking-[0.3em] text-white/30 uppercase mb-1">SRM Andra</p>
+                    <div class="flex items-center gap-3">
+                        <h1 class="text-2xl font-extrabold tracking-tighter">Mess Menu</h1>
+                        <div id="liveBadge" class="hidden flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500/10 border border-green-500/20">
+                            <div class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
+                            <span class="text-[10px] font-black text-green-500 uppercase tracking-widest">Live</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex bg-white/5 p-1 rounded-full border border-white/10">
+                    <button id="btnSouth" onclick="setRegion('South')" class="px-5 py-1.5 rounded-full text-[10px] font-bold transition-all text-white/40">SOUTH</button>
+                    <button id="btnNorth" onclick="setRegion('North')" class="px-5 py-1.5 rounded-full text-[10px] font-bold transition-all bg-white text-black shadow-lg">NORTH</button>
+                </div>
+            </div>
+
+            <div id="dayTabs" class="flex overflow-x-auto no-scrollbar gap-1">
+                <!-- Days injected here -->
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="menuContainer" class="max-w-xl mx-auto px-6 py-8 space-y-6">
+        <!-- Cards injected here -->
+    </main>
+
+    <!-- Footer Status -->
+    <footer class="fixed bottom-0 left-0 right-0 z-50 p-6 pointer-events-none">
+        <div class="max-w-xl mx-auto flex justify-between items-end pointer-events-auto">
+            <div class="flex items-center gap-4 bg-[#1a1a1a]/95 backdrop-blur-2xl border border-white/10 rounded-3xl p-4 shadow-2xl">
+                <div id="statusIconBg" class="w-10 h-10 rounded-2xl flex items-center justify-center bg-white/5 border border-white/5 transition-colors">
+                    <svg id="statusIcon" class="w-5 h-5 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                </div>
+                <div>
+                    <p class="text-[9px] font-black text-white/30 uppercase tracking-[0.2em]">Live Tracking</p>
+                    <p id="statusLabel" class="text-sm font-bold text-white tracking-tight">Checking...</p>
+                </div>
+            </div>
+
+            <button onclick="scrollToActive()" class="w-14 h-14 rounded-full bg-white text-black flex items-center justify-center shadow-2xl active:scale-90 transition-transform">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 13l-7 7-7-7m14-8l-7 7-7-7"></path></svg>
+            </button>
+        </div>
+    </footer>
+
+    <script>
+        const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const mealConfig = [
+            { id: 'breakfast', label: 'Breakfast', start: 7, end: 10 },
+            { id: 'lunch', label: 'Lunch', start: 12, end: 15 },
+            { id: 'snacks', label: 'Snacks', start: 16.5, end: 18 },
+            { id: 'dinner', label: 'Dinner', start: 19, end: 22 }
+        ];
+
+        let currentRegion = 'North';
+        let selectedDay = days[new Date().getDay()];
+
+        const menuData = {
+            North: {
+                Monday: { breakfast: ["Lachha Parotta", "Rice Khichdi", "Veg Kurma", "Bread/Butter/Jam", "Boiled Egg", "Cut Fruits", "Tea/Coffee/Milk"], lunch: ["Green Salad", "Boiled Rice", "Roti", "Dal Maharani", "Bottle Gourd Chana Dal", "Curd", "Fryums", "Pickle", "Gulab Jamun"], snacks: ["Tea/Coffee/Milk", "Cream Bun"], dinner: ["Ghee Rice", "Boiled Rice", "Roti", "Dal Tadka", "Mix Veg Subji", "Rasam", "Curd", "Pickle"] },
+                Tuesday: { breakfast: ["Kal Dosa", "Sambar", "Tomato Chutney", "Rava Bhat", "Egg Burji", "Nannari Sabja Juice", "Brown Bread/Butter/Jam", "Tea/Coffee/Milk"], lunch: ["Green Salad", "Boiled Rice", "Roti", "Panchratni Dal", "Baigan Bharta", "Curd", "Fryums", "Pickle", "Sabudana Kheer"], snacks: ["Tea/Coffee/Milk", "Punugulu"], dinner: ["Veg Pulao", "Boiled Rice", "Roti", "Dal Makhani", "Aloo Matar", "Rasam", "Curd", "Pickle"] },
+                Wednesday: { breakfast: ["Poori", "Aloo Masala Sabji", "Tomato Sevai", "Boiled Egg", "Banana", "Bread/Butter/Jam", "Tea/Coffee/Milk"], lunch: ["Green Salad", "Boiled Rice", "Roti", "Dal Fry", "Aloo Jeera", "Curd", "Fryums", "Pickle", "Laddu"], snacks: ["Tea/Coffee/Milk", "Bhel Puri"], dinner: ["Coriander Rice", "Boiled Rice", "Roti", "Dal Palak", "Paneer Butter Masala", "Rasam", "Curd", "Pickle"] },
+                Thursday: { breakfast: ["Pav Bun", "Aloo Bhaji", "Pongal", "Coconut Chutney", "Omelette", "Watermelon Juice", "Brown Bread/Butter/Jam", "Tea/Coffee/Milk"], lunch: ["Green Salad", "Boiled Rice", "Roti", "Leafy Dal", "Veg Jhalfrezi", "Curd", "Fryums", "Pickle", "Bread Halwa"], snacks: ["Tea/Coffee/Milk", "Onion Pakoda"], dinner: ["Boiled Rice", "Roti", "Dal Fry", "Mix Veg Subji", "Rasam", "Curd", "Pickle"] },
+                Friday: { breakfast: ["Bhatura", "Chole Masala", "Poha-Namkin", "Boiled Egg", "Cut Fruits", "Bread/Butter/Jam", "Tea/Coffee/Milk"], lunch: ["Green Salad", "Boiled Rice", "Roti", "Channa Dal", "Gatta Kadi", "Curd", "Fryums", "Pickle", "Badusa"], snacks: ["Tea/Coffee/Milk", "Banana Bread / Fruit Cake"], dinner: ["Bagara Rice", "Boiled Rice", "Roti", "Dal Fry", "Mushroom Curry", "Rasam", "Curd", "Pickle"] },
+                Saturday: { breakfast: ["Aloo Paratha", "Curd", "Semiya Uppma", "Green Chutney", "Boiled Egg", "Banana", "Brown Bread/Butter/Jam", "Tea/Coffee/Milk"], lunch: ["Green Salad", "Boiled Rice", "Roti", "Dal Lasoni", "Bhindi Masala", "Curd", "Fryums", "Pickle", "Mysore Pak"], snacks: ["Tea/Coffee/Milk", "Samosa"], dinner: ["Corn Pulao", "Boiled Rice", "Roti", "Dal Tadka", "Veg Manchurian (Gravy)", "Rasam", "Curd", "Pickle"] },
+                Sunday: { breakfast: ["Idly", "Sambar", "Corn Flakes", "Boiled Egg", "Grape Juice", "Bread/Butter/Jam", "Tea/Coffee/Milk"], lunch: ["Onion Lemon Salad", "Hyderabadi Paneer Biryani", "Mirchi Ka Salan", "Onion Raita", "Mint Lemon Juice", "Ice Cream", "Rasam"], snacks: ["Tea/Coffee/Milk", "Corn Chat"], dinner: ["Jeera Rice", "Boiled Rice", "Roti", "Dal Makhani", "Paneer Lababdar", "Rasam", "Curd", "Pickle"] }
+            },
+            South: {
+                Monday: { breakfast: ["Lachha Parotta", "Rice Khichdi", "Veg Kurma", "Boiled Egg", "Cut Fruits", "Tea/Coffee/Milk"], lunch: ["Green Salad", "Boiled Rice", "Dal", "Aloo Gobi", "Curd", "Fryums", "Pickle", "Gulab Jamun"], snacks: ["Tea/Coffee/Milk", "Cream Bun"], dinner: ["Ghee Rice", "Boiled Rice", "Roti", "Rasam", "Dal", "Veg Subji (Andhra Style)", "Curd", "Pickle"] },
+                Tuesday: { breakfast: ["Kal Dosa", "Rava Bhath", "Sambar", "Tomato Chutney", "Egg Burji", "Nannari Sabja Juice", "Tea/Coffee/Milk"], lunch: ["Green Salad", "Boiled Rice", "Dal Tadka", "Baigan Bharta", "Curd", "Fryums", "Pickle", "Sabudana Kheer"], snacks: ["Tea/Coffee/Milk", "Punugulu"], dinner: ["Veg Pulao", "Boiled Rice", "Roti", "Rasam", "Dal", "Cabbage Fry", "Curd", "Pickle"] },
+                Wednesday: { breakfast: ["Poori", "Aloo Masala", "Tomato Semiya", "Boiled Egg", "Banana", "Tea/Coffee/Milk"], lunch: ["Green Salad", "Boiled Rice", "Dal Makhani", "Bhindi Fry", "Curd", "Fryums", "Pickle", "Laddu"], snacks: ["Tea/Coffee/Milk", "Bhel Puri"], dinner: ["Coriander Rice", "Boiled Rice", "Roti", "Rasam", "Dal", "Dondaikaya Fry", "Curd", "Pickle"] },
+                Thursday: { breakfast: ["Vada", "Pongal", "Sambar", "Coconut Chutney", "Omelette", "Watermelon Juice", "Tea/Coffee/Milk"], lunch: ["Green Salad", "Boiled Rice", "Panchratna Dal", "Veg Jhalfrezi", "Curd", "Fryums", "Gongura Chutney", "Bread Halwa"], snacks: ["Tea/Coffee/Milk", "Onion Pakoda"], dinner: ["Mint Pulao / Pulihara", "Boiled Rice", "Roti", "Rasam", "Dal Fry", "Aloo Gobi", "Curd", "Pickle"] },
+                Friday: { breakfast: ["Onion Uttapam", "Mysore Bonda", "Sambar", "Peanut Chutney", "Boiled Egg", "Cut Fruits", "Tea/Coffee/Milk"], lunch: ["Green Salad", "Boiled Rice", "Chana Dal", "Aloo Jeera", "Curd", "Fryums", "Pickle", "Badusa"], snacks: ["Tea/Coffee/Milk", "Banana Bread / Fruit Cake"], dinner: ["Bagara Rice", "Boiled Rice", "Roti", "Rasam", "Dal Fry", "Mushroom Curry", "Curd", "Pickle"] },
+                Saturday: { breakfast: ["Aloo Parotta", "Semiya Uppma", "Curd", "Coconut Chutney", "Boiled Egg", "Banana", "Tea/Coffee/Milk"], lunch: ["Green Salad", "Boiled Rice", "Dal Lasoni", "Bhindi Masala", "Curd", "Fryums/Papad", "Avakai Pickle", "Mysore Pak"], snacks: ["Tea/Coffee/Milk", "Samosa"], dinner: ["Corn Pulao", "Boiled Rice", "Roti", "Rasam", "Dal Tadka", "Veg Manchurian", "Curd", "Pickle"] },
+                Sunday: { breakfast: ["Idly", "Sambar", "Tomato Chutney", "Corn Flakes", "Boiled Egg", "Grape Juice", "Tea/Coffee/Milk"], lunch: ["Veg Biryani", "Mirchi Ka Salan", "Onion Raita", "Mint Lemon Juice", "Ice Cream"], snacks: ["Tea/Coffee/Milk", "Corn Chat"], dinner: ["Jeera Rice", "Boiled Rice", "Roti", "Rasam", "Dal Makhani", "Paneer Lababdar", "Curd", "Pickle"] }
+            }
+        };
+
+        function setRegion(region) {
+            currentRegion = region;
+            const isNorth = region === 'North';
+            document.getElementById('btnNorth').className = `px-5 py-1.5 rounded-full text-[10px] font-bold transition-all ${isNorth ? 'bg-white text-black shadow-lg' : 'text-white/40'}`;
+            document.getElementById('btnSouth').className = `px-5 py-1.5 rounded-full text-[10px] font-bold transition-all ${!isNorth ? 'bg-white text-black shadow-lg' : 'text-white/40'}`;
+            renderMenu();
+        }
+
+        function setDay(day) {
+            selectedDay = day;
+            renderDayTabs();
+            renderMenu();
+        }
+
+        function renderDayTabs() {
+            const container = document.getElementById('dayTabs');
+            container.innerHTML = days.map(day => `
+                <button onclick="setDay('${day}')" class="relative px-4 py-2 text-[10px] font-black tracking-widest transition-all whitespace-nowrap ${selectedDay === day ? 'text-white' : 'text-white/20'}">
+                    ${day.substring(0, 3).toUpperCase()}
+                    ${selectedDay === day ? '<div class="tab-indicator"></div>' : ''}
+                </button>
+            `).join('');
+        }
+
+        function renderMenu() {
+            const container = document.getElementById('menuContainer');
+            const now = new Date();
+            const currentHour = now.getHours() + (now.getMinutes() / 60);
+            const isToday = selectedDay === days[now.getDay()];
+            const data = menuData[currentRegion][selectedDay];
+            
+            let html = '';
+            let status = isToday ? "Kitchen Closed" : "Viewing " + selectedDay;
+            let hasLive = false;
+
+            mealConfig.forEach((meal, idx) => {
+                let state = 'future';
+                let progress = 0;
+                
+                if (isToday) {
+                    if (currentHour >= meal.end) {
+                        state = 'passed';
+                        progress = 100;
+                    } else if (currentHour >= meal.start && currentHour < meal.end) {
+                        state = 'live';
+                        progress = ((currentHour - meal.start) / (meal.end - meal.start)) * 100;
+                        hasLive = true;
+                        status = "Now Serving: " + meal.label;
+                    } else {
+                        // Determine if it's the immediate next one
+                        const upcoming = mealConfig.find(m => m.start > currentHour);
+                        if (upcoming && upcoming.id === meal.id) {
+                            state = 'next';
+                            if (status === "Kitchen Closed") status = "Next: " + meal.label;
+                        }
+                    }
+                }
+
+                const isActive = state === 'live';
+                const isNext = state === 'next';
+                const accentColor = isActive ? 'var(--accent-green)' : (isNext ? 'var(--accent-orange)' : 'rgba(255,255,255,0.1)');
+                const items = data[meal.id] || [];
+
+                html += `
+                    <div class="meal-card rounded-[2rem] p-7 visible ${isActive ? 'active-glow' : ''} ${isNext ? 'next-glow' : ''} ${state === 'passed' ? 'passed-style' : ''}" style="transition-delay: ${idx * 0.1}s">
+                        <div class="flex justify-between items-start mb-6">
+                            <div>
+                                <h3 class="text-[10px] font-black tracking-[0.25em] uppercase mb-1.5 flex items-center gap-2" style="color: ${accentColor}">
+                                    ${meal.label}
+                                    ${isActive ? '<span class="animate-pulse-dot">●</span>' : ''}
+                                </h3>
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    <span class="text-xl font-extrabold tracking-tight">${meal.start}:00 — ${meal.end}:00</span>
+                                </div>
+                            </div>
+                            <span class="text-[10px] font-bold text-white/10 uppercase tracking-tighter">${state}</span>
+                        </div>
+                        <div class="space-y-3 mb-6">
+                            ${items.map(item => `
+                                <div class="flex items-center gap-4">
+                                    <div class="w-1.5 h-1.5 rounded-full" style="background-color: ${accentColor}"></div>
+                                    <span class="text-sm font-semibold ${isActive ? 'text-white' : 'text-white/60'}">${item}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="progress-bar">
+                            <div class="h-full transition-all duration-1000" style="width: ${progress}%; background-color: ${accentColor}"></div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+            document.getElementById('statusLabel').innerText = status;
+            document.getElementById('liveBadge').style.display = hasLive ? 'flex' : 'none';
+            document.getElementById('statusIcon').style.color = hasLive ? 'var(--accent-green)' : 'rgba(255,255,255,0.2)';
+        }
+
+        function scrollToActive() {
+            const active = document.querySelector('.active-glow') || document.querySelector('.next-glow');
+            if (active) {
+                active.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // Initialize
+        window.onload = () => {
+            renderDayTabs();
+            renderMenu();
+            setTimeout(scrollToActive, 800);
+        };
+    </script>
+</body>
+</html>
