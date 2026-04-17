@@ -171,3 +171,79 @@ void loop() {   float humidity = dht.readHumidity();   float temperature = dht.r
  
   delay(2000); // Update every 2 seconds 
 }
+
+
+
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
+
+
+const int MY_THRESHOLD = 6; 
+
+#define TRIG_PIN 9
+#define ECHO_PIN 10
+
+
+long calculateFactorial(int n) {
+  if (n <= 1) return 1;
+  return n * calculateFactorial(n - 1);
+}
+
+void setup() {
+  pinMode(TRIG_PIN, OUTPUT);
+  pinMode(ECHO_PIN, INPUT);
+  
+  if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+    display.begin(SSD1306_SWITCHCAPVCC, 0x3D);
+  }
+  display.clearDisplay();
+  display.setTextColor(SSD1306_WHITE);
+}
+
+void loop() {
+  // Distance Measurement
+  digitalWrite(TRIG_PIN, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIG_PIN, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG_PIN, LOW);
+
+  long duration = pulseIn(ECHO_PIN, HIGH);
+  int distance = duration * 0.034 / 2;
+
+  display.clearDisplay();
+  display.setCursor(0, 10);
+
+  // AUTOMATIC LOGIC: Uses MY_THRESHOLD for both the check and the math
+  if (distance == MY_THRESHOLD) {
+    long result = calculateFactorial(MY_THRESHOLD);
+    
+    display.setTextSize(1);
+    display.print("TARGET REACHED: ");
+    display.print(MY_THRESHOLD);
+    display.println("cm");
+    display.drawLine(0, 20, 128, 20, SSD1306_WHITE);
+    
+    display.setCursor(0, 35);
+    display.setTextSize(2);
+    display.print(MY_THRESHOLD);
+    display.print("! = ");
+    display.print(result);
+  } 
+  else {
+    display.setTextSize(1);
+    display.println("SCANNING...");
+    display.setCursor(0, 25);
+    display.setTextSize(3);
+    display.print(distance);
+    display.print("cm");
+  }
+
+  display.display();
+  delay(150);
+}
