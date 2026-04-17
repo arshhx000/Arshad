@@ -1,0 +1,124 @@
+gcd and lcm 
+
+no1: dw 0x6
+no2: dw 0x5 
+gcd: dw 0 
+lcm: dw 0 
+start:
+mov ax, word no1 
+mov bx, word no2 
+loop0: mov dx, 0x0 
+
+div bx 
+mov ax, bx 
+mov bx, dx 
+cmp bx, 0x0 
+jnz loop0
+mov word gcd, ax 
+mov cx, ax ;
+mov ax, word no1 
+mov bx, word no2 
+mul bx 
+div cx 
+mov word lcm, ax 
+print reg
+
+
+1) ADDITION AND SUBTRACTION 
+; Program to add two word length numbers 
+OPR1: DW 0x6969          
+OPR2: DW 0x0420         RESULT: DW 0             start: 
+MOV AX, word OPR1        
+MOV BX, word OPR2        
+CLC                      
+ADD AX, BX               
+MOV DI, OFFSET RESULT  MOV word [DI], AX        
+print reg              
+ 
+; Program to sub two word length numbers 
+OPR1: DW 0x6969          
+OPR2: DW 0x0420          
+RESULT: DW 0
+
+
+4) 1² up to n² summations code in assembly language 
+; Program to calculate sum of squares: 1² + 2² + ... + n² 
+NUM:    DW 0x5          ; n = 5 → sum = 1²+2²+3²+4²+5² = 55 
+RESULT: DW 0            ; stores final result 
+ 
+start: 
+    MOV CX, word NUM    ; CX = n (loop counter) 
+    MOV AX, 0x0         ; AX = 0 (running sum) 
+ 
+SQUARELOOP: 
+    PUSH AX             ; save running sum 
+    MOV AX, CX          ; AX = current counter value 
+    MUL CX              ; AX = CX * CX  (i.e. CX²) 
+    MOV BX, AX          ; BX = CX² (temporary) 
+    POP AX              ; restore running sum 
+    ADD AX, BX          ; AX = sum + CX² 
+    DEC CX              ; CX = CX - 1 
+    JNZ SQUARELOOP      ; if CX != 0, repeat 
+ 
+    MOV word RESULT, AX ; RESULT = 1²+2²+...+n²     print reg
+
+3) Determine factorial 7 in assembly language 
+; Program to calculate factorial using looping 
+NUM: DW 0x7      
+RESULT: DW 0     
+ 
+start: 
+MOV CX,word NUM      
+MOV AX, 0x1         NOTZEROLOOP:         
+MUL CX               
+DEC CX               
+JNZ NOTZEROLOOP      MOV word RESULT,AX   
+print reg
+
+
+2) temp and humidity value displaying in OLED display  
+#include <Wire.h> 
+#include <Adafruit_GFX.h> 
+#include <Adafruit_SSD1306.h> 
+#include <DHT.h> 
+ 
+// OLED settings 
+#define SCREEN_WIDTH 128 
+#define SCREEN_HEIGHT 64 
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1); 
+ 
+// DHT settings 
+#define DHTPIN 2        // Data pin connected to D2 
+#define DHTTYPE DHT11   // Change to DHT22 if using that 
+ 
+DHT dht(DHTPIN, DHTTYPE); 
+ 
+void setup() { 
+  Serial.begin(9600); 
+ 
+  // Initialize OLED 
+  if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {     Serial.println("OLED not found");     while(true); 
+  } 
+ 
+  display.clearDisplay();   display.setTextSize(1);   display.setTextColor(WHITE); 
+ 
+  // Initialize DHT sensor   dht.begin(); 
+ 
+  display.setCursor(0,0);   display.println("Initializing...");   display.display();   delay(2000); 
+} 
+ 
+void loop() {   float humidity = dht.readHumidity();   float temperature = dht.readTemperature(); 
+ 
+  // Check if reading failed   if (isnan(humidity) || isnan(temperature)) {     Serial.println("Failed to read from DHT!");     return; 
+  } 
+ 
+  // Clear display   display.clearDisplay(); 
+ 
+  // Display Temperature   display.setCursor(0, 10);   display.setTextSize(1);   display.print("Temp: ");   display.print(temperature);   display.println(" C"); 
+ 
+  // Display Humidity   display.setCursor(0, 30);   display.print("Humidity: ");   display.print(humidity);   display.println(" %"); 
+ 
+  display.display(); 
+ 
+  delay(2000); // Update every 2 seconds 
+}
