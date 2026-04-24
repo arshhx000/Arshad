@@ -247,3 +247,77 @@ void loop() {
   display.display();
   delay(150);
 }
+
+
+
+
+
+
+Program 2 - DHT11 with LED Alert on Change
+#include <DHT11.h>
+DHT11 dht11(2);
+const int ledPin = 13;
+int startTemp = 0, startHum = 0;
+bool baselineSet = false;
+void setup() {
+ Serial.begin(9600); pinMode(ledPin, OUTPUT); digitalWrite(ledPin, LOW);
+}
+void loop() {
+ int temperature = 0, humidity = 0;
+ int result = dht11.readTemperatureHumidity(temperature, humidity);
+ if (result == 0) {
+ if (!baselineSet) {
+ startTemp = temperature; startHum = humidity;
+ baselineSet = true; Serial.println("Baseline Set!");
+ }
+ Serial.print("Temp: "); Serial.print(temperature);
+ Serial.print(" C | Humidity: "); Serial.print(humidity); Serial.println(" %");
+ if (temperature > startTemp) {
+ Serial.println("Alert: Temperature Increased!");
+ blinkLED(2); startTemp = temperature;
+ }
+ if (humidity > startHum) {
+ Serial.println("Alert: Humidity Increased!");
+ blinkLED(3); startHum = humidity;
+ }
+ } else { Serial.println(DHT11::getErrorString(result)); }
+ delay(4000);
+}
+void blinkLED(int times) {
+ for (int i = 0; i < times; i++) {
+ digitalWrite(ledPin, HIGH); delay(200);
+ digitalWrite(ledPin, LOW); delay(200);
+
+Part B - Touch Count -> RGB Color Display
+const int sensorPin=A0, redPin=9, bluePin=8, greenPin=10;
+int threshold=500, sensorCount=0;
+bool touched=false, ledOn=false;
+unsigned long startTime=0, ledStartTime=0;
+const unsigned long timeWindow=5000, ledOnTime=500;
+void setup() {
+ Serial.begin(9600);
+ pinMode(redPin,OUTPUT); pinMode(bluePin,OUTPUT); pinMode(greenPin,OUTPUT);
+}
+void loop() {
+ int sv = analogRead(sensorPin);
+ if (sv > threshold && !touched) {
+ touched = true;
+ if (sensorCount == 0) startTime = millis();
+ sensorCount++;
+ }
+ if (sv < threshold) touched = false;
+ if (sensorCount > 0 && millis()-startTime >= timeWindow && !ledOn) {
+ showColor(sensorCount); ledStartTime=millis(); ledOn=true; sensorCount=0;
+ }
+ if (millis()-ledStartTime >= ledOnTime) { turnOffLED(); ledOn=false; }
+}
+void showColor(int count) {
+ turnOffLED();
+ if (count==1) digitalWrite(bluePin, HIGH);
+ else if (count==2) digitalWrite(greenPin,HIGH);
+ else if (count==3) digitalWrite(redPin, HIGH);
+}
+void turnOffLED() {
+ digitalWrite(redPin,LOW); digitalWrite(bluePin,LOW); digitalWrite(greenPin,LOW);
+}
+
