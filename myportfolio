@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ARSHAD — AI Agent Developer & Full Stack UX Designer</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --bg-panel: #111111;
+      --bg-grid: #161616;
+      --border: #222222;
+      --text: #e0dcd4;
+      --text-dim: #5a5450;
+      --te-orange: #ff5e2b;
+      --te-green: #2ecc71;
+      --te-blue: #3498db;
+      --te-white: #e8e4dc;
+      --te-red: #e74c3c;
+      --te-purple: #9b59b6;
+      --glow-orange: 0 0 10px #ff5e2b44;
+      --glow-green: 0 0 10px #2ecc7144;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'JetBrains Mono', monospace;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.6;
+      letter-spacing: -0.2px;
+      overflow-x: hidden;
+    }
+
+    a { color: var(--te-orange); text-decoration: none; }
+
+    /* ─── CRT SCANLINES ─── */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.03) 2px,
+        rgba(0,0,0,0.03) 4px
+      );
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ─── POWER-ON BOOT SEQUENCE ─── */
+    #boot-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      letter-spacing: 2px;
+    }
+    .boot-line {
+      color: var(--te-orange);
+      margin: 4px 0;
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    .boot-line.visible {
+      animation: bootIn 0.4s ease forwards;
+    }
+    @keyframes bootIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .boot-cursor {
+      display: inline-block;
+      width: 8px; height: 14px;
+      background: var(--te-orange);
+      margin-left: 4px;
+      animation: blink .5s infinite;
+    }
+    #boot-bar {
+      width: 200px;
+      height: 2px;
+      background: var(--border);
+      margin-top: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    #boot-fill {
+      position: absolute;
+      left: 0; top: 0;
+      height: 100%;
+      width: 0%;
+      background: var(--te-orange);
+      box-shadow: 0 0 8px var(--te-orange);
+      transition: width 0.2s linear;
+    }
+
+    /* ─── GLITCH ─── */
+    .glitch {
+      position: relative;
+    }
+    .glitch::before,
+    .glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      opacity: 0;
+    }
+    .glitch:hover::before {
+      animation: glitch-1 0.3s cubic-bezier(.25,.46,.45,.94) both infinite;
+      color: var(--te-blue);
+      z-index: -1;
+      opacity: 0.8;
+    }
+    .glitch:hover::after {
+      animation: glitch-2 0.3s cubic-bezier(.25,.46,.45,.94) reverse both infinite;
+      color: var(--te-red);
+      z-index: -2;
+      opacity: 0.8;
+    }
+    @keyframes glitch-1 {
+      0% { clip-path: inset(20% 0 60% 0); transform: translate(-2px,0); }
+      20% { clip-path: inset(60% 0 10% 0); transform: translate(2px,0); }
+      40% { clip-path: inset(40% 0 40% 0); transform: translate(-2px,0); }
+      60% { clip-path: inset(80% 0 5% 0); transform: translate(2px,0); }
+      80% { clip-path: inset(10% 0 70% 0); transform: translate(-1px,0); }
+      100% { clip-path: inset(50% 0 30% 0); transform: translate(1px,0); }
+    }
+    @keyframes glitch-2 {
+      0% { clip-path: inset(10% 0 70% 0); transform: translate(2px,0); }
+      20% { clip-path: inset(70% 0 10% 0); transform: translate(-2px,0); }
+      40% { clip-path: inset(30% 0 50% 0); transform: translate(2px,0); }
+      60% { clip-path: inset(50% 0 40% 0); transform: translate(-2px,0); }
+      80% { clip-path: inset(15% 0 65% 0); transform: translate(1px,0); }
+      100% { clip-path: inset(65% 0 15% 0); transform: translate(-1px,0); }
+    }
+
+    /* ─── FLICKER ─── */
+    .flicker { animation: flicker 4s infinite; }
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      41% { opacity: 1; }
+      42% { opacity: 0.4; }
+      43% { opacity: 1; }
+      45% { opacity: 1; }
+      46% { opacity: 0.2; }
+      47% { opacity: 1; }
+      92% { opacity: 1; }
+      93% { opacity: 0.6; }
+      94% { opacity: 1; }
+    }
+
+    /* ─── TOP BAR ─── */
+    .top-bar {
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      animation: slideDown 0.6s ease-out;
+    }
+    @keyframes slideDown {
+      from { transform: translateY(-100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .logo-block { display: flex; align-items: center; gap: 10px; }
+    .logo-text {
+      font-weight: 800;
+      font-size: 15px;
+      letter-spacing: 2px;
+      color: var(--text);
+    }
+    .logo-text span { color: var(--te-orange); }
+    .status-led {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--te-green);
+      box-shadow: 0 0 6px var(--te-green);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 6px var(--te-green); }
+      50% { opacity: 0.4; box-shadow: 0 0 2px var(--te-green); }
+    }
+    .nav { display: flex; gap: 4px; margin-left: auto; }
+    .nav a {
+      color: var(--text-dim);
+      font-size: 11px;
+      padding: 6px 14px;
+      border: 1px solid transparent;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: all .15s;
+    }
+    .nav a:hover, .nav a.active {
+      color: var(--te-orange);
+      border-color: var(--border);
+      background: var(--bg-grid);
+      text-decoration: none;
+      box-shadow: var(--glow-orange);
+    }
+
+    /* ─── PAGE ─── */
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 24px;
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 24px;
+      opacity: 0;
+      animation: fadeUp 0.8s 2.2s ease forwards;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @media (max-width: 768px) { .page { grid-template-columns: 1fr; } }
+
+    /* ─── PANELS ─── */
+    .panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      position: relative;
+      transition: box-shadow 0.3s;
+    }
+    .panel:hover { box-shadow: 0 0 20px rgba(255,94,43,0.06); }
+    .panel::before, .panel::after {
+      content: '';
+      position: absolute;
+      width: 6px; height: 6px;
+      border: 1px solid var(--border);
+    }
+    .panel::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+    .panel::after { top: -1px; right: -1px; border-left: none; border-bottom: none; }
+    .panel-inner::before, .panel-inner::after {
+      content: '';
+      position: absolute;
+      width: 6px; height: 6px;
+      border: 1px solid var(--border);
+    }
+    .panel-inner::before { bottom: -1px; left: -1px; border-right: none; border-top: none; }
+    .panel-inner::after { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+
+    .screw {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #333 0%, #111 100%);
+      border: 1px solid #3a3a3a;
+      position: relative;
+      display: inline-block;
+    }
+    .screw::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 6px; height: 1px;
+      background: #555;
+      transform: translate(-50%, -50%) rotate(45deg);
+    }
+
+    .module-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-grid);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-dim);
+    }
+    .module-body { padding: 16px; }
+
+    /* ─── AVATAR ─── */
+    .avatar-box {
+      width: 200px; height: 200px;
+      background: var(--bg-grid);
+      border: 1px solid var(--border);
+      margin: 0 auto 16px;
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+      transition: transform 0.3s;
+    }
+    .avatar-box:hover { transform: scale(1.02); }
+    .avatar-box img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      filter: grayscale(30%) contrast(1.1);
+      transition: filter 0.4s;
+    }
+    .avatar-box:hover img { filter: grayscale(0%) contrast(1.2); }
+    .avatar-fallback {
+      font-size: 64px;
+      font-weight: 800;
+      color: var(--te-orange);
+    }
+    .corner {
+      position: absolute;
+      width: 8px; height: 8px;
+      border: 1px solid var(--te-orange);
+    }
+    .corner-tl { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+    .corner-tr { top: -1px; right: -1px; border-left: none; border-bottom: none; }
+    .corner-bl { bottom: -1px; left: -1px; border-right: none; border-top: none; }
+    .corner-br { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+
+    .id-block { text-align: center; margin-bottom: 16px; opacity: 0; animation: reveal 0.5s 2.6s ease forwards; }
+    .id-name { font-size: 16px; font-weight: 700; letter-spacing: 1px; }
+    .id-handle { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+
+    .param-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 11px;
+      opacity: 0;
+      transform: translateX(-10px);
+      animation: slideIn 0.3s ease forwards;
+    }
+    .param-row:nth-child(1) { animation-delay: 2.7s; }
+    .param-row:nth-child(2) { animation-delay: 2.8s; }
+    .param-row:nth-child(3) { animation-delay: 2.9s; }
+    .param-row:nth-child(4) { animation-delay: 3.0s; }
+    .param-row:nth-child(5) { animation-delay: 3.1s; }
+    .param-row:nth-child(6) { animation-delay: 3.2s; }
+    @keyframes slideIn {
+      to { opacity: 1; transform: translateX(0); }
+    }
+    .param-label { color: var(--text-dim); text-transform: uppercase; letter-spacing: .5px; }
+    .param-val { color: var(--te-orange); }
+
+    /* ─── ENCODERS ─── */
+    .encoder-strip { display: flex; gap: 8px; margin-top: 14px; }
+    .encoder { flex: 1; text-align: center; }
+    .encoder-knob {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: 2px solid;
+      margin: 0 auto 6px;
+      position: relative;
+      transition: transform 0.4s cubic-bezier(.25,.46,.45,.94);
+    }
+    .encoder:hover .encoder-knob {
+      transform: rotate(180deg);
+    }
+    .encoder-knob::after {
+      content: '';
+      position: absolute;
+      top: 3px; left: 50%;
+      width: 2px; height: 10px;
+      transform: translateX(-50%);
+    }
+    .enc-green .encoder-knob { border-color: var(--te-green); }
+    .enc-green .encoder-knob::after { background: var(--te-green); }
+    .enc-blue .encoder-knob { border-color: var(--te-blue); }
+    .enc-blue .encoder-knob::after { background: var(--te-blue); }
+    .enc-orange .encoder-knob { border-color: var(--te-orange); }
+    .enc-orange .encoder-knob::after { background: var(--te-orange); }
+    .enc-white .encoder-knob { border-color: var(--te-white); }
+    .enc-white .encoder-knob::after { background: var(--te-white); }
+    .encoder-label { font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+
+    .pill-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .hw-pill {
+      font-size: 10px;
+      padding: 3px 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-grid);
+      color: var(--text-dim);
+      letter-spacing: .5px;
+      transition: all 0.2s;
+      cursor: default;
+    }
+    .hw-pill:hover {
+      border-color: var(--te-orange);
+      color: var(--te-orange);
+      box-shadow: var(--glow-orange);
+    }
+
+    /* ─── MAIN ─── */
+    .main { display: flex; flex-direction: column; gap: 20px; }
+
+    .screen {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      position: relative;
+      padding: 20px;
+      opacity: 0;
+      transform: translateY(12px);
+      animation: reveal 0.5s 2.4s ease forwards;
+    }
+    @keyframes reveal {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .screen-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .screen-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text-dim);
+    }
+    .screen-title span { color: var(--te-orange); }
+
+    .tab-rail {
+      display: flex;
+      gap: 2px;
+      margin-bottom: 20px;
+      opacity: 0;
+      animation: reveal 0.4s 2.5s ease forwards;
+    }
+    .tab-rail button {
+      background: var(--bg-grid);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      font-family: inherit;
+      font-size: 10px;
+      padding: 8px 16px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .tab-rail button::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,94,43,0.1), transparent);
+      transition: left 0.3s;
+    }
+    .tab-rail button:hover::after { left: 100%; }
+    .tab-rail button:hover { color: var(--text); border-color: var(--te-orange); }
+    .tab-rail button.active {
+      background: var(--te-orange);
+      border-color: var(--te-orange);
+      color: var(--bg);
+      font-weight: 600;
+      box-shadow: 0 0 12px rgba(255,94,43,0.3);
+    }
+
+    .view {
+      display: none;
+      opacity: 0;
+      transform: translateX(-8px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+    .view.active {
+      display: block;
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* ─── DECODE TEXT ─── */
+    .decode-text {
+      opacity: 0;
+      animation: decodeFade 0.3s ease forwards;
+    }
+
+    /* ─── TYPING ─── */
+    .pixel-text {
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.3;
+      margin-bottom: 12px;
+      letter-spacing: -1px;
+    }
+    .cursor {
+      display: inline-block;
+      width: 10px; height: 18px;
+      background: var(--te-orange);
+      animation: blink .8s infinite;
+      vertical-align: middle;
+      margin-left: 4px;
+      box-shadow: 0 0 6px var(--te-orange);
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    .readout {
+      color: var(--text-dim);
+      font-size: 12px;
+      line-height: 1.8;
+      margin-bottom: 16px;
+    }
+    .readout strong { color: var(--te-white); font-weight: 500; }
+
+    .list-term {
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-dim);
+      font-size: 12px;
+      display: flex;
+      gap: 10px;
+      align-items: baseline;
+      opacity: 0;
+      transform: translateX(-8px);
+      transition: all 0.2s;
+    }
+    .list-term.visible {
+      animation: slideIn 0.3s ease forwards;
+    }
+    .list-term:hover {
+      color: var(--text);
+      padding-left: 4px;
+      border-left: 2px solid var(--te-orange);
+    }
+    .list-term:last-child { border-bottom: none; }
+    .list-bullet { color: var(--te-orange); font-weight: 700; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    /* ─── DEVICE CARDS ─── */
+    .device {
+      background: var(--bg-grid);
+      border: 1px solid var(--border);
+      padding: 14px;
+      position: relative;
+      transition: all 0.3s cubic-bezier(.25,.46,.45,.94);
+      transform-style: preserve-3d;
+      perspective: 600px;
+      opacity: 0;
+      transform: translateY(10px) rotateX(4deg);
+    }
+    .device.visible {
+      animation: deviceIn 0.4s ease forwards;
+    }
+    @keyframes deviceIn {
+      to { opacity: 1; transform: translateY(0) rotateX(0); }
+    }
+    .device:hover {
+      border-color: var(--te-orange);
+      transform: translateY(-3px) rotateX(0);
+      box-shadow: var(--glow-orange);
+    }
+    .device::before {
+      content: '';
+      position: absolute;
+      top: 8px; right: 8px;
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: var(--te-green);
+      box-shadow: 0 0 4px var(--te-green);
+      animation: pulse 2s infinite;
+    }
+    .device-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+    .device-id {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--te-orange);
+      letter-spacing: .5px;
+      transition: color 0.2s;
+    }
+    .device:hover .device-id { color: var(--te-white); }
+    .device-type {
+      font-size: 9px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .device-desc {
+      font-size: 11px;
+      color: var(--text-dim);
+      line-height: 1.6;
+      margin-bottom: 10px;
+    }
+    .device-tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .device-tags span {
+      font-size: 9px;
+      padding: 2px 6px;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      transition: all 0.2s;
+    }
+    .device:hover .device-tags span {
+      border-color: var(--te-orange);
+      color: var(--te-orange);
+    }
+
+    /* ─── TRACKS ─── */
+    .track { display: flex; flex-direction: column; gap: 0; }
+    .track-row {
+      display: flex;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      opacity: 0;
+      transform: translateX(-12px);
+      transition: all 0.2s;
+    }
+    .track-row.visible { animation: slideIn 0.4s ease forwards; }
+    .track-row:hover { background: rgba(255,94,43,0.03); padding-left: 8px; }
+    .track-row:last-child { border-bottom: none; }
+    .track-channel {
+      width: 32px; min-width: 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .track-num {
+      font-size: 9px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+    }
+    .track-led {
+      width: 8px; height: 8px;
+      border-radius: 2px;
+      background: var(--border);
+      transition: all 0.3s;
+    }
+    .track-led.on { background: var(--te-green); box-shadow: 0 0 4px var(--te-green); }
+    .track-led.blue { background: var(--te-blue); box-shadow: 0 0 4px var(--te-blue); }
+    .track-led.orange { background: var(--te-orange); box-shadow: 0 0 4px var(--te-orange); }
+    .track-led.pulse { animation: pulse 1.5s infinite; }
+    .track-info { flex: 1; }
+    .track-title { font-size: 13px; font-weight: 600; color: var(--text); letter-spacing: .3px; }
+    .track-meta { font-size: 10px; color: var(--te-orange); margin: 2px 0 6px; letter-spacing: .5px; }
+    .track-body { font-size: 11px; color: var(--text-dim); line-height: 1.6; }
+
+    /* ─── FIGMA UNITS ─── */
+    .figma-unit {
+      background: var(--bg-grid);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: all 0.3s;
+      opacity: 0;
+      transform: scale(0.96);
+    }
+    .figma-unit.visible { animation: scaleIn 0.4s ease forwards; }
+    @keyframes scaleIn {
+      to { opacity: 1; transform: scale(1); }
+    }
+    .figma-unit:hover {
+      border-color: var(--te-purple);
+      box-shadow: 0 0 16px rgba(155,89,182,0.15);
+      transform: translateY(-2px);
+    }
+    .figma-display {
+      height: 140px;
+      background: linear-gradient(135deg, #111 0%, #0a0a0a 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 40px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    .figma-display::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.2) 2px, rgba(0,0,0,0.2) 4px);
+    }
+    .figma-display::after {
+      content: '';
+      position: absolute;
+      bottom: 8px; right: 8px;
+      width: 20px; height: 2px;
+      background: var(--te-orange);
+      animation: flicker 3s infinite;
+    }
+    .figma-body { padding: 12px; }
+    .figma-name { font-size: 12px; font-weight: 600; margin-bottom: 4px; letter-spacing: .3px; }
+    .figma-detail { font-size: 10px; color: var(--text-dim); line-height: 1.5; }
+    .figma-tag {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 9px;
+      color: var(--te-purple);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    /* ─── PATCH BAY ─── */
+    .patch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+    }
+    .patch {
+      background: var(--bg-grid);
+      border: 1px solid var(--border);
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.25s;
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    .patch.visible { animation: reveal 0.3s ease forwards; }
+    .patch:hover {
+      border-color: var(--te-orange);
+      background: rgba(255,94,43,0.04);
+      transform: translateY(-2px);
+      box-shadow: var(--glow-orange);
+      text-decoration: none;
+    }
+    .patch-jack {
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      background: var(--bg);
+      position: relative;
+      transition: all 0.3s;
+    }
+    .patch:hover .patch-jack {
+      transform: scale(1.2);
+      box-shadow: 0 0 8px currentColor;
+    }
+    .patch-jack::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .patch-jack.orange { border-color: var(--te-orange); }
+    .patch-jack.orange::after { background: var(--te-orange); }
+    .patch-jack.blue { border-color: var(--te-blue); }
+    .patch-jack.blue::after { background: var(--te-blue); }
+    .patch-jack.green { border-color: var(--te-green); }
+    .patch-jack.green::after { background: var(--te-green); }
+    .patch-jack.white { border-color: var(--te-white); }
+    .patch-jack.white::after { background: var(--te-white); }
+    .patch-info { flex: 1; }
+    .patch-label { font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+    .patch-val { font-size: 12px; color: var(--text); font-weight: 500; }
+
+    /* ─── CONTRIBUTION GRID ─── */
+    .contrib-grid { display: flex; gap: 3px; overflow-x: auto; padding: 4px; }
+    .contrib-day {
+      width: 10px; height: 10px;
+      border-radius: 1px;
+      cursor: pointer;
+      transition: all 0.15s;
+      position: relative;
+    }
+    .contrib-day:hover {
+      transform: scale(1.6);
+      z-index: 2;
+      box-shadow: 0 0 6px rgba(255,255,255,0.2);
+    }
+
+    /* ─── FOOTER ─── */
+    .foot {
+      text-align: center;
+      padding: 24px;
+      border-top: 1px solid var(--border);
+      color: var(--text-dim);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-top: 20px;
+      opacity: 0;
+      animation: reveal 0.5s 3s ease forwards;
+    }
+    .foot span { color: var(--te-orange); }
+
+    /* ─── RIPPLE ON CLICK ─── */
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,94,43,0.2);
+      transform: scale(0);
+      animation: ripple 0.6s linear;
+      pointer-events: none;
+    }
+    @keyframes ripple {
+      to { transform: scale(4); opacity: 0; }
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 1px; }
+
+    /* ─── TERMINAL COMMAND INPUT ─── */
+    .terminal-panel {
+      border-top: 1px solid var(--border);
+      background: var(--bg-panel);
+      padding: 12px 24px;
+      margin-top: 32px;
+      max-width: 1100px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .terminal-output {
+      font-size: 11px;
+      color: var(--te-green);
+      line-height: 1.4;
+      margin-bottom: 8px;
+      max-height: 120px;
+      overflow-y: auto;
+      font-family: 'JetBrains Mono', monospace;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .terminal-output::-webkit-scrollbar { width: 4px; }
+    .terminal-output::-webkit-scrollbar-thumb { background: var(--border); }
+    .terminal-input-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .terminal-prompt {
+      color: var(--te-orange);
+      font-weight: 600;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+    .terminal-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      color: var(--te-green);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      padding: 6px 0;
+      outline: none;
+    }
+    .terminal-input::placeholder { color: var(--text-dim); }
+    .terminal-input:focus { border-bottom-color: var(--te-green); box-shadow: 0 2px 0 var(--te-green); }
+    .cmd-hint {
+      font-size: 9px;
+      color: var(--text-dim);
+      margin-top: 6px;
+      letter-spacing: 0.5px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- BOOT SEQUENCE -->
+<div id="boot-overlay">
+  <div id="boot-content"></div>
+  <div id="boot-bar"><div id="boot-fill"></div></div>
+</div>
+
+<!-- CRT SCANLINES via CSS -->
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="logo-block">
+    <div class="status-led"></div>
+    <div class="logo-text glitch" data-text="ARSHAD">ARSH<span>AD</span></div>
+  </div>
+  <div class="screw" style="margin-left:8px;"></div>
+  <div class="nav">
+    <a href="#overview" class="active" onclick="showView('overview',this)">Overview</a>
+    <a href="#repos" onclick="showView('repos',this)">Repos</a>
+    <a href="#design" onclick="showView('design',this)">Figma</a>
+    <a href="#exp" onclick="showView('exp',this)">Exp</a>
+    <a href="#contact" onclick="showView('contact',this)">I/O</a>
+  </div>
+  <div class="screw"></div>
+</div>
+
+<!-- PAGE -->
+<div class="page">
+
+  <!-- LEFT MODULE -->
+  <aside>
+    <div class="panel" style="margin-bottom: 20px;">
+      <div class="panel-inner">
+        <div class="module-header">
+          <div class="screw" style="width:7px;height:7px;"></div>
+          User Profile
+          <div class="screw" style="width:7px;height:7px; margin-left:auto;"></div>
+        </div>
+        <div class="module-body">
+
+          <div class="avatar-box">
+            <img src="https://avatars.githubusercontent.com/u/191598942?v=4" alt="Arshad"
+              onerror="this.style.display='none'; this.parentNode.querySelector('.avatar-fallback').style.display='block'" />
+            <div class="avatar-fallback" style="display:none;">A</div>
+            <div class="corner corner-tl"></div>
+            <div class="corner corner-tr"></div>
+            <div class="corner corner-bl"></div>
+            <div class="corner corner-br"></div>
+          </div>
+
+          <div class="id-block">
+            <div class="id-name">MD ARSHAD ALAM</div>
+            <div class="id-handle flicker">@arshhx000</div>
+          </div>
+
+          <div style="border-top:1px solid var(--border); padding-top:10px;">
+            <div class="param-row"><span class="param-label">Status</span><span class="param-val">OPEN TO WORK</span></div>
+            <div class="param-row"><span class="param-label">Focus</span><span>AI · Automation</span></div>
+            <div class="param-row"><span class="param-label">Location</span><span>IN</span></div>
+          </div>
+
+          <div style="border-top:1px solid var(--border); margin-top:14px; padding-top:10px;">
+            <div class="module-header" style="padding:0 0 8px 0; border:none; background:none;">Core Skills</div>
+            <div class="pill-grid">
+              <span class="hw-pill">LLM Integration</span>
+              <span class="hw-pill">AI Agents</span>
+              <span class="hw-pill">Automation</span>
+              <span class="hw-pill">Full Stack</span>
+              <span class="hw-pill">UI/UX Design</span>
+              <span class="hw-pill"></span>
+            </div>
+          </div>
+
+          <div class="encoder-strip">
+            <div class="encoder enc-green"><div class="encoder-knob"></div><div class="encoder-label">React</div></div>
+            <div class="encoder enc-blue"><div class="encoder-knob"></div><div class="encoder-label">Node</div></div>
+            <div class="encoder enc-orange"><div class="encoder-knob"></div><div class="encoder-label">Figma</div></div>
+            <div class="encoder enc-white"><div class="encoder-knob"></div><div class="encoder-label">C++</div></div>
+          </div>
+
+          <div style="border-top:1px solid var(--border); margin-top:14px; padding-top:10px;">
+            <div class="module-header" style="padding:0 0 8px 0; border:none; background:none;">Parameters</div>
+            <div class="pill-grid">
+              <span class="hw-pill">MongoDB</span>
+              <span class="hw-pill">Express</span>
+              <span class="hw-pill">Python</span>
+              <span class="hw-pill">Tailwind</span>
+              <span class="hw-pill">SQL</span>
+              <span class="hw-pill">Git</span>
+              <span class="hw-pill">Vercel</span>
+              <span class="hw-pill">Flask</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="tab-rail">
+      <button class="active" id="btn-overview" onclick="showView('overview',this)">01 · Overview</button>
+      <button id="btn-repos" onclick="showView('repos',this)">02 · Repos</button>
+      <button id="btn-design" onclick="showView('design',this)">03 · Figma</button>
+      <button id="btn-exp" onclick="showView('exp',this)">04 · Exp</button>
+      <button id="btn-contact" onclick="showView('contact',this)">05 · I/O</button>
+    </div>
+
+    <!-- VIEW: OVERVIEW -->
+    <div class="view active" id="view-overview">
+
+      <div class="screen">
+        <div class="screen-header">
+          <div class="screen-title"><span>/</span> readme.md</div>
+          <div style="font-size:10px; color:var(--text-dim);">v1.0.0</div>
+        </div>
+
+        <div class="pixel-text">AI Agent Developer & Full Stack UX Designer<span class="cursor"></span></div>
+        <div class="readout">
+          Building AI-powered products using full-stack development, automation systems, and modern UI/UX design.<br/><br/>
+          I specialize in creating intelligent agent systems, scalable backend architectures, and intuitive user experiences that bridge the gap between complex automation and elegant interface design.
+        </div>
+
+        <div class="module-header" style="margin:16px 0;">Active Projects</div>
+        <div id="project-list">
+          <div class="list-term"><span class="list-bullet">01</span> <strong>Sevasetu</strong> — Municipal complaint platform, MERN + role dashboards</div>
+          <div class="list-term"><span class="list-bullet">02</span> <strong>Report Nest</strong> — Python/Flask report card system with analytics</div>
+          <div class="list-term"><span class="list-bullet">03</span> <strong>Smart Escalation</strong> — Auto-escalation engine with SLA tracking</div>
+          <div class="list-term"><span class="list-bullet">04</span> <strong>DSA Practice</strong> — Algorithms in C++ / JS with complexity notes</div>
+        </div>
+
+        <div class="module-header" style="margin:16px 0 10px;">Stack</div>
+        <div class="encoder-strip" style="justify-content:flex-start; gap:12px;">
+          <div class="encoder enc-green"><div class="encoder-knob"></div><div class="encoder-label">React</div></div>
+          <div class="encoder enc-blue"><div class="encoder-knob"></div><div class="encoder-label">Node</div></div>
+          <div class="encoder enc-orange"><div class="encoder-knob"></div><div class="encoder-label">Figma</div></div>
+          <div class="encoder enc-white"><div class="encoder-knob"></div><div class="encoder-label">C++</div></div>
+          <div class="encoder enc-green"><div class="encoder-knob"></div><div class="encoder-label">Python</div></div>
+          <div class="encoder enc-blue"><div class="encoder-knob"></div><div class="encoder-label">Mongo</div></div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px; font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:1px;">Pinned</div>
+      <div class="grid-2" style="margin-top:8px;" id="pinned-devices">
+        <div class="device">
+          <div class="device-header"><div><div class="device-type">Public</div><div class="device-id">sevasetu</div></div></div>
+          <div class="device-desc">MERN civic platform. Citizens file complaints; officers manage via dashboards with trend charts.</div>
+          <div class="device-tags"><span>JavaScript</span><span>MERN</span><span>MongoDB</span></div>
+        </div>
+        <div class="device">
+          <div class="device-header"><div><div class="device-type">Public</div><div class="device-id">report-nest</div></div></div>
+          <div class="device-desc">Python/Flask student report system. Parent portals, PDF export, analytics, role-based security.</div>
+          <div class="device-tags"><span>Python</span><span>Flask</span><span>SQL</span></div>
+        </div>
+        <div class="device">
+          <div class="device-header"><div><div class="device-type">Public</div><div class="device-id">smart-escalation</div></div></div>
+          <div class="device-desc">React + Node escalation engine. JWT auth, SLA timers, automatic routing to higher authorities.</div>
+          <div class="device-tags"><span>React</span><span>Node</span><span>JWT</span></div>
+        </div>
+        <div class="device">
+          <div class="device-header"><div><div class="device-type">Public</div><div class="device-id">dsa-practice</div></div></div>
+          <div class="device-desc">DSA implementations in C++ and JS. Time/space complexity annotations for every solution.</div>
+          <div class="device-tags"><span>C++</span><span>Algorithms</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW: REPOS -->
+    <div class="view" id="view-repos">
+      <div class="screen">
+        <div class="screen-header">
+          <div class="screen-title"><span>/</span> repositories</div>
+          <div style="font-size:10px; color:var(--text-dim);">6 found</div>
+        </div>
+        <div class="grid-2" id="repo-list"></div>
+      </div>
+    </div>
+
+    <!-- VIEW: FIGMA -->
+    <div class="view" id="view-design">
+      <div class="screen">
+        <div class="screen-header">
+          <div class="screen-title"><span>/</span> figma.workspace</div>
+          <div style="font-size:10px; color:var(--text-dim);">4 files</div>
+        </div>
+        <div class="readout" style="margin-bottom:16px;">
+          Interface design and prototyping in Figma. Wireframes → components → auto-layout → interactive flows. All work is built with reusable systems in mind.
+        </div>
+
+        <div class="grid-2" id="figma-grid">
+          <div class="figma-unit">
+            <div class="figma-display">📱</div>
+            <div class="figma-body">
+              <div class="figma-name">Task App UX</div>
+              <div class="figma-detail">Mobile productivity flow. Clean task creation, prioritization UI, minimal onboarding screens.</div>
+              <span class="figma-tag">Mobile · Case Study</span>
+            </div>
+          </div>
+          <div class="figma-unit">
+            <div class="figma-display">🌐</div>
+            <div class="figma-body">
+              <div class="figma-name">Sevasetu Dashboard</div>
+              <div class="figma-detail">Admin & officer panels. Complaint cards, status indicators, data viz layouts, responsive grids.</div>
+              <span class="figma-tag">Dashboard · UI</span>
+            </div>
+          </div>
+          <div class="figma-unit">
+            <div class="figma-display">🎓</div>
+            <div class="figma-body">
+              <div class="figma-name">Report Nest Portal</div>
+              <div class="figma-detail">Grade tables, analytics charts, PDF preview layouts. Parent view + admin view variants.</div>
+              <span class="figma-tag">Web App · UX</span>
+            </div>
+          </div>
+          <div class="figma-unit">
+            <div class="figma-display">⚙️</div>
+            <div class="figma-body">
+              <div class="figma-name">Design System</div>
+              <div class="figma-detail">Color tokens, type scale, button variants, spacing rules, component library.</div>
+              <span class="figma-tag">System · Components</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="border-top:1px solid var(--border); margin-top:20px; padding-top:14px;">
+          <div class="module-header" style="padding:0 0 10px 0; border:none; background:none;">Figma Parameters</div>
+          <div class="pill-grid">
+            <span class="hw-pill">Wireframing</span>
+            <span class="hw-pill">Prototyping</span>
+            <span class="hw-pill">Auto Layout</span>
+            <span class="hw-pill">Components</span>
+            <span class="hw-pill">Variants</span>
+            <span class="hw-pill">Interactive Flows</span>
+            <span class="hw-pill">Design Tokens</span>
+            <span class="hw-pill">Responsive Frames</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW: EXPERIENCE -->
+    <div class="view" id="view-exp">
+      <div class="screen">
+        <div class="screen-header">
+          <div class="screen-title"><span>/</span> experience.timeline</div>
+          <div style="font-size:10px; color:var(--text-dim);">4 tracks</div>
+        </div>
+        <div class="track" id="track-list">
+          <div class="track-row">
+            <div class="track-channel"><div class="track-num">T1</div><div class="track-led on pulse"></div></div>
+            <div class="track-info">
+              <div class="track-title">Sevasetu — Full Stack</div>
+              <div class="track-meta">MERN · 2025—Present</div>
+              <div class="track-body">Built civic complaint platform: React frontend, Node/Express APIs, MongoDB schema, JWT auth, role-based routing, Chart.js analytics, Multer image upload.</div>
+            </div>
+          </div>
+          <div class="track-row">
+            <div class="track-channel"><div class="track-num">T2</div><div class="track-led blue pulse"></div></div>
+            <div class="track-info">
+              <div class="track-title">Report Nest — Backend</div>
+              <div class="track-meta">Python/Flask · 2025</div>
+              <div class="track-body">Digitized report card system. Parent portals, PDF/email export, analytics dashboards, role-based security. Flask + SQLAlchemy + Jinja2.</div>
+            </div>
+          </div>
+          <div class="track-row">
+            <div class="track-channel"><div class="track-num">T3</div><div class="track-led orange pulse"></div></div>
+            <div class="track-info">
+              <div class="track-title">UI/UX — Figma</div>
+              <div class="track-meta">Design · 2024—Present</div>
+              <div class="track-body">App interfaces, dashboard layouts, design systems. Wireframing, component architecture, auto-layout, prototyping, design token management.</div>
+            </div>
+          </div>
+          <div class="track-row">
+            <div class="track-channel"><div class="track-num">T4</div><div class="track-led on pulse"></div></div>
+            <div class="track-info">
+              <div class="track-title">CS Student — SRM AP</div>
+              <div class="track-meta">B.Sc CS · 2024—2028</div>
+              <div class="track-body">OOP (C++), Digital Electronics, DBMS, Data Structures, Probability, Assembly (8086). Applied directly to MERN and Python projects.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW: CONTACT -->
+    <div class="view" id="view-contact">
+      <div class="screen">
+        <div class="screen-header">
+          <div class="screen-title"><span>/</span> io.patchbay</div>
+          <div style="font-size:10px; color:var(--text-dim);">4 connections</div>
+        </div>
+        <div class="readout" style="margin-bottom:16px;">
+          Open to software internships and UI/UX collaborations. Route signals through any channel below.
+        </div>
+        <div class="patch-grid" id="patch-list">
+          <a href="https://github.com/arshhx000" target="_blank" class="patch">
+            <div class="patch-jack orange"></div>
+            <div class="patch-info"><div class="patch-label">GitHub</div><div class="patch-val">arshhx000</div></div>
+          </a>
+          <a href="https://www.linkedin.com/in/md-arshad-alam-3bb290293/" target="_blank" class="patch">
+            <div class="patch-jack blue"></div>
+            <div class="patch-info"><div class="patch-label">LinkedIn</div><div class="patch-val">Md Arshad Alam</div></div>
+          </a>
+          <a href="mailto:mdarshadalam2007@gmail.com" class="patch">
+            <div class="patch-jack green"></div>
+            <div class="patch-info"><div class="patch-label">Email</div><div class="patch-val">mdarshadalam2007@gmail.com</div></div>
+          </a>
+          <div class="patch" style="cursor:default;">
+            <div class="patch-jack white"></div>
+            <div class="patch-info"><div class="patch-label">Location</div><div class="patch-val">Andhra Pradesh, IN</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- TERMINAL COMMAND INPUT -->
+<div class="terminal-panel">
+  <div class="terminal-output" id="terminal-output">Type 'help' for available commands...</div>
+  <div class="terminal-input-group">
+    <span class="terminal-prompt">root@arshad ~$</span>
+    <input type="text" class="terminal-input" id="cmd-input" placeholder="Enter command...">
+  </div>
+  <div class="cmd-hint">Type: goto [overview|repos|design|exp|contact] | help | time | clear</div>
+</div>
+
+<div class="foot">
+  <span>ARSHAD</span> · AI Agent Developer & Full Stack UX Designer · 2026
+</div>
+
+<script>
+  // ─── BOOT SEQUENCE ───
+  const bootLines = [
+    'INITIALIZING HARDWARE...',
+    'LOADING KERNEL modules/arshad.bin',
+    'MOUNTING /dev/portfolio',
+    'CALIBRATING ENCODERS... OK',
+    'SCANNING REPOSITORIES... 26 FOUND',
+    'LINKING FIGMA WORKSPACE... OK',
+    'ESTABLISHING CONNECTION...',
+    'SYSTEM READY.'
+  ];
+  const bootContent = document.getElementById('boot-content');
+  const bootFill = document.getElementById('boot-fill');
+  const bootOverlay = document.getElementById('boot-overlay');
+
+  async function runBoot() {
+    for (let i = 0; i < bootLines.length; i++) {
+      const div = document.createElement('div');
+      div.className = 'boot-line';
+      div.innerHTML = `[${String(i+1).padStart(2,'0')}/${String(bootLines.length).padStart(2,'0')}] ${bootLines[i]}<span class="boot-cursor"></span>`;
+      bootContent.appendChild(div);
+      await new Promise(r => setTimeout(r, 80));
+      div.classList.add('visible');
+      bootFill.style.width = `${((i+1)/bootLines.length)*100}%`;
+      await new Promise(r => setTimeout(r, 180));
+    }
+    await new Promise(r => setTimeout(r, 400));
+    bootOverlay.style.transition = 'opacity 0.6s';
+    bootOverlay.style.opacity = '0';
+    await new Promise(r => setTimeout(r, 600));
+    bootOverlay.style.display = 'none';
+    startRevealAnimations();
+  }
+
+  function startRevealAnimations() {
+    // Staggered reveals for lists and cards
+    const lists = document.querySelectorAll('.list-term');
+    lists.forEach((el, i) => { el.style.animationDelay = `${2.8 + i*0.1}s`; el.classList.add('visible'); });
+
+    const devices = document.querySelectorAll('.device');
+    devices.forEach((el, i) => { el.style.animationDelay = `${3.0 + i*0.08}s`; el.classList.add('visible'); });
+
+    const figmaUnits = document.querySelectorAll('.figma-unit');
+    figmaUnits.forEach((el, i) => { el.style.animationDelay = `${2.9 + i*0.1}s`; el.classList.add('visible'); });
+
+    const patches = document.querySelectorAll('.patch');
+    patches.forEach((el, i) => { el.style.animationDelay = `${2.8 + i*0.1}s`; el.classList.add('visible'); });
+
+    const trackRows = document.querySelectorAll('.track-row');
+    trackRows.forEach((el, i) => { el.style.animationDelay = `${2.7 + i*0.12}s`; el.classList.add('visible'); });
+  }
+
+  // ─── VIEW SWITCHING ───
+  function showView(view, btn) {
+    document.querySelectorAll('.view').forEach(v => {
+      v.classList.remove('active');
+      v.style.opacity = '0';
+      v.style.transform = 'translateX(-8px)';
+    });
+    document.querySelectorAll('.tab-rail button').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
+
+    const target = document.getElementById('view-' + view);
+    target.classList.add('active');
+    requestAnimationFrame(() => {
+      target.style.opacity = '1';
+      target.style.transform = 'translateX(0)';
+    });
+
+    if(btn) btn.classList.add('active');
+    const map = {'overview':'overview','repos':'repos','design':'design','exp':'exp','contact':'contact'};
+    const navLink = document.querySelector(`.nav a[href="#${map[view] || view}"]`);
+    if(navLink) navLink.classList.add('active');
+  }
+
+  // ─── RIPPLE EFFECT ───
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('.screen, .device, .patch, .figma-unit')) {
+      const el = e.target.closest('.screen, .device, .patch, .figma-unit');
+      const ripple = document.createElement('span');
+      ripple.className = 'ripple';
+      const rect = el.getBoundingClientRect();
+      ripple.style.left = (e.clientX - rect.left) + 'px';
+      ripple.style.top = (e.clientY - rect.top) + 'px';
+      el.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 600);
+    }
+  });
+
+  // ─── CONTRIBUTION GRID ───
+  const grid = document.getElementById('contrib-grid');
+  if(grid) {
+    const colors = ['#161616','#0e4429','#006d32','#26a641','#39d353'];
+    for(let w=0; w<52; w++){
+      const week = document.createElement('div');
+      week.style.cssText = 'display:flex; flex-direction:column; gap:3px;';
+      for(let d=0; d<7; d++){
+        const day = document.createElement('div');
+        day.className = 'contrib-day';
+        const l = Math.floor(Math.random()*5);
+        day.style.background = colors[l];
+        day.title = `${l*3} events`;
+        week.appendChild(day);
+      }
+      grid.appendChild(week);
+    }
+  }
+
+  // ─── REPO LIST ───
+  const repos = [
+    {name:'sevasetu', desc:'MERN municipal complaint platform with role dashboards and analytics', tags:['JavaScript','MERN','MongoDB']},
+    {name:'report-nest', desc:'Python/Flask student report card system with parent portals and PDF export', tags:['Python','Flask','SQL']},
+    {name:'smart-escalation', desc:'React + Node/Express escalation system with JWT auth and SLA tracking', tags:['React','Node','JWT']},
+    {name:'dsa-practice', desc:'DSA implementations in C++ and JS with complexity analysis', tags:['C++','Algorithms']},
+    {name:'dbms-notes', desc:'Database queries, schemas, normalization examples and ER diagrams', tags:['SQL','DBMS']},
+    {name:'portfolio-figma', desc:'Figma design files for portfolio UI components and design system', tags:['Figma','UI']},
+  ];
+  const repoList = document.getElementById('repo-list');
+  repos.forEach((r,i) => {
+    repoList.innerHTML += `
+      <div class="device" style="animation-delay:${3.0+i*0.08}s">
+        <div class="device-header"><div><div class="device-type">Public</div><div class="device-id">${r.name}</div></div></div>
+        <div class="device-desc">${r.desc}</div>
+        <div class="device-tags">${r.tags.map(t=>`<span>${t}</span>`).join('')}</div>
+      </div>`;
+  });
+
+  // ─── TERMINAL COMMAND HANDLER ───
+  const terminal = document.getElementById('terminal-output');
+  const cmdInput = document.getElementById('cmd-input');
+  
+  if (terminal && cmdInput) {
+    const commands = {
+      overview: () => { showView('overview'); return 'Navigated to Overview'; },
+      repos: () => { showView('repos'); return 'Navigated to Repositories'; },
+      design: () => { showView('design'); return 'Navigated to Figma'; },
+      exp: () => { showView('exp'); return 'Navigated to Experience'; },
+      contact: () => { showView('contact'); return 'Navigated to I/O'; },
+      help: () => {
+        return `Available Commands:\n  goto <section>   Navigate to section (overview, repos, design, exp, contact)\n  overview         Jump to overview\n  repos            Jump to repositories\n  design           Jump to Figma workspace\n  exp              Jump to experience\n  contact          Jump to I/O\n  time             Show current time\n  clear            Clear terminal\n  help             Show this help`;
+      },
+      time: () => {
+        const now = new Date();
+        return `Current time: ${now.toLocaleTimeString()}`;
+      },
+      clear: () => { terminal.innerHTML = ''; return null; }
+    };
+
+    function executeCommand(input) {
+      const parts = input.toLowerCase().trim().split(' ');
+      const cmd = parts[0];
+      const arg = parts[1];
+      let output = '';
+
+      if (cmd === 'goto' && arg) {
+        const section = arg.toLowerCase();
+        if (commands[section]) {
+          output = commands[section]();
+        } else {
+          output = `Unknown section: ${arg}`;
+        }
+      } else if (commands[cmd]) {
+        output = commands[cmd]();
+      } else {
+        output = `Command not found: ${cmd}. Type 'help' for available commands.`;
+      }
+
+      if (output !== null) {
+        const line = `${output}`;
+        terminal.innerHTML += (terminal.innerHTML ? '\n' : '') + line;
+        terminal.scrollTop = terminal.scrollHeight;
+      }
+    }
+
+    cmdInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        const cmd = cmdInput.value;
+        if (cmd.trim()) {
+          terminal.innerHTML += (terminal.innerHTML ? '\n' : '') + `root@arshad ~$ ${cmd}`;
+          executeCommand(cmd);
+          cmdInput.value = '';
+          terminal.scrollTop = terminal.scrollHeight;
+        }
+      }
+    });
+  }
+
+  // Start boot on load
+  runBoot();
+</script>
+</body>
+</html>
