@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Astra Decision Engine</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Futuristic typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+    rel="stylesheet"
+  >
+
+  <style>
+  /* Root + reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:root {
+  --bg-main: #0d1117;
+  --bg-elevated: rgba(20, 26, 37, 0.7);
+  --border-glass: rgba(148, 163, 184, 0.35);
+  --accent-primary: #3b82f6;
+  --accent-secondary: #22c55e;
+  --accent-danger: #f97373;
+  --accent-warning: #facc15;
+  --accent-neutral: #38bdf8;
+  --text-main: #e5e7eb;
+  --text-muted: #9ca3af;
+  --text-soft: #6b7280;
+  --radius-lg: 18px;
+  --radius-pill: 999px;
+  --shadow-soft: 0 18px 60px rgba(15, 23, 42, 0.8);
+  --glass-blur: 18px;
+  --transition-fast: 160ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-med: 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  --font-heading: "Space Grotesk", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco,
+    Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: var(--font-heading);
+  color: var(--text-main);
+  background: radial-gradient(circle at top left, #1f2937 0, #020617 38%, #000 100%);
+  background-color: var(--bg-main);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Animated aurora background */
+.bg-orbit {
+  position: fixed;
+  inset: -20%;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(56, 189, 248, 0.18) 0, transparent 60%),
+    radial-gradient(circle at 100% 0%, rgba(59, 130, 246, 0.23) 0, transparent 55%),
+    radial-gradient(circle at 50% 100%, rgba(34, 197, 94, 0.18) 0, transparent 55%);
+  mix-blend-mode: screen;
+  opacity: 0.55;
+  filter: blur(18px);
+  pointer-events: none;
+  z-index: -2;
+  animation: orbit 22s linear infinite alternate;
+}
+
+.bg-orbit-2 {
+  opacity: 0.4;
+  animation-duration: 34s;
+  animation-direction: alternate-reverse;
+}
+
+@keyframes orbit {
+  0% {
+    transform: translate3d(-2%, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(3%, -2%, 0) scale(1.04);
+  }
+  100% {
+    transform: translate3d(-1%, 3%, 0) scale(1.02);
+  }
+}
+
+/* Layout */
+.app-shell {
+  max-width: 1120px;
+  margin: 32px auto;
+  padding: 0 16px 32px;
+}
+
+.app-header {
+  margin-bottom: 24px;
+  padding: 20px 24px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.title-block h1 {
+  font-size: 1.9rem;
+  letter-spacing: 0.05em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.subtitle {
+  margin: 4px 0 0;
+  font-size: 0.96rem;
+  color: var(--text-muted);
+}
+
+.header-note {
+  margin: 8px 0 0;
+  font-size: 0.86rem;
+  color: var(--text-soft);
+}
+
+.app-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 20px;
+}
+
+.panel {
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+}
+
+/* glassmorphism */
+.glass {
+  background: linear-gradient(
+      135deg,
+      rgba(15, 23, 42, 0.8),
+      rgba(15, 23, 42, 0.6)
+    ),
+    radial-gradient(circle at top left, rgba(56, 189, 248, 0.1), transparent 55%);
+  background-blend-mode: soft-light, normal;
+  border: 1px solid var(--border-glass);
+  backdrop-filter: blur(var(--glass-blur));
+}
+
+/* Titles */
+.panel-title {
+  margin: 0 0 2px;
+  font-size: 0.98rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--text-muted);
+}
+
+.panel-subtitle {
+  margin: 0 0 16px;
+  font-size: 0.94rem;
+  color: var(--text-soft);
+}
+
+/* Form */
+.panel:first-of-type {
+  padding: 20px 20px 18px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 14px 18px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field label {
+  font-size: 0.86rem;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.field select,
+.field input[type="range"] {
+  font-family: var(--font-heading);
+}
+
+.field select {
+  appearance: none;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  background:
+    radial-gradient(circle at top left, rgba(56, 189, 248, 0.14), transparent 60%),
+    rgba(15, 23, 42, 0.9);
+  color: var(--text-main);
+  padding: 8px 10px;
+  font-size: 0.9rem;
+  outline: none;
+  position: relative;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast),
+    background var(--transition-fast), transform var(--transition-fast);
+}
+
+.field select:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.7);
+  transform: translateY(-1px);
+}
+
+.field select:hover {
+  border-color: rgba(148, 163, 184, 0.8);
+}
+
+/* Slider */
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#duration {
+  flex: 1;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(31, 41, 55, 0.9);
+  outline: none;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #e5e7eb 0, #f9fafb 20%, #38bdf8 80%);
+  border: 2px solid #0f172a;
+  box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.35);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 0 6px rgba(56, 189, 248, 0.5);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #e5e7eb 0, #f9fafb 20%, #38bdf8 80%);
+  border: 2px solid #0f172a;
+  box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.35);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+input[type="range"]::-moz-range-thumb:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 0 6px rgba(56, 189, 248, 0.5);
+}
+
+.pill {
+  border-radius: var(--radius-pill);
+  padding: 3px 10px;
+  font-size: 0.76rem;
+  color: var(--accent-neutral);
+  border: 1px solid rgba(56, 189, 248, 0.7);
+  background: rgba(15, 23, 42, 0.9);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+}
+
+.field-hint {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--text-soft);
+}
+
+/* Button */
+.actions {
+  grid-column: 1 / -1;
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.btn-analyze {
+  position: relative;
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 10px 18px;
+  font-family: var(--font-heading);
+  font-size: 0.92rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  isolation: isolate;
+  color: #f9fafb;
+  background: linear-gradient(120deg, #22c55e, #22c55e, #3b82f6, #a855f7);
+  background-size: 220% 220%;
+  box-shadow: 0 12px 32px rgba(34, 197, 94, 0.3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: transform var(--transition-med), box-shadow var(--transition-med),
+    background-position 320ms ease-out;
+}
+
+.btn-analyze .btn-label {
+  position: relative;
+  z-index: 1;
+}
+
+.btn-glow {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: radial-gradient(circle at 10% 0, rgba(248, 250, 252, 0.35), transparent 55%);
+  transition: opacity var(--transition-fast);
+}
+
+.btn-analyze:hover {
+  transform: translateY(-1px) scale(1.01);
+  box-shadow: 0 16px 40px rgba(56, 189, 248, 0.45);
+  background-position: 90% 0;
+}
+
+.btn-analyze:hover .btn-glow {
+  opacity: 1;
+}
+
+.btn-analyze:active {
+  transform: translateY(1px) scale(0.995);
+  box-shadow: 0 8px 26px rgba(15, 23, 42, 0.9);
+}
+
+.fine-print {
+  margin: 0;
+  font-size: 0.72rem;
+  color: var(--text-soft);
+}
+
+/* Right panel */
+.panel-right {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.scores-card {
+  padding: 18px 20px 14px;
+}
+
+.scores-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+}
+
+.score-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.score-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.score-value {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: #e5e7eb;
+}
+
+.score-bar {
+  position: relative;
+  height: 6px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 0 50%, rgba(31, 41, 55, 0.9), rgba(15, 23, 42, 0.96));
+  overflow: hidden;
+}
+
+.score-fill {
+  position: absolute;
+  inset: 0;
+  width: 0;
+  border-radius: inherit;
+  transition: width 420ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.score-dopamine {
+  background: linear-gradient(90deg, #f97316, #facc15);
+}
+
+.score-productivity {
+  background: linear-gradient(90deg, #22c55e, #22d3ee);
+}
+
+.score-growth {
+  background: linear-gradient(90deg, #22c55e, #4ade80);
+}
+
+.score-focus {
+  background: linear-gradient(90deg, #38bdf8, #a855f7);
+}
+
+.score-fill.glow {
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.5);
+}
+
+.score-hint {
+  margin: 0;
+  font-size: 0.76rem;
+  color: var(--text-soft);
+}
+
+/* Result card */
+.result-card {
+  margin-top: 2px;
+  padding: 17px 20px 16px;
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(148, 163, 184, 0.55);
+  box-shadow: 0 18px 55px rgba(15, 23, 42, 0.95);
+  transform: translateY(8px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.result-card::before {
+  content: "";
+  position: absolute;
+  inset: -60%;
+  background:
+    conic-gradient(
+      from 0deg,
+      rgba(59, 130, 246, 0.06),
+      rgba(34, 197, 94, 0.15),
+      rgba(56, 189, 248, 0.1),
+      rgba(234, 179, 8, 0.12),
+      rgba(248, 113, 113, 0.16),
+      transparent 70%
+    );
+  opacity: 0;
+  transition: opacity 420ms ease-out;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.result-card.show {
+  opacity: 1;
+  pointer-events: auto;
+  animation: reveal 420ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.result-card.show::before {
+  opacity: 1;
+}
+
+.result-card:hover {
+  border-color: rgba(129, 140, 248, 0.9);
+}
+
+/* Animated reveal */
+@keyframes reveal {
+  0% {
+    transform: translateY(10px) scale(0.985);
+  }
+  60% {
+    transform: translateY(-2px) scale(1.01);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.result-chip {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  background: rgba(15, 23, 42, 0.95);
+}
+
+/* Decision state colors */
+.result-chip.positive {
+  border-color: rgba(34, 197, 94, 0.85);
+  color: #bbf7d0;
+  box-shadow: 0 0 16px rgba(34, 197, 94, 0.4);
+}
+
+.result-chip.avoid {
+  border-color: rgba(248, 113, 113, 0.9);
+  color: #fecaca;
+  box-shadow: 0 0 16px rgba(248, 113, 113, 0.4);
+}
+
+.result-chip.caution {
+  border-color: rgba(250, 204, 21, 0.9);
+  color: #fef9c3;
+  box-shadow: 0 0 16px rgba(250, 204, 21, 0.4);
+}
+
+.result-chip.neutral {
+  border-color: rgba(56, 189, 248, 0.9);
+  color: #bae6fd;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.4);
+}
+
+.result-tag {
+  font-size: 0.76rem;
+  color: var(--text-soft);
+}
+
+.result-title {
+  margin: 0 0 6px;
+  font-size: 1.05rem;
+}
+
+.result-reason {
+  margin: 0 0 10px;
+  font-size: 0.86rem;
+  color: var(--text-muted);
+}
+
+.result-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: var(--text-soft);
+}
+
+.result-pattern {
+  font-family: var(--font-mono);
+}
+
+.result-tip {
+  text-align: right;
+}
+
+/* Footer */
+.app-footer {
+  margin-top: 22px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.76rem;
+  color: var(--text-soft);
+}
+
+.footer-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(148, 163, 184, 0.7);
+}
+
+/* Responsive */
+@media (max-width: 880px) {
+  .app-shell {
+    margin-top: 20px;
+  }
+
+  .app-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .panel-right {
+    order: -1;
+  }
+
+  .app-header {
+    padding: 16px 14px 14px;
+  }
+
+  .panel:first-of-type,
+  .scores-card,
+  .result-card {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  .title-block h1 {
+    font-size: 1.4rem;
+  }
+
+  .subtitle {
+    font-size: 0.84rem;
+  }
+
+  .form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .scores-card {
+    margin-top: 8px;
+  }
+}
+  </style>
+</head>
+<body>
+  
+  <div class="bg-orbit"></div>
+  <div class="bg-orbit bg-orbit-2"></div>
+
+  <main class="app-shell">
+    <header class="app-header glass">
+      <div class="title-block">
+        <h1>Astra 1411</h1>
+      </div>
+    </header>
+
+    <section class="app-grid">
+      <!-- INPUT PANEL -->
+      <section class="panel glass">
+        <h2 class="panel-title">Input your current context</h2>
+        <p class="panel-subtitle">Describe what you want to do right now.</p>
+
+        <form id="astra-form" class="form-grid">
+          <!-- Category -->
+          <div class="field">
+            <label for="category">Activity category</label>
+            <select id="category" required>
+              <option value="" disabled selected>Select a category</option>
+              <option>Study</option>
+              <option>Skill Building</option>
+              <option>Coding</option>
+              <option>UI/UX Design</option>
+              <option>Logo Design</option>
+              <option>Client Work</option>
+              <option>AI Project</option>
+              <option>Startup Work</option>
+              <option>Workout</option>
+              <option>Reading</option>
+              <option>Networking</option>
+              <option>Sleep</option>
+              <option>Gaming</option>
+              <option>Social Media</option>
+              <option>Scrolling</option>
+              <option>YouTube</option>
+              <option>Porn</option>
+              <option>Movies</option>
+              <option>Music</option>
+              <option>Relaxation</option>
+            </select>
+            <p class="field-hint">
+              Choose the closest match to what you’re about to do.
+            </p>
+          </div>
+
+          <!-- Time of day -->
+          <div class="field">
+            <label for="timeOfDay">Time of day</label>
+            <select id="timeOfDay" required>
+              <option value="" disabled selected>Select time context</option>
+              <option value="morning">Morning (5am–11am)</option>
+              <option value="afternoon">Afternoon (11am–5pm)</option>
+              <option value="evening">Evening (5pm–11pm)</option>
+              <option value="latenight">Late Night (&gt; 11pm)</option>
+            </select>
+            <p class="field-hint">
+              Some actions (like porn or heavy entertainment) are worse late at night; sleep is more valuable then.
+            </p>
+          </div>
+
+          <!-- Duration -->
+          <div class="field">
+            <label for="duration">Planned duration (minutes)</label>
+            <div class="slider-row">
+              <input
+                type="range"
+                id="duration"
+                min="5"
+                max="180"
+                step="5"
+                value="30"
+              />
+              <span id="duration-label" class="pill">30 min</span>
+            </div>
+            <p class="field-hint">
+              Long sessions of high-dopamine distractions are treated as riskier than short, intentional breaks.
+            </p>
+          </div>
+
+          <!-- Energy -->
+          <div class="field">
+            <label for="energy">Current energy</label>
+            <select id="energy" required>
+              <option value="" disabled selected>How is your energy?</option>
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+            <p class="field-hint">
+              High energy + productive work = strong green light. Low energy often means you should recover or start small.
+            </p>
+          </div>
+
+          <!-- Mood -->
+          <div class="field">
+            <label for="mood">Current mood</label>
+            <select id="mood" required>
+              <option value="" disabled selected>How do you feel?</option>
+              <option value="focused">Focused</option>
+              <option value="bored">Bored</option>
+              <option value="stressed">Stressed</option>
+              <option value="distracted">Distracted</option>
+              <option value="motivated">Motivated</option>
+              <option value="charged">Emotionally Charged</option>
+            </select>
+            <p class="field-hint">
+              Being stressed or emotionally charged changes whether distraction helps or hurts.
+            </p>
+          </div>
+
+          <!-- Analyze Button -->
+          <div class="actions">
+            <button type="submit" class="btn-analyze">
+              <span class="btn-glow"></span>
+              <span class="btn-label">Analyze Decision</span>
+            </button>
+            <p class="fine-print">
+              Astra is a heuristic guide, not medical advice. Use it to become more intentional, not to punish yourself.
+            </p>
+          </div>
+        </form>
+      </section>
+
+      <!-- SCORES + RESULT PANEL -->
+      <section class="panel panel-right">
+        <!-- Scores -->
+        <div class="glass scores-card">
+          <h2 class="panel-title">Cognitive impact scores</h2>
+          <p class="panel-subtitle">
+            Astra estimates how this choice affects dopamine, productivity, growth and focus.
+          </p>
+
+          <div class="scores-grid">
+            <div class="score-item">
+              <div class="score-label-row">
+                <span>Dopamine score</span>
+                <span id="dopamine-value" class="score-value">–</span>
+              </div>
+              <div class="score-bar">
+                <div id="dopamine-bar" class="score-fill score-dopamine"></div>
+              </div>
+              <p class="score-hint">
+                Higher = more stimulating. Too high with low productivity becomes a trap.
+              </p>
+            </div>
+
+            <div class="score-item">
+              <div class="score-label-row">
+                <span>Productivity score</span>
+                <span id="productivity-value" class="score-value">–</span>
+              </div>
+              <div class="score-bar">
+                <div id="productivity-bar" class="score-fill score-productivity"></div>
+              </div>
+              <p class="score-hint">
+                How much this action moves real work or responsibilities forward.
+              </p>
+            </div>
+
+            <div class="score-item">
+              <div class="score-label-row">
+                <span>Growth score</span>
+                <span id="growth-value" class="score-value">–</span>
+              </div>
+              <div class="score-bar">
+                <div id="growth-bar" class="score-fill score-growth"></div>
+              </div>
+              <p class="score-hint">
+                Long-term skill, health, and identity building.
+              </p>
+            </div>
+
+            <div class="score-item">
+              <div class="score-label-row">
+                <span>Focus score</span>
+                <span id="focus-value" class="score-value">–</span>
+              </div>
+              <div class="score-bar">
+                <div id="focus-bar" class="score-fill score-focus"></div>
+              </div>
+              <p class="score-hint">
+                How much this choice trains or erodes your ability to focus deeply.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Result -->
+        <div id="result-card" class="glass result-card">
+          <div class="result-header">
+            <span class="result-chip" id="decision-chip">Awaiting input</span>
+            <span class="result-tag" id="result-tag">No analysis yet</span>
+          </div>
+
+          <h2 id="result-title" class="result-title">
+            Tell Astra what you’re about to do.
+          </h2>
+
+          <p id="result-reason" class="result-reason">
+            Once you fill in the left panel and hit “Analyze Decision”, Astra will reveal a color-coded recommendation with a short explanation.
+          </p>
+
+          <div class="result-meta">
+            <span id="result-pattern" class="result-pattern">—</span>
+            <span id="result-tip" class="result-tip">—</span>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <footer class="app-footer">
+    </footer>
+  </main>
+
+  <script>
+    // --- Astra Decision Engine core logic ---
+// All logic is encoded in plain objects + simple functions for beginner readability.
+
+// Category configuration: base scores on 0–10 scale
+// type: "productive" | "rest" | "entertainment" | "high_dopamine" | "harmful"
+const CATEGORY_CONFIG = {
+  "Study":            { type: "productive",    dopamine: 4, productivity: 9, growth: 9, focus: 8 },
+  "Skill Building":   { type: "productive",    dopamine: 5, productivity: 9, growth: 9, focus: 8 },
+  "Coding":           { type: "productive",    dopamine: 5, productivity: 9, growth: 9, focus: 8 },
+  "UI/UX Design":     { type: "productive",    dopamine: 5, productivity: 8, growth: 8, focus: 7 },
+  "Logo Design":      { type: "productive",    dopamine: 5, productivity: 7, growth: 8, focus: 7 },
+  "Client Work":      { type: "productive",    dopamine: 4, productivity: 9, growth: 8, focus: 7 },
+  "AI Project":       { type: "productive",    dopamine: 6, productivity: 9, growth: 9, focus: 8 },
+  "Startup Work":     { type: "productive",    dopamine: 6, productivity: 9, growth: 10, focus: 8 },
+  "Workout":          { type: "productive",    dopamine: 7, productivity: 8, growth: 9, focus: 7 },
+  "Reading":          { type: "productive",    dopamine: 4, productivity: 7, growth: 9, focus: 8 },
+  "Networking":       { type: "productive",    dopamine: 6, productivity: 7, growth: 8, focus: 6 },
+  "Sleep":            { type: "rest",          dopamine: 3, productivity: 7, growth: 8, focus: 7 },
+
+  "Gaming":           { type: "high_dopamine", dopamine: 8, productivity: 3, growth: 3, focus: 3 },
+  "Social Media":     { type: "high_dopamine", dopamine: 9, productivity: 2, growth: 2, focus: 2 },
+  "Scrolling":        { type: "high_dopamine", dopamine: 9, productivity: 1, growth: 1, focus: 1 },
+  "YouTube":          { type: "high_dopamine", dopamine: 8, productivity: 3, growth: 3, focus: 3 },
+  "Movies":           { type: "entertainment", dopamine: 7, productivity: 2, growth: 2, focus: 2 },
+  "Music":            { type: "entertainment", dopamine: 6, productivity: 3, growth: 3, focus: 4 },
+  "Relaxation":       { type: "rest",          dopamine: 5, productivity: 4, growth: 5, focus: 5 },
+
+  // Porn is deliberately marked harmful: very high dopamine but negative for focus, productivity and long-term stability
+  "Porn":             { type: "harmful",       dopamine: 10, productivity: 0, growth: 0, focus: 0 }
+};
+
+// DOM references
+const form = document.getElementById("astra-form");
+const durationInput = document.getElementById("duration");
+const durationLabel = document.getElementById("duration-label");
+
+const dopamineBar = document.getElementById("dopamine-bar");
+const productivityBar = document.getElementById("productivity-bar");
+const growthBar = document.getElementById("growth-bar");
+const focusBar = document.getElementById("focus-bar");
+
+const dopamineValue = document.getElementById("dopamine-value");
+const productivityValue = document.getElementById("productivity-value");
+const growthValue = document.getElementById("growth-value");
+const focusValue = document.getElementById("focus-value");
+
+const resultCard = document.getElementById("result-card");
+const decisionChip = document.getElementById("decision-chip");
+const resultTag = document.getElementById("result-tag");
+const resultTitle = document.getElementById("result-title");
+const resultReason = document.getElementById("result-reason");
+const resultPattern = document.getElementById("result-pattern");
+const resultTip = document.getElementById("result-tip");
+
+// Update duration label live
+durationInput.addEventListener("input", () => {
+  durationLabel.textContent = `${durationInput.value} min`;
+});
+
+// Small helper: clamp between 0–10 then scale to 0–100
+function toPercent(score) {
+  const clamped = Math.max(0, Math.min(10, score));
+  return Math.round(clamped * 10);
+}
+
+// Compute multipliers based on energy and mood
+function getContextMultipliers(type, energy, mood, timeOfDay, duration) {
+  let dopamineShift = 0;
+  let productivityShift = 0;
+  let growthShift = 0;
+  let focusShift = 0;
+
+  // Energy effects
+  if (energy === "high") {
+    if (type === "productive") {
+      productivityShift += 1.5;
+      growthShift += 0.5;
+      focusShift += 1.5;
+    } else if (type === "high_dopamine" || type === "entertainment") {
+      dopamineShift += 0.5; // more tempting when you feel good
+    }
+  } else if (energy === "low") {
+    if (type === "productive") {
+      productivityShift -= 1.5;
+      focusShift -= 1.5;
+    }
+    if (type === "rest" || type === "rest-entertainment") {
+      growthShift += 0.5; // recovery is more valuable when tired
+    }
+  }
+
+  // Mood effects
+  if (mood === "focused" || mood === "motivated") {
+    if (type === "productive") {
+      productivityShift += 1.5;
+      growthShift += 1;
+      focusShift += 1.5;
+    }
+  }
+
+  if (mood === "bored" || mood === "distracted") {
+    if (type === "high_dopamine") {
+      dopamineShift += 1; // high-dopamine distractions feel even more rewarding
+      productivityShift -= 1;
+      focusShift -= 1;
+    }
+  }
+
+  if (mood === "stressed" || mood === "charged") {
+    // Stress makes mindless distractions more risky, recovery more valuable
+    if (type === "high_dopamine") {
+      dopamineShift += 1.5;
+      productivityShift -= 1.5;
+      focusShift -= 1.5;
+    }
+    if (type === "rest") {
+      growthShift += 1;
+      focusShift += 0.5;
+    }
+  }
+
+  // Time of day effects
+  if (timeOfDay === "latenight") {
+    if (type === "productive") {
+      focusShift -= 1; // most people are cognitively worse late night
+    }
+    if (type === "high_dopamine" || type === "entertainment" || type === "harmful") {
+      dopamineShift += 1.5;
+      productivityShift -= 1;
+      focusShift -= 1.5;
+    }
+    if (type === "rest") {
+      growthShift += 1;
+      focusShift += 1;
+    }
+  }
+
+  // Duration effects
+  if (duration >= 60) {
+    if (type === "high_dopamine" || type === "entertainment" || type === "harmful") {
+      dopamineShift += 1.5;
+      productivityShift -= 2;
+      growthShift -= 2;
+      focusShift -= 2;
+    }
+    if (type === "productive") {
+      // Long, deep sessions can be powerful if energy is there
+      if (energy !== "low") {
+        productivityShift += 0.5;
+        growthShift += 0.5;
+      } else {
+        focusShift -= 1; // too long when exhausted = low quality
+      }
+    }
+  } else if (duration <= 25) {
+    if (type === "high_dopamine") {
+      // Short intentional break is much safer
+      productivityShift += 0.5;
+      focusShift += 0.5;
+    }
+  }
+
+  return { dopamineShift, productivityShift, growthShift, focusShift };
+}
+
+// Decide label and color based on scores and context
+function decideLabel(category, type, scores, energy, mood, timeOfDay, duration) {
+  const d = scores.dopamine;
+  const p = scores.productivity;
+  const g = scores.growth;
+  const f = scores.focus;
+
+  // Strong hard rules first
+  if (category === "Porn") {
+    return {
+      label: "DON'T DO IT",
+      tone: "avoid",
+      tag: "High dopamine, low control",
+      pattern: "Supranormal reward, long-term cost.",
+      tip: "Replace with sleep, workout, or reading. Protect your reward system."
+    };
+  }
+
+  if (category === "Sleep") {
+    if (timeOfDay === "latenight" || energy === "low" || mood === "stressed" || mood === "charged") {
+      return {
+        label: "SLEEP",
+        tone: "positive",
+        tag: "Deep recovery move",
+        pattern: "Rest now, perform better tomorrow.",
+        tip: "Full sleep will give you more focus, mood stability, and decision power for real work."
+      };
+    } else {
+      return {
+        label: "GOOD CHOICE",
+        tone: "neutral",
+        tag: "Recovery-focused",
+        pattern: "Short rest can reset your focus.",
+        tip: "Keep it reasonable so it doesn’t break your circadian rhythm."
+      };
+    }
+  }
+
+  // High-quality productive deep work
+  if (type === "productive" && p >= 75 && g >= 75 && d <= 70 && f >= 65 && energy !== "low") {
+    return {
+      label: "DO IT",
+      tone: "positive",
+      tag: "High leverage block",
+      pattern: "Strong energy + high-growth work.",
+      tip: "Silence notifications, set a 50–90 min deep focus block, and let this build your future."
+    };
+  }
+
+  // Productive but you’re low on energy or focus
+  if (type === "productive" && p >= 55 && g >= 60 && (energy === "low" || f < 65)) {
+    return {
+      label: "START SMALL",
+      tone: "caution",
+      tag: "Micro-commitment",
+      pattern: "Good choice but capacity limited.",
+      tip: "Commit to 10–25 minutes. If you still feel dead after that, pivot to sleep or light reading."
+    };
+  }
+
+  // Workout is generally a good choice even when mood is off
+  if (category === "Workout" && (p >= 55 || g >= 70)) {
+    if (energy === "low") {
+      return {
+        label: "START SMALL",
+        tone: "positive",
+        tag: "Movement over perfection",
+        pattern: "Even 10–15 minutes helps.",
+        tip: "Do a short, light session. It will boost your mood and support later deep work."
+      };
+    }
+    return {
+      label: "GOOD CHOICE",
+      tone: "positive",
+      tag: "Brain + body boost",
+      pattern: "Exercise supports dopamine, mood, and cognition.",
+      tip: "Treat this as part of your productivity system, not a distraction from it."
+    };
+  }
+
+  // High-dopamine distractions: social media, scrolling, gaming, YouTube
+  if (type === "high_dopamine") {
+    if (duration >= 60 || timeOfDay === "latenight") {
+      return {
+        label: "AVOID",
+        tone: "avoid",
+        tag: "High dopamine trap",
+        pattern: "Long, late sessions erode focus and sleep.",
+        tip: "If you must, set a 10–15 minute timer and keep lights bright to avoid endless binging."
+      };
+    }
+
+    if (mood === "stressed" || mood === "charged") {
+      return {
+        label: "LIMIT IT",
+        tone: "caution",
+        tag: "Numbing, not healing",
+        pattern: "This soothes short term but keeps the stress cycle.",
+        tip: "Use a calmer outlet: walk, stretching, journaling, or slow music while lying down."
+      };
+    }
+
+    return {
+      label: "LIMIT IT",
+      tone: "caution",
+      tag: "High dopamine leisure",
+      pattern: "Fun but easy to overdo.",
+      tip: "Keep it short and intentional, then switch back to growth work or sleep."
+    };
+  }
+
+  // Entertainment like movies, music, relaxation
+  if (type === "entertainment" || type === "rest") {
+    if (mood === "stressed" || mood === "charged") {
+      return {
+        label: "MODERATE",
+        tone: "neutral",
+        tag: "Regulate, don’t escape",
+        pattern: "Calm entertainment can help you downshift.",
+        tip: "Choose gentle content (music, slow movie) and avoid endless scrolling."
+      };
+    }
+
+    if (duration >= 90 && timeOfDay === "latenight") {
+      return {
+        label: "LIMIT IT",
+        tone: "caution",
+        tag: "Sleep is better here",
+        pattern: "Very long late-night leisure steals tomorrow’s energy.",
+        tip: "Either shorten this session or move it earlier in the day next time."
+      };
+    }
+
+    return {
+      label: "MODERATE",
+      tone: "neutral",
+      tag: "Neutral leisure",
+      pattern: "Fine as a conscious break.",
+      tip: "Enjoy it, but make sure you’ve already touched at least one growth task today."
+    };
+  }
+
+  // Backstop: if dopamine is very high and productivity very low
+  if (d >= 80 && p <= 30) {
+    return {
+      label: "AVOID",
+      tone: "avoid",
+      tag: "Overstimulation, low return",
+      pattern: "Strong reward, almost no growth.",
+      tip: "Swap this with 10 minutes of walking, journaling, or planning tomorrow."
+    };
+  }
+
+  // Balanced but not amazing
+  return {
+    label: "GOOD CHOICE",
+    tone: "neutral",
+    tag: "Reasonable next step",
+    pattern: "Not perfect, not destructive.",
+    tip: "Make it intentional: set a clear end time and what you’ll do afterwards."
+  };
+}
+
+// Generate explanation string for the result card
+function buildReasonText(category, type, energy, mood, timeOfDay, duration, scores) {
+  const timeLabelMap = {
+    morning: "this morning",
+    afternoon: "this afternoon",
+    evening: "this evening",
+    latenight: "late at night"
+  };
+
+  const contextPieces = [];
+  contextPieces.push(`You chose <strong>${category}</strong> for about <strong>${duration} minutes</strong> ${timeLabelMap[timeOfDay]}.`);
+
+  contextPieces.push(
+    `Right now your state is <strong>${energy.toUpperCase()} energy</strong> and mood <strong>${mood.replace(/^\w/, c => c.toUpperCase())}</strong>.`
+  );
+
+  // Comment on scores
+  if (scores.productivity >= 70 && scores.growth >= 70) {
+    contextPieces.push(
+      `This has <strong>high productivity (${scores.productivity}/100)</strong> and <strong>high growth value (${scores.growth}/100)</strong>, which makes it a strong future-building choice.`
+    );
+  } else if (scores.productivity <= 35 && scores.dopamine >= 70) {
+    contextPieces.push(
+      `Here <strong>dopamine is high (${scores.dopamine}/100)</strong> but <strong>productivity is low (${scores.productivity}/100)</strong>, which is the classic “feels good now, hurts later” pattern.`
+    );
+  } else {
+    contextPieces.push(
+      `Astra sees a mixed profile: productivity at <strong>${scores.productivity}/100</strong>, growth at <strong>${scores.growth}/100</strong> and focus at <strong>${scores.focus}/100</strong>.`
+    );
+  }
+
+  if (type === "high_dopamine") {
+    contextPieces.push(
+      `High-dopamine digital habits train your brain to expect constant stimulation, which makes it harder to sit with boredom and do deep work later.`
+    );
+  }
+
+  if (category === "Workout") {
+    contextPieces.push(
+      `Quality movement also supports better mood and cognitive performance afterwards, so it indirectly boosts your future focus blocks.`
+    );
+  }
+
+  if (category === "Reading") {
+    contextPieces.push(
+      `Regular reading is like strength training for attention and long-term thinking, so it compounding over months is huge for your future self.`
+    );
+  }
+
+  if (category === "Sleep" && (timeOfDay === "latenight" || energy === "low")) {
+    contextPieces.push(
+      `Deep sleep now will give you more consistent energy, better emotional regulation, and sharper decision-making tomorrow.`
+    );
+  }
+
+  return contextPieces.join(" ");
+}
+
+// Apply scores to UI
+function renderScores(scores) {
+  const { dopamine, productivity, growth, focus } = scores;
+
+  dopamineBar.style.width = `${dopamine}%`;
+  productivityBar.style.width = `${productivity}%`;
+  growthBar.style.width = `${growth}%`;
+  focusBar.style.width = `${focus}%`;
+
+  // Add glow briefly
+  [dopamineBar, productivityBar, growthBar, focusBar].forEach(bar => {
+    bar.classList.add("glow");
+    setTimeout(() => bar.classList.remove("glow"), 450);
+  });
+
+  dopamineValue.textContent = `${dopamine}`;
+  productivityValue.textContent = `${productivity}`;
+  growthValue.textContent = `${growth}`;
+  focusValue.textContent = `${focus}`;
+}
+
+// Apply decision to result card
+function renderDecision(decision, category, type, scores, energy, mood, timeOfDay, duration) {
+  // Ensure card is visible
+  if (!resultCard.classList.contains("show")) {
+    resultCard.classList.add("show");
+  }
+
+  // Reset tone classes
+  decisionChip.classList.remove("positive", "avoid", "caution", "neutral");
+  decisionChip.classList.add(decision.tone);
+
+  decisionChip.textContent = decision.label;
+  resultTag.textContent = decision.tag;
+
+  // Title and reasons
+  if (decision.label === "DO IT" || decision.label === "GOOD CHOICE" || decision.label === "SLEEP") {
+    resultTitle.textContent = `${decision.label} — this action is aligned with your future self.`;
+  } else if (decision.label === "START SMALL") {
+    resultTitle.textContent = "START SMALL — reduce friction, but move a little.";
+  } else if (decision.label === "LIMIT IT") {
+    resultTitle.textContent = "LIMIT IT — enjoy it, but don’t let it hijack your day.";
+  } else if (decision.label === "AVOID" || decision.label === "DON'T DO IT") {
+    resultTitle.textContent = `${decision.label} — this will likely feel good now and harm you later.`;
+  } else if (decision.label === "MODERATE") {
+    resultTitle.textContent = "MODERATE — acceptable as a conscious, time-boxed choice.";
+  } else {
+    resultTitle.textContent = decision.label;
+  }
+
+  resultReason.innerHTML = buildReasonText(
+    category,
+    type,
+    energy,
+    mood,
+    timeOfDay,
+    duration,
+    scores
+  );
+
+  resultPattern.textContent = decision.pattern;
+  resultTip.textContent = decision.tip;
+}
+
+// Main form handler
+form.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  const category = document.getElementById("category").value;
+  const timeOfDay = document.getElementById("timeOfDay").value;
+  const duration = parseInt(durationInput.value, 10);
+  const energy = document.getElementById("energy").value;
+  const mood = document.getElementById("mood").value;
+
+  if (!category || !timeOfDay || !energy || !mood) {
+    alert("Please fill in all fields before analyzing.");
+    return;
+  }
+
+  const config = CATEGORY_CONFIG[category];
+  if (!config) {
+    alert("Unknown category selected.");
+    return;
+  }
+
+  const type = config.type;
+
+  // Base scores
+  let dopamineScore = config.dopamine;
+  let productivityScore = config.productivity;
+  let growthScore = config.growth;
+  let focusScore = config.focus;
+
+  // Apply context multipliers/shifts
+  const shifts = getContextMultipliers(type, energy, mood, timeOfDay, duration);
+
+  dopamineScore += shifts.dopamineShift;
+  productivityScore += shifts.productivityShift;
+  growthScore += shifts.growthShift;
+  focusScore += shifts.focusShift;
+
+  // Normalize to percentages
+  const scores = {
+    dopamine: toPercent(dopamineScore),
+    productivity: toPercent(productivityScore),
+    growth: toPercent(growthScore),
+    focus: toPercent(focusScore)
+  };
+
+  // Decide label
+  const decision = decideLabel(
+    category,
+    type,
+    scores,
+    energy,
+    mood,
+    timeOfDay,
+    duration
+  );
+
+  // Render UI
+  renderScores(scores);
+  renderDecision(decision, category, type, scores, energy, mood, timeOfDay, duration);
+});
+  </script>
+</body>
+</html>
