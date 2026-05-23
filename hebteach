@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ivrit — Hebrew Learning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  :root {
+    --parchment: #e8dcc8;
+    --parchment-dim: #c4b49a;
+    --bg: #15120f;
+    --card: #231e18;
+    --card-elevated: #2f2720;
+    --gold: #d4af37;
+    --gold-dim: #a68a2e;
+    --amber: #f0c040;
+    --green: #7ee787;
+    --red: #ffa69e;
+    --border: #3d3228;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body, #root { height: 100%; }
+  body {
+    background: radial-gradient(circle at 50% 0%, #2a2218 0%, var(--bg) 60%);
+    color: var(--parchment);
+    font-family: 'Frank Ruhl Libre', Georgia, serif;
+    overflow-x: hidden;
+  }
+  .app { min-height: 100%; display: flex; flex-direction: column; }
+  .header {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(21, 18, 15, 0.85);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 16px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .title-block { display: flex; align-items: baseline; gap: 10px; }
+  .logo { font-size: 22px; font-weight: 900; color: var(--gold); letter-spacing: 1px; }
+  .subtitle { font-size: 12px; color: var(--parchment-dim); text-transform: uppercase; letter-spacing: 2px; }
+  .stats-corner {
+    display: flex; gap: 14px; align-items: center; font-size: 13px;
+  }
+  .stat { display: flex; flex-direction: column; align-items: center; line-height: 1.1; }
+  .stat-value { font-weight: 700; color: var(--gold); font-size: 16px; }
+  .stat-label { font-size: 10px; color: var(--parchment-dim); text-transform: uppercase; letter-spacing: 1px; }
+  .tabs {
+    display: flex; gap: 8px; justify-content: center; padding: 14px 10px 6px;
+  }
+  .tab {
+    background: transparent; border: 1px solid var(--border); color: var(--parchment-dim);
+    padding: 8px 14px; border-radius: 999px; cursor: pointer; font-family: inherit;
+    font-size: 13px; letter-spacing: 0.5px; transition: all .2s ease;
+  }
+  .tab.active { background: rgba(212,175,55,0.12); border-color: var(--gold); color: var(--gold); }
+  .tab:hover:not(.active) { border-color: var(--parchment-dim); color: var(--parchment); }
+  .main { flex: 1; padding: 10px 16px 40px; max-width: 720px; margin: 0 auto; width: 100%; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0.4;
+  }
+  .hebrew-xl {
+    font-size: clamp(72px, 15vw, 140px);
+    font-weight: 400;
+    color: var(--parchment);
+    text-align: center;
+    direction: rtl;
+    margin: 10px 0 6px;
+    line-height: 1.1;
+    font-family: 'Frank Ruhl Libre', Georgia, serif;
+  }
+  .hebrew-lg {
+    font-size: clamp(40px, 10vw, 72px);
+    font-weight: 400;
+    color: var(--parchment);
+    text-align: center;
+    direction: rtl;
+    margin: 6px 0;
+    line-height: 1.2;
+    font-family: 'Frank Ruhl Libre', Georgia, serif;
+  }
+  .hebrew-md {
+    font-size: clamp(28px, 6vw, 48px);
+    font-weight: 400;
+    color: var(--parchment);
+    text-align: center;
+    direction: rtl;
+    line-height: 1.3;
+    font-family: 'Frank Ruhl Libre', Georgia, serif;
+  }
+  .label {
+    text-align: center; color: var(--parchment-dim); font-size: 13px;
+    text-transform: uppercase; letter-spacing: 2px; margin-top: 6px;
+  }
+  .options {
+    display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 22px;
+  }
+  .option-btn {
+    background: var(--card-elevated);
+    border: 1px solid var(--border);
+    color: var(--parchment);
+    padding: 14px 16px; border-radius: 12px; cursor: pointer;
+    font-family: inherit; font-size: 16px; text-align: center;
+    transition: transform .15s ease, border-color .2s ease, background .2s ease;
+  }
+  .option-btn:hover:not(:disabled) { transform: translateY(-2px); border-color: var(--gold-dim); }
+  .option-btn:disabled { cursor: default; }
+  .option-btn.correct { border-color: var(--green); background: rgba(126,231,135,0.08); color: var(--green); }
+  .option-btn.wrong { border-color: var(--red); background: rgba(255,166,158,0.08); color: var(--red); animation: shake .35s ease; }
+  @keyframes shake {
+    0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)}
+  }
+  .fade-in { animation: fadeIn .4s ease both; }
+  .fade-in-up { animation: fadeInUp .5s ease both; }
+  @keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
+  @keyframes fadeInUp { from { opacity:0; transform:translateY(12px) } to { opacity:1; transform:translateY(0) } }
+  .flash-correct { animation: flashGreen .6s ease; }
+  @keyframes flashGreen { 0%{box-shadow:0 0 0 rgba(126,231,135,0)} 50%{box-shadow:0 0 40px rgba(126,231,135,.25)} 100%{box-shadow:0 0 0 rgba(126,231,135,0)} }
+  .progress-wrap { margin-top: 18px; }
+  .progress-bar {
+    height: 8px; background: var(--card-elevated); border-radius: 999px; overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--gold-dim), var(--gold)); border-radius: 999px; transition: width .4s ease; }
+  .progress-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--parchment-dim); margin-top: 6px; }
+  .controls { display: flex; gap: 10px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
+  .btn-primary {
+    background: linear-gradient(180deg, rgba(212,175,55,0.25), rgba(212,175,55,0.12));
+    border: 1px solid var(--gold-dim); color: var(--gold);
+    padding: 12px 22px; border-radius: 12px; cursor: pointer;
+    font-family: inherit; font-size: 15px; transition: all .2s ease;
+  }
+  .btn-primary:hover { transform: translateY(-1px); border-color: var(--gold); }
+  .btn-ghost {
+    background: transparent; border: 1px solid var(--border); color: var(--parchment-dim);
+    padding: 12px 18px; border-radius: 12px; cursor: pointer;
+    font-family: inherit; font-size: 14px;
+  }
+  .btn-ghost.active { border-color: var(--gold); color: var(--gold); }
+  .detail-row { text-align: center; margin: 8px 0; }
+  .detail-row .translit { font-size: 20px; color: var(--amber); font-weight: 500; letter-spacing: 1px; }
+  .detail-row .meaning { font-size: 18px; color: var(--parchment); }
+  .detail-row .tip {
+    display: inline-block; margin-top: 10px; padding: 8px 14px; border-radius: 999px;
+    background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.25);
+    color: var(--parchment-dim); font-size: 13px;
+  }
+  .feedback { text-align: center; margin-top: 14px; font-size: 16px; font-weight: 700; min-height: 24px; }
+  .feedback.correct { color: var(--green); }
+  .feedback.wrong { color: var(--red); }
+  .session-badge {
+    position: fixed; bottom: 16px; right: 16px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 10px 14px; font-size: 13px; color: var(--parchment-dim);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  }
+  .session-badge span { color: var(--gold); font-weight: 700; }
+  .ornament { text-align: center; color: var(--gold-dim); font-size: 18px; letter-spacing: 4px; margin: 6px 0; }
+  .ornament::before, .ornament::after { content: "◆"; margin: 0 8px; opacity: 0.5; }
+  .streak { color: var(--amber); font-weight: 700; }
+  @media (min-width: 560px) {
+    .options { grid-template-columns: 1fr 1fr; }
+    .header { padding: 14px 24px; }
+    .main { padding: 14px 24px 50px; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const LETTERS = [
+  { char: "א", name: "Aleph", sound: "silent" },
+  { char: "ב", name: "Bet", sound: "b / v" },
+  { char: "ג", name: "Gimel", sound: "g" },
+  { char: "ד", name: "Dalet", sound: "d" },
+  { char: "ה", name: "He", sound: "h" },
+  { char: "ו", name: "Vav", sound: "v / o / u" },
+  { char: "ז", name: "Zayin", sound: "z" },
+  { char: "ח", name: "Het", sound: "kh (guttural)" },
+  { char: "ט", name: "Tet", sound: "t" },
+  { char: "י", name: "Yod", sound: "y / i / e" },
+  { char: "כ", name: "Kaf", sound: "ch / k" },
+  { char: "ך", name: "Kaf (final)", sound: "ch / k" },
+  { char: "ל", name: "Lamed", sound: "l" },
+  { char: "מ", name: "Mem", sound: "m" },
+  { char: "ם", name: "Mem (final)", sound: "m" },
+  { char: "נ", name: "Nun", sound: "n" },
+  { char: "ן", name: "Nun (final)", sound: "n" },
+  { char: "ס", name: "Samekh", sound: "s" },
+  { char: "ע", name: "Ayin", sound: "guttural" },
+  { char: "פ", name: "Pe", sound: "p / f" },
+  { char: "ף", name: "Pe (final)", sound: "p / f" },
+  { char: "צ", name: "Tsadi", sound: "ts" },
+  { char: "ץ", name: "Tsadi (final)", sound: "ts" },
+  { char: "ק", name: "Qof", sound: "k (deep)" },
+  { char: "ר", name: "Resh", sound: "r (guttural)" },
+  { char: "ש", name: "Shin", sound: "sh / s" },
+  { char: "ת", name: "Tav", sound: "t" }
+];
+
+const WORDS = [
+  // Greetings & Basics
+  { hebrew: "שלום", transliteration: "Shalom", meaning: "Peace / Hello / Goodbye", category: "greetings", tip: "The shin (ש) sounds like 'sh'" },
+  { hebrew: "היי", transliteration: "Hi / Hey", meaning: "Hi", category: "greetings" },
+  { hebrew: "ברוך", transliteration: "Baruch", meaning: "Blessed", category: "greetings" },
+  { hebrew: "להתראות", transliteration: "Lehitra'ot", meaning: "Goodbye", category: "greetings", tip: "The het (ח) is a throaty 'kh'" },
+  { hebrew: "תודה", transliteration: "Toda", meaning: "Thank you", category: "greetings" },
+  { hebrew: "בבקשה", transliteration: "Bevakasha", meaning: "Please / You're welcome", category: "greetings" },
+  { hebrew: "כן", transliteration: "Ken", meaning: "Yes", category: "greetings" },
+  { hebrew: "לא", transliteration: "Lo", meaning: "No", category: "greetings" },
+  { hebrew: "סליחה", transliteration: "Slicha", meaning: "Excuse me / Sorry", category: "greetings" },
+  { hebrew: "מזל טוב", transliteration: "Mazal Tov", meaning: "Congratulations", category: "greetings", tip: "Tsadi (צ) sounds like 'ts'" },
+  { hebrew: "בוקר טוב", transliteration: "Boker Tov", meaning: "Good morning", category: "greetings" },
+  { hebrew: "לילה טוב", transliteration: "Layla Tov", meaning: "Good night", category: "greetings" },
+  { hebrew: "מצטער", transliteration: "Mitzta'er", meaning: "Sorry (male)", category: "greetings" },
+  { hebrew: "נעים מאוד", transliteration: "Na'im Me'od", meaning: "Nice to meet you", category: "greetings", tip: "Ayin (ע) is a deep throat sound" },
+  { hebrew: "בהצלחה", transliteration: "Behatzlacha", meaning: "Good luck", category: "greetings" },
+  // Numbers
+  { hebrew: "אחד", transliteration: "Echad", meaning: "One", category: "numbers" },
+  { hebrew: "שניים", transliteration: "Shnayim", meaning: "Two", category: "numbers" },
+  { hebrew: "שלוש", transliteration: "Shalosh", meaning: "Three", category: "numbers" },
+  { hebrew: "ארבע", transliteration: "Arba", meaning: "Four", category: "numbers" },
+  { hebrew: "חמש", transliteration: "Chamesh", meaning: "Five", category: "numbers", tip: "Het (ח) is a throaty 'kh'" },
+  { hebrew: "שש", transliteration: "Shesh", meaning: "Six", category: "numbers" },
+  { hebrew: "שבע", transliteration: "Sheva", meaning: "Seven", category: "numbers" },
+  { hebrew: "שמונה", transliteration: "Shmone", meaning: "Eight", category: "numbers" },
+  { hebrew: "תשע", transliteration: "Tesha", meaning: "Nine", category: "numbers" },
+  { hebrew: "עשר", transliteration: "Eser", meaning: "Ten", category: "numbers" },
+  // Colors
+  { hebrew: "לבן", transliteration: "Lavan", meaning: "White", category: "colors" },
+  { hebrew: "שחור", transliteration: "Shachor", meaning: "Black", category: "colors" },
+  { hebrew: "אדום", transliteration: "Adom", meaning: "Red", category: "colors" },
+  { hebrew: "כחול", transliteration: "Kachol", meaning: "Blue", category: "colors" },
+  { hebrew: "ירוק", transliteration: "Yarok", meaning: "Green", category: "colors" },
+  { hebrew: "צהוב", transliteration: "Tzahov", meaning: "Yellow", category: "colors", tip: "Tsadi (צ) is 'ts' like in 'cats'" },
+  { hebrew: "סגול", transliteration: "Sagol", meaning: "Purple", category: "colors" },
+  { hebrew: "ורוד", transliteration: "Varod", meaning: "Pink", category: "colors" },
+  { hebrew: "חום", transliteration: "Chum", meaning: "Brown", category: "colors" },
+  { hebrew: "אפור", transliteration: "Afor", meaning: "Gray", category: "colors" },
+  { hebrew: "כסף", transliteration: "Kesef", meaning: "Silver / Money", category: "colors" },
+  { hebrew: "זהב", transliteration: "Zahav", meaning: "Gold", category: "colors" },
+  // Family
+  { hebrew: "אב", transliteration: "Av", meaning: "Father", category: "family" },
+  { hebrew: "אם", transliteration: "Em", meaning: "Mother", category: "family" },
+  { hebrew: "אח", transliteration: "Ach", meaning: "Brother", category: "family" },
+  { hebrew: "אחות", transliteration: "Achot", meaning: "Sister", category: "family" },
+  { hebrew: "בן", transliteration: "Ben", meaning: "Son", category: "family" },
+  { hebrew: "בת", transliteration: "Bat", meaning: "Daughter", category: "family" },
+  { hebrew: "סבא", transliteration: "Saba", meaning: "Grandfather", category: "family" },
+  { hebrew: "סבתא", transliteration: "Savta", meaning: "Grandmother", category: "family" },
+  { hebrew: "דוד", transliteration: "Dod", meaning: "Uncle", category: "family" },
+  { hebrew: "דודה", transliteration: "Doda", meaning: "Aunt", category: "family" },
+  { hebrew: "משפחה", transliteration: "Mishpacha", meaning: "Family", category: "family" },
+  { hebrew: "הורים", transliteration: "Horim", meaning: "Parents", category: "family" },
+  // Food & Drink
+  { hebrew: "לחם", transliteration: "Lechem", meaning: "Bread", category: "food" },
+  { hebrew: "מים", transliteration: "Mayim", meaning: "Water", category: "food" },
+  { hebrew: "חלב", transliteration: "Chalav", meaning: "Milk", category: "food", tip: "Het (ח) is a throaty 'kh' like in 'Bach'" },
+  { hebrew: "יין", transliteration: "Yayin", meaning: "Wine", category: "food" },
+  { hebrew: "בשר", transliteration: "Basar", meaning: "Meat", category: "food" },
+  { hebrew: "דג", transliteration: "Dag", meaning: "Fish", category: "food" },
+  { hebrew: "תפוח", transliteration: "Tapuach", meaning: "Apple", category: "food" },
+  { hebrew: "בננה", transliteration: "Banana", meaning: "Banana", category: "food" },
+  { hebrew: "עגבניה", transliteration: "Agvaniya", meaning: "Tomato", category: "food", tip: "Ayin (ע) comes from deep in the throat" },
+  { hebrew: "גבינה", transliteration: "Gvina", meaning: "Cheese", category: "food" },
+  { hebrew: "ביצה", transliteration: "Beitza", meaning: "Egg", category: "food" },
+  { hebrew: "סוכר", transliteration: "Sukar", meaning: "Sugar", category: "food" },
+  { hebrew: "מלח", transliteration: "Melach", meaning: "Salt", category: "food" },
+  { hebrew: "פלפל", transliteration: "Pilpel", meaning: "Pepper", category: "food" },
+  { hebrew: "אורז", transliteration: "Orez", meaning: "Rice", category: "food" },
+  { hebrew: "עוף", transliteration: "Of", meaning: "Chicken / Bird", category: "food" },
+  { hebrew: "ירק", transliteration: "Yerak", meaning: "Vegetable", category: "food" },
+  { hebrew: "פירות", transliteration: "Perot", meaning: "Fruits", category: "food" },
+  { hebrew: "מנה", transliteration: "Mana", meaning: "Dish / Meal", category: "food" },
+  { hebrew: "קפה", transliteration: "Kafe", meaning: "Coffee", category: "food" },
+  // Body parts
+  { hebrew: "ראש", transliteration: "Rosh", meaning: "Head", category: "body" },
+  { hebrew: "עין", transliteration: "Ayin", meaning: "Eye", category: "body" },
+  { hebrew: "אף", transliteration: "Af", meaning: "Nose", category: "body" },
+  { hebrew: "פה", transliteration: "Pe", meaning: "Mouth", category: "body" },
+  { hebrew: "יד", transliteration: "Yad", meaning: "Hand", category: "body" },
+  { hebrew: "רגל", transliteration: "Regel", meaning: "Foot / Leg", category: "body" },
+  { hebrew: "לב", transliteration: "Lev", meaning: "Heart", category: "body" },
+  { hebrew: "אוזן", transliteration: "Ozen", meaning: "Ear", category: "body" },
+  { hebrew: "שן", transliteration: "Shen", meaning: "Tooth", category: "body" },
+  { hebrew: "בטן", transliteration: "Beten", meaning: "Belly / Stomach", category: "body" },
+  { hebrew: "גב", transliteration: "Gav", meaning: "Back", category: "body" },
+  { hebrew: "כתף", transliteration: "Katef", meaning: "Shoulder", category: "body" },
+  { hebrew: "ברך", transliteration: "Berech", meaning: "Knee", category: "body" },
+  { hebrew: "דם", transliteration: "Dam", meaning: "Blood", category: "body" },
+  { hebrew: "שיער", transliteration: "Se'ar", meaning: "Hair", category: "body" },
+  // Time
+  { hebrew: "שעה", transliteration: "Sha'a", meaning: "Hour", category: "time" },
+  { hebrew: "דקה", transliteration: "Daka", meaning: "Minute", category: "time" },
+  { hebrew: "חודש", transliteration: "Chodesh", meaning: "Month", category: "time" },
+  { hebrew: "שנה", transliteration: "Shana", meaning: "Year", category: "time" },
+  { hebrew: "יום", transliteration: "Yom", meaning: "Day", category: "time" },
+  { hebrew: "שבוע", transliteration: "Shavua", meaning: "Week", category: "time" },
+  { hebrew: "בוקר", transliteration: "Boker", meaning: "Morning", category: "time" },
+  { hebrew: "ערב", transliteration: "Erev", meaning: "Evening", category: "time" },
+  { hebrew: "לילה", transliteration: "Layla", meaning: "Night", category: "time" },
+  { hebrew: "חצות", transliteration: "Chatzot", meaning: "Midnight", category: "time" },
+  { hebrew: "היום", transliteration: "Hayom", meaning: "Today", category: "time" },
+  { hebrew: "מחר", transliteration: "Machar", meaning: "Tomorrow", category: "time" },
+  // Common verbs
+  { hebrew: "ללמוד", transliteration: "Lilmod", meaning: "To learn", category: "verbs" },
+  { hebrew: "לכתוב", transliteration: "Lichtov", meaning: "To write", category: "verbs" },
+  { hebrew: "לקרוא", transliteration: "Likro", meaning: "To read / To call", category: "verbs" },
+  { hebrew: "לדבר", transliteration: "Ledaber", meaning: "To speak", category: "verbs" },
+  { hebrew: "לאכול", transliteration: "Le'echol", meaning: "To eat", category: "verbs" },
+  { hebrew: "לשתות", transliteration: "Lishtot", meaning: "To drink", category: "verbs" },
+  { hebrew: "ללכת", transliteration: "Lalechet", meaning: "To go / To walk", category: "verbs" },
+  { hebrew: "לבוא", transliteration: "Lavo", meaning: "To come", category: "verbs" },
+  { hebrew: "לישון", transliteration: "Lishon", meaning: "To sleep", category: "verbs" },
+  { hebrew: "לעבוד", transliteration: "La'avod", meaning: "To work", category: "verbs" },
+  { hebrew: "לשחק", transliteration: "Lesachek", meaning: "To play", category: "verbs" },
+  { hebrew: "לראות", transliteration: "Lir'ot", meaning: "To see", category: "verbs" },
+  { hebrew: "לשמוע", transliteration: "Lishmoa", meaning: "To hear", category: "verbs" },
+  { hebrew: "לעשות", transliteration: "La'asot", meaning: "To do / To make", category: "verbs" },
+  { hebrew: "לתת", transliteration: "Latet", meaning: "To give", category: "verbs" },
+  { hebrew: "לקחת", transliteration: "Lakachat", meaning: "To take", category: "verbs" },
+  { hebrew: "לרוץ", transliteration: "Larutz", meaning: "To run", category: "verbs" },
+  { hebrew: "לעמוד", transliteration: "La'amod", meaning: "To stand", category: "verbs" },
+  { hebrew: "לשבת", transliteration: "Lishevet", meaning: "To sit", category: "verbs" },
+  { hebrew: "לפתוח", transliteration: "Liftpoach", meaning: "To open", category: "verbs" },
+  // Adjectives
+  { hebrew: "טוב", transliteration: "Tov", meaning: "Good", category: "adjectives" },
+  { hebrew: "רע", transliteration: "Ra", meaning: "Bad", category: "adjectives" },
+  { hebrew: "גדול", transliteration: "Gadol", meaning: "Big / Great", category: "adjectives" },
+  { hebrew: "קטן", transliteration: "Katan", meaning: "Small", category: "adjectives" },
+  { hebrew: "חדש", transliteration: "Chadash", meaning: "New", category: "adjectives" },
+  { hebrew: "ישן", transliteration: "Yashan", meaning: "Old", category: "adjectives" },
+  { hebrew: "יפה", transliteration: "Yafe", meaning: "Beautiful", category: "adjectives" },
+  { hebrew: "חם", transliteration: "Cham", meaning: "Hot", category: "adjectives" },
+  { hebrew: "קר", transliteration: "Kar", meaning: "Cold", category: "adjectives" },
+  { hebrew: "מהיר", transliteration: "Mahir", meaning: "Fast", category: "adjectives" },
+  { hebrew: "איטי", transliteration: "Ity", meaning: "Slow", category: "adjectives" },
+  { hebrew: "חזק", transliteration: "Chazak", meaning: "Strong", category: "adjectives" },
+  { hebrew: "חלש", transliteration: "Chalash", meaning: "Weak", category: "adjectives" },
+  { hebrew: "עשיר", transliteration: "Ashir", meaning: "Rich", category: "adjectives" },
+  { hebrew: "עני", transliteration: "Ani", meaning: "Poor", category: "adjectives" },
+  // Nature
+  { hebrew: "שמש", transliteration: "Shemesh", meaning: "Sun", category: "nature" },
+  { hebrew: "ירח", transliteration: "Yareach", meaning: "Moon", category: "nature" },
+  { hebrew: "כוכב", transliteration: "Kochav", meaning: "Star", category: "nature" },
+  { hebrew: "אדמה", transliteration: "Adama", meaning: "Earth / Ground", category: "nature" },
+  { hebrew: "ים", transliteration: "Yam", meaning: "Sea / Ocean", category: "nature" },
+  { hebrew: "נהר", transliteration: "Nahar", meaning: "River", category: "nature" },
+  { hebrew: "הר", transliteration: "Har", meaning: "Mountain", category: "nature" },
+  { hebrew: "עץ", transliteration: "Etz", meaning: "Tree", category: "nature" },
+  { hebrew: "פרח", transliteration: "Perach", meaning: "Flower", category: "nature" },
+  { hebrew: "שמיים", transliteration: "Shamayim", meaning: "Sky / Heaven", category: "nature" },
+  { hebrew: "ענן", transliteration: "Anan", meaning: "Cloud", category: "nature" },
+  { hebrew: "גשם", transliteration: "Geshem", meaning: "Rain", category: "nature" },
+  // Home
+  { hebrew: "בית", transliteration: "Bayit", meaning: "House / Home", category: "home" },
+  { hebrew: "דלת", transliteration: "Delet", meaning: "Door", category: "home" },
+  { hebrew: "חלון", transliteration: "Chalon", meaning: "Window", category: "home" },
+  { hebrew: "קיר", transliteration: "Kir", meaning: "Wall", category: "home" },
+  { hebrew: "שולחן", transliteration: "Shulchan", meaning: "Table", category: "home" },
+  { hebrew: "כיסא", transliteration: "Kise", meaning: "Chair", category: "home" },
+  { hebrew: "מיטה", transliteration: "Mitah", meaning: "Bed", category: "home" },
+  { hebrew: "מנורה", transliteration: "Menorah", meaning: "Lamp", category: "home" },
+  { hebrew: "מטבח", transliteration: "Mitbach", meaning: "Kitchen", category: "home" },
+  { hebrew: "חדר", transliteration: "Cheder", meaning: "Room", category: "home" },
+  { hebrew: "מרפסת", transliteration: "Mirpeset", meaning: "Balcony", category: "home" },
+  { hebrew: "גינה", transliteration: "Gina", meaning: "Garden", category: "home" },
+  // Pronouns & Prepositions
+  { hebrew: "אני", transliteration: "Ani", meaning: "I / Me", category: "grammar" },
+  { hebrew: "אתה", transliteration: "Ata", meaning: "You (male)", category: "grammar" },
+  { hebrew: "את", transliteration: "At", meaning: "You (female)", category: "grammar" },
+  { hebrew: "הוא", transliteration: "Hu", meaning: "He", category: "grammar" },
+  { hebrew: "היא", transliteration: "Hi", meaning: "She", category: "grammar" },
+  { hebrew: "אנחנו", transliteration: "Anachnu", meaning: "We", category: "grammar" },
+  { hebrew: "הם", transliteration: "Hem", meaning: "They (male/mixed)", category: "grammar" },
+  { hebrew: "עם", transliteration: "Im", meaning: "With", category: "grammar" },
+  { hebrew: "בלי", transliteration: "Bli", meaning: "Without", category: "grammar" },
+  { hebrew: "ל", transliteration: "Le", meaning: "To / For", category: "grammar" },
+  { hebrew: "ב", transliteration: "Be", meaning: "In / At", category: "grammar" },
+  { hebrew: "מ", transliteration: "Mi", meaning: "From", category: "grammar" },
+  // Questions & Adverbs
+  { hebrew: "מה", transliteration: "Ma", meaning: "What", category: "questions" },
+  { hebrew: "מי", transliteration: "Mi", meaning: "Who", category: "questions" },
+  { hebrew: "איפה", transliteration: "Eifo", meaning: "Where", category: "questions" },
+  { hebrew: "מתי", transliteration: "Matai", meaning: "When", category: "questions" },
+  { hebrew: "למה", transliteration: "Lama", meaning: "Why", category: "questions" },
+  { hebrew: "איך", transliteration: "Eich", meaning: "How", category: "questions" },
+  { hebrew: "כמה", transliteration: "Kama", meaning: "How much / How many", category: "questions" },
+  { hebrew: "כאן", transliteration: "Kan", meaning: "Here", category: "questions" },
+  { hebrew: "שם", transliteration: "Sham", meaning: "There", category: "questions" },
+  { hebrew: "עכשיו", transliteration: "Achshav", meaning: "Now", category: "questions" },
+  // Animals
+  { hebrew: "כלב", transliteration: "Kelev", meaning: "Dog", category: "animals" },
+  { hebrew: "חתול", transliteration: "Chatul", meaning: "Cat", category: "animals" },
+  { hebrew: "סוס", transliteration: "Sus", meaning: "Horse", category: "animals" },
+  { hebrew: "פרה", transliteration: "Para", meaning: "Cow", category: "animals" },
+  { hebrew: "דג", transliteration: "Dag", meaning: "Fish", category: "animals" },
+  { hebrew: "ציפור", transliteration: "Tzipor", meaning: "Bird", category: "animals" },
+  { hebrew: "אריה", transliteration: "Aryeh", meaning: "Lion", category: "animals" },
+  { hebrew: "נחש", transliteration: "Nachash", meaning: "Snake", category: "animals" },
+  { hebrew: "פיל", transliteration: "Pil", meaning: "Elephant", category: "animals" },
+  { hebrew: "זאב", transliteration: "Ze'ev", meaning: "Wolf", category: "animals" },
+  // Professions
+  { hebrew: "מורה", transliteration: "More / Mora", meaning: "Teacher", category: "professions" },
+  { hebrew: "רופא", transliteration: "Rofe", meaning: "Doctor", category: "professions" },
+  { hebrew: "שוטר", transliteration: "Shoter", meaning: "Police officer", category: "professions" },
+  { hebrew: "טבח", transliteration: "Tabach", meaning: "Cook / Chef", category: "professions" },
+  { hebrew: "נהג", transliteration: "Nag", meaning: "Driver", category: "professions" },
+  { hebrew: "מהנדס", transliteration: "Mehandes", meaning: "Engineer", category: "professions" },
+  { hebrew: "זמר", transliteration: "Zamar", meaning: "Musician / Singer", category: "professions" },
+  { hebrew: "סופר", transliteration: "Sofar", meaning: "Author / Writer", category: "professions" },
+  { hebrew: "מנהל", transliteration: "Menael", meaning: "Manager", category: "professions" },
+  { hebrew: "סטודנט", transliteration: "Student", meaning: "Student", category: "professions" }
+];
+
+/* =================== Helpers =================== */
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function pickN(arr, n, exclude) {
+  const pool = arr.filter(x => x !== exclude);
+  const shuffled = shuffle(pool);
+  return shuffled.slice(0, n);
+}
+function weightedRandom(items, weights) {
+  let total = weights.reduce((a, b) => a + b, 0);
+  let rnd = Math.random() * total;
+  for (let i = 0; i < items.length; i++) {
+    if (rnd < weights[i]) return items[i];
+    rnd -= weights[i];
+  }
+  return items[items.length - 1];
+}
+
+/* =================== Mode 1: Letters =================== */
+function LetterQuiz({ stats, setStats }) {
+  const [current, setCurrent] = React.useState(null);
+  const [options, setOptions] = React.useState([]);
+  const [selected, setSelected] = React.useState(null);
+  const [phase, setPhase] = React.useState("idle"); // idle | correct | wrong
+  const [streak, setStreak] = React.useState(0);
+  const [key, setKey] = React.useState(0);
+
+  function nextQuestion() {
+    const letter = LETTERS[Math.floor(Math.random() * LETTERS.length)];
+    const wrongs = pickN(LETTERS.filter(l => l.name !== letter.name), 4, null).map(l => l.name);
+    const opts = shuffle([letter.name, ...wrongs]);
+    setCurrent(letter);
+    setOptions(opts);
+    setSelected(null);
+    setPhase("idle");
+    setKey(k => k + 1);
+  }
+
+  React.useEffect(() => { nextQuestion(); }, []);
+
+  function handleClick(name) {
+    if (phase !== "idle") return;
+    const isCorrect = name === current.name;
+    setSelected(name);
+    if (isCorrect) {
+      setPhase("correct");
+      setStreak(s => s + 1);
+      setStats(s => ({ ...s, score: s.score + 1, total: s.total + 1, streak: Math.max(s.streak, streak + 1) }));
+      setTimeout(() => nextQuestion(), 900);
+    } else {
+      setPhase("wrong");
+      setStreak(0);
+      setStats(s => ({ ...s, total: s.total + 1, streak: Math.max(s.streak, streak) }));
+      setTimeout(() => nextQuestion(), 1400);
+    }
+  }
+
+  if (!current) return null;
+  return (
+    <div className={"card fade-in" + (phase === "correct" ? " flash-correct" : "")} key={key}>
+      <div className="label">What is this letter called?</div>
+      <div className="hebrew-xl">{current.char}</div>
+      <div className="ornament"></div>
+      <div className="options">
+        {options.map((opt, i) => {
+          let cls = "option-btn";
+          if (phase === "correct" && opt === current.name) cls += " correct";
+          else if (phase === "wrong" && opt === selected) cls += " wrong";
+          else if (phase === "wrong" && opt === current.name) cls += " correct";
+          return (
+            <button key={i} className={cls} disabled={phase !== "idle"} onClick={() => handleClick(opt)}>
+              {opt}
+            </button>
+          );
+        })}
+      </div>
+      <div className="feedback" style={{ marginTop: 10 }}>
+        {phase === "correct" ? <span className="correct">Correct! +1</span> : phase === "wrong" ? <span className="wrong">That was {current.name}</span> : <span style={{ color: "var(--parchment-dim)" }}>Streak: <span className="streak">{streak}</span></span>}
+      </div>
+    </div>
+  );
+}
+
+/* =================== Mode 2: Word Explorer =================== */
+function WordExplorer() {
+  const [order, setOrder] = React.useState(() => shuffle([...Array(WORDS.length).keys()]));
+  const [index, setIndex] = React.useState(0);
+  const [isShuffle, setIsShuffle] = React.useState(true);
+  const [animKey, setAnimKey] = React.useState(0);
+
+  const current = WORDS[order[index]];
+  const progress = ((index + 1) / order.length) * 100;
+
+  function nextWord() {
+    if (index + 1 < order.length) {
+      setIndex(i => i + 1);
+      setAnimKey(k => k + 1);
+    } else {
+      setIndex(0);
+      if (isShuffle) setOrder(shuffle([...Array(WORDS.length).keys()]));
+      setAnimKey(k => k + 1);
+    }
+  }
+
+  function toggleShuffle() {
+    const newShuffle = !isShuffle;
+    setIsShuffle(newShuffle);
+    const newOrder = newShuffle ? shuffle([...Array(WORDS.length).keys()]) : [...Array(WORDS.length).keys()];
+    setOrder(newOrder);
+    setIndex(0);
+    setAnimKey(k => k + 1);
+  }
+
+  return (
+    <div className="card">
+      <div className="fade-in-up" key={animKey}>
+        <div className="hebrew-lg">{current.hebrew}</div>
+        <div className="ornament"></div>
+        <div className="detail-row">
+          <div className="translit">{current.transliteration}</div>
+        </div>
+        <div className="detail-row">
+          <div className="meaning">{current.meaning}</div>
+        </div>
+        {current.tip && (
+          <div className="detail-row">
+            <div className="tip">💡 {current.tip}</div>
+          </div>
+        )}
+      </div>
+      <div className="controls">
+        <button className="btn-primary" onClick={nextWord}>Next Word →</button>
+        <button className={"btn-ghost" + (isShuffle ? " active" : "")} onClick={toggleShuffle}>{isShuffle ? "🔀 Shuffled" : "➡️ Sequential"}</button>
+      </div>
+      <div className="progress-wrap">
+        <div className="progress-bar"><div className="progress-fill" style={{ width: progress + "%" }}></div></div>
+        <div className="progress-label"><span>{index + 1} / {WORDS.length}</span><span>{Math.round(progress)}%</span></div>
+      </div>
+    </div>
+  );
+}
+
+/* =================== Mode 3: Meaning Quiz =================== */
+function MeaningQuiz({ stats, setStats }) {
+  const [order, setOrder] = React.useState(() => shuffle([...Array(WORDS.length).keys()]));
+  const [pos, setPos] = React.useState(0);
+  const [wordStats, setWordStats] = React.useState({});
+  const [selected, setSelected] = React.useState(null);
+  const [phase, setPhase] = React.useState("idle"); // idle | correct | wrong
+  const [options, setOptions] = React.useState([]);
+  const [key, setKey] = React.useState(0);
+
+  function buildOptions(wordIdx) {
+    const correct = WORDS[wordIdx];
+    const sameCat = WORDS.filter((w, i) => w.category === correct.category && i !== wordIdx);
+    const pool = sameCat.length >= 2 ? sameCat : WORDS.filter((_, i) => i !== wordIdx);
+    const wrongs = pickN(pool, 2, null).map(w => w.meaning);
+    return shuffle([correct.meaning, ...wrongs]);
+  }
+
+  function nextWord() {
+    // Weighted selection based on mistakes
+    const all = [...Array(WORDS.length).keys()];
+    const unseen = all.filter(i => !wordStats[i]);
+    let nextIdx;
+    if (unseen.length > 0) {
+      nextIdx = unseen[Math.floor(Math.random() * unseen.length)];
+    } else {
+      const weights = all.map(i => {
+        const s = wordStats[i] || { wrong: 0, lastSeen: 0 };
+        return (s.wrong + 1) / (s.lastSeen + 1);
+      });
+      nextIdx = weightedRandom(all, weights);
+    }
+    const opts = buildOptions(nextIdx);
+    setPos(p => p + 1);
+    setOrder(o => { o[pos] = nextIdx; return o; }); // not used directly; we just track pos
+    setOptions(opts);
+    setSelected(null);
+    setPhase("idle");
+    setKey(k => k + 1);
+    setWordStats(prev => {
+      const next = { ...prev };
+      next[nextIdx] = { ...(next[nextIdx] || { seen: 0, correct: 0, wrong: 0, lastSeen: 0 }), seen: (next[nextIdx]?.seen || 0) + 1, lastSeen: Date.now() };
+      return next;
+    });
+    // store current word index in a ref-like state via currentWord state
+    setCurrentWord(nextIdx);
+  }
+
+  const [currentWord, setCurrentWord] = React.useState(null);
+
+  React.useEffect(() => {
+    // init first word
+    const idx = Math.floor(Math.random() * WORDS.length);
+    setCurrentWord(idx);
+    setOptions(buildOptions(idx));
+    setWordStats({ [idx]: { seen: 1, correct: 0, wrong: 0, lastSeen: Date.now() } });
+    setKey(1);
+  }, []);
+
+  function handleClick(meaning) {
+    if (phase !== "idle" || currentWord === null) return;
+    const correct = WORDS[currentWord].meaning;
+    const isCorrect = meaning === correct;
+    setSelected(meaning);
+    if (isCorrect) {
+      setPhase("correct");
+      setStats(s => ({ ...s, score: s.score + 1, total: s.total + 1 }));
+      setWordStats(prev => {
+        const next = { ...prev };
+        const cur = next[currentWord] || { seen: 0, correct: 0, wrong: 0 };
+        next[currentWord] = { ...cur, correct: cur.correct + 1 };
+        return next;
+      });
+    } else {
+      setPhase("wrong");
+      setStats(s => ({ ...s, total: s.total + 1 }));
+      setWordStats(prev => {
+        const next = { ...prev };
+        const cur = next[currentWord] || { seen: 0, correct: 0, wrong: 0 };
+        next[currentWord] = { ...cur, wrong: cur.wrong + 1 };
+        return next;
+      });
+    }
+    setTimeout(() => nextWord(), 1500);
+  }
+
+  const current = currentWord !== null ? WORDS[currentWord] : null;
+  if (!current) return <div className="card" style={{ textAlign: "center", padding: 40 }}>Loading…</div>;
+
+  const accuracy = stats.total > 0 ? Math.round((stats.score / stats.total) * 100) : 0;
+
+  return (
+    <div className={"card fade-in" + (phase === "correct" ? " flash-correct" : "")} key={key}>
+      <div className="label">Choose the correct meaning</div>
+      <div className="hebrew-md">{current.hebrew}</div>
+      <div className="detail-row">
+        <div className="translit" style={{ fontSize: 18, opacity: 0.9 }}>{current.transliteration}</div>
+      </div>
+      <div className="ornament"></div>
+      <div className="options">
+        {options.map((opt, i) => {
+          let cls = "option-btn";
+          if (phase !== "idle" && opt === current.meaning) cls += " correct";
+          else if (phase === "wrong" && opt === selected) cls += " wrong";
+          return (
+            <button key={i} className={cls} disabled={phase !== "idle"} onClick={() => handleClick(opt)}>
+              {opt}
+            </button>
+          );
+        })}
+      </div>
+      <div className="feedback">
+        {phase === "correct" ? <span className="correct">Correct!</span> : phase === "wrong" ? <span className="wrong">Incorrect — it means "{current.meaning}"</span> : <span style={{ color: "var(--parchment-dim)" }}>Session accuracy: {accuracy}%</span>}
+      </div>
+    </div>
+  );
+}
+
+/* =================== App =================== */
+function App() {
+  const [mode, setMode] = React.useState(1);
+  const [stats, setStats] = React.useState({ score: 0, total: 0, streak: 0 });
+
+  const accuracy = stats.total > 0 ? Math.round((stats.score / stats.total) * 100) : 0;
+
+  return (
+    <div className="app">
+      <header className="header">
+        <div className="title-block">
+          <div className="logo">Ivrit</div>
+          <div className="subtitle">Hebrew Learning</div>
+        </div>
+        <div className="stats-corner">
+          <div className="stat"><span className="stat-value">{stats.score}</span><span className="stat-label">Correct</span></div>
+          <div className="stat"><span className="stat-value">{accuracy}%</span><span className="stat-label">Accuracy</span></div>
+          <div className="stat"><span className="stat-value">{stats.streak}</span><span className="stat-label">Best Streak</span></div>
+        </div>
+      </header>
+      <div className="tabs">
+        <button className={"tab" + (mode === 1 ? " active" : "")} onClick={() => setMode(1)}>Letters</button>
+        <button className={"tab" + (mode === 2 ? " active" : "")} onClick={() => setMode(2)}>Words</button>
+        <button className={"tab" + (mode === 3 ? " active" : "")} onClick={() => setMode(3)}>Quiz</button>
+      </div>
+      <main className="main">
+        {mode === 1 && <LetterQuiz stats={stats} setStats={setStats} />}
+        {mode === 2 && <WordExplorer />}
+        {mode === 3 && <MeaningQuiz stats={stats} setStats={setStats} />}
+      </main>
+      <div className="session-badge">
+        Session: <span>{stats.score}</span> / {stats.total} correct
+      </div>
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
+</body>
+</html>
