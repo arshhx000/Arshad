@@ -172,6 +172,1415 @@
     <script type="text/babel">
         const { useEffect, useState } = React;
 
+        // Edit this array to preload 3-4 default plans without uploading a JSON file.
+        const DEFAULT_PRELOAD_PLANS = [
+            {
+  "title": "21 Day HCI Research Bootcamp",
+  "days": [
+    {
+      "day": 1,
+      "title": "What Research Actually Is",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "Objectives: Understand research vs. engineering; grasp the scientific method.",
+          "completed": false
+        },
+        {
+          "id": 2,
+          "title": "Concepts: Definition of research, basic/applied/exploratory/descriptive/experimental research types, hypothesis vs. theory, IMRaD structure.",
+          "completed": false
+        },
+        {
+          "id": 3,
+          "title": "Reading: Lazar et al., Ch.1 \"Introduction to HCI research\"  [sciencedirect](https://www.sciencedirect.com/book/9780128053904/research-methods-in-human-computer-interaction); any intro-to-research-methods primer on Google Scholar.",
+          "completed": false
+        },
+        {
+          "id": 4,
+          "title": "Tasks: Read 2 published CHI/UIST short papers just for structure (ignore content depth); annotate where each IMRaD section starts.",
+          "completed": false
+        },
+        {
+          "id": 5,
+          "title": "Deliverables: 1-page summary: \"What makes a claim scientific?\"",
+          "completed": false
+        },
+        {
+          "id": 6,
+          "title": "Time: 5 hrs (2 hrs reading, 2 hrs paper annotation, 1 hr writing).",
+          "completed": false
+        },
+        {
+          "id": 7,
+          "title": "Checklist: Can you define research? Can you name 4 research types? Did you annotate 2 papers?",
+          "completed": false
+        },
+        {
+          "id": 8,
+          "title": "Common mistakes: Confusing \"building an app\" with \"doing research\" — research requires a claim tested against evidence.",
+          "completed": false
+        },
+        {
+          "id": 9,
+          "title": "Review questions: What distinguishes applied from basic research? Why isn't a portfolio project automatically research?",
+          "completed": false
+        },
+        {
+          "id": 10,
+          "title": "Homework: List 3 problems from your own MERN/UI-UX experience that felt confusing or frustrating as a user — these are potential seeds.",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 2,
+      "title": "Ethics, Plagiarism, Academic Integrity",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "Objectives: Understand research ethics obligations before touching real users.",
+          "completed": false
+        },
+        {
+          "id": 2,
+          "title": "Concepts: Informed consent, IRB/ethics review, data privacy, plagiarism types (direct, paraphrase, self-plagiarism), citation ethics.",
+          "completed": false
+        },
+        {
+          "id": 3,
+          "title": "Reading: Lazar et al., Ch.15 \"Working with human subjects\"  [sciencedirect](https://www.sciencedirect.com/book/9780128053904/research-methods-in-human-computer-interaction).",
+          "completed": false
+        },
+        {
+          "id": 4,
+          "title": "Tasks: Draft a mock informed-consent form for a hypothetical usability study.",
+          "completed": false
+        },
+        {
+          "id": 5,
+          "title": "Deliverables: Consent form draft + 5-sentence ethics statement.",
+          "completed": false
+        },
+        {
+          "id": 6,
+          "title": "Time: 4 hrs.",
+          "completed": false
+        },
+        {
+          "id": 7,
+          "title": "Checklist: Consent form covers purpose, risks, withdrawal rights, confidentiality?",
+          "completed": false
+        },
+        {
+          "id": 8,
+          "title": "Common mistakes: Treating \"anonymous\" data as automatically ethical without explaining data handling.",
+          "completed": false
+        },
+        {
+          "id": 9,
+          "title": "Review questions: What's the difference between anonymized and de-identified data? Why does self-plagiarism matter?",
+          "completed": false
+        },
+        {
+          "id": 10,
+          "title": "Homework: Read your university's academic integrity policy and note 3 rules relevant to research writing.",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 3,
+      "title": "HCI Foundations",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "Objectives: Learn HCI as a discipline distinct from UI/UX practice.",
+          "completed": false
+        },
+        {
+          "id": 2,
+          "title": "Concepts: Human factors, interaction design, cognitive psychology basics (mental models, cognitive load, Fitts's Law, Hick's Law), user-centered design (UCD) cycle.",
+          "completed": false
+        },
+        {
+          "id": 3,
+          "title": "Reading: Don Norman's *The Design of Everyday Things* (intro chapters); any HCI foundations overview from ACM Digital Library.",
+          "completed": false
+        },
+        {
+          "id": 4,
+          "title": "Tasks: Map your Sevasetu project onto the UCD cycle (research → design → prototype → evaluate).",
+          "completed": false
+        },
+        {
+          "id": 5,
+          "title": "Deliverables: UCD-cycle diagram of one past project.",
+          "completed": false
+        },
+        {
+          "id": 6,
+          "title": "Time: 5 hrs.",
+          "completed": false
+        },
+        {
+          "id": 7,
+          "title": "Checklist: Can you explain Fitts's Law with an example? Can you name the 4 UCD stages?",
+          "completed": false
+        },
+        {
+          "id": 8,
+          "title": "Common mistakes: Treating HCI as \"just UI design\" — it's an interdisciplinary science of human behavior with computers.",
+          "completed": false
+        },
+        {
+          "id": 9,
+          "title": "Review questions: How does cognitive load affect interface complexity? Give one example from your own app.",
+          "completed": false
+        },
+        {
+          "id": 10,
+          "title": "Homework: Watch one HCI foundations lecture (e.g., from a top university's open courseware) and summarize in 200 words.",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 4,
+      "title": "Usability, Accessibility, Heuristic Evaluation",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "Objectives: Learn evaluation frameworks used across HCI research.",
+          "completed": false
+        },
+        {
+          "id": 2,
+          "title": "Concepts: Usability (effectiveness, efficiency, satisfaction), Nielsen's 10 usability heuristics, WCAG accessibility principles, heuristic evaluation methodology.",
+          "completed": false
+        },
+        {
+          "id": 3,
+          "title": "Reading: Nielsen's 10 Usability Heuristics  [midrocket](https://midrocket.com/en/guides/nielsen-heuristics-usability/); WCAG 2.1 quick reference.",
+          "completed": false
+        },
+        {
+          "id": 4,
+          "title": "Tasks: Perform a heuristic evaluation of one existing app (not your own) using all 10 heuristics.",
+          "completed": false
+        },
+        {
+          "id": 5,
+          "title": "Deliverables: Heuristic evaluation report (1 issue per heuristic, severity-rated).",
+          "completed": false
+        },
+        {
+          "id": 6,
+          "title": "Time: 5 hrs.",
+          "completed": false
+        },
+        {
+          "id": 7,
+          "title": "Checklist: All 10 heuristics applied? Severity ratings (0–4) assigned?",
+          "completed": false
+        },
+        {
+          "id": 8,
+          "title": "Common mistakes: Vague findings (\"bad UX\") instead of heuristic-mapped, specific, severity-rated issues.",
+          "completed": false
+        },
+        {
+          "id": 9,
+          "title": "Review questions: Which heuristic is most violated in typical student projects? Why does accessibility matter for research validity?",
+          "completed": false
+        },
+        {
+          "id": 10,
+          "title": "Homework: Read one academic paper that uses heuristic evaluation as its method (find via Google Scholar).",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 5,
+      "title": "Finding Research Problems & Gaps",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "Objectives: Learn to convert vague interest into a scoped research problem.",
+          "completed": false
+        },
+        {
+          "id": 2,
+          "title": "Concepts: Research problem vs. research question, novelty, feasibility, \"gap-spotting\" strategies (contradiction, extension, application, methodological gaps).",
+          "completed": false
+        },
+        {
+          "id": 3,
+          "title": "Reading: Any \"how to find a research gap\" guide from a university writing center; skim 5 recent CHI/IEEE abstracts in your interest area (e.g., civic tech, accessibility, MERN-based tools).",
+          "completed": false
+        },
+        {
+          "id": 4,
+          "title": "Tasks: From Day 1's homework list, pick 3 candidate problems; for each, search Google Scholar for existing work.",
+          "completed": false
+        },
+        {
+          "id": 5,
+          "title": "Deliverables: Gap-analysis table (3 candidate problems × existing work × possible gap).",
+          "completed": false
+        },
+        {
+          "id": 6,
+          "title": "Time: 6 hrs.",
+          "completed": false
+        },
+        {
+          "id": 7,
+          "title": "Checklist: Each candidate has ≥3 related papers found? Gap articulated in 1 sentence each?",
+          "completed": false
+        },
+        {
+          "id": 8,
+          "title": "Common mistakes: Picking a topic with zero prior work (usually means it's already solved elsewhere or unfeasible) or one that's oversaturated.",
+          "completed": false
+        },
+        {
+          "id": 9,
+          "title": "Review questions: What's the difference between \"no one has done this\" and \"this is a genuine gap\"?",
+          "completed": false
+        },
+        {
+          "id": 10,
+          "title": "Homework: Narrow to your top 1 candidate topic (recommend: usability/accessibility of civic-tech platforms, drawing on your Sevasetu experience).",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 6,
+      "title": "Literature Search & Reading Strategy",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "Objectives: Learn to search, filter, and read papers efficiently.",
+          "completed": false
+        },
+        {
+          "id": 2,
+          "title": "Concepts: Boolean search strings, snowballing (forward/backward citation chasing), the 3-pass reading method (skim → key sections → deep read).",
+          "completed": false
+        },
+        {
+          "id": 3,
+          "title": "Reading: Google Scholar, Semantic Scholar, ACM Digital Library search tutorials.",
+          "completed": false
+        },
+        {
+          "id": 4,
+          "title": "Tasks: Search your chosen topic; collect 15 papers using varied search strings; do a first-pass skim (title, abstract, conclusion) on all 15.",
+          "completed": false
+        },
+        {
+          "id": 5,
+          "title": "Deliverables: List of 15 papers with 1-line relevance note each.",
+          "completed": false
+        },
+        {
+          "id": 6,
+          "title": "Time: 6 hrs.",
+          "completed": false
+        },
+        {
+          "id": 7,
+          "title": "Checklist: 15 papers collected? All from reputable venues (ACM CHI/CSCW/DIS, IEEE, ScienceDirect)?",
+          "completed": false
+        },
+        {
+          "id": 8,
+          "title": "Common mistakes: Relying only on blog posts or non-peer-reviewed sources instead of ACM/IEEE/Elsevier venues.",
+          "completed": false
+        },
+        {
+          "id": 9,
+          "title": "Review questions: What's the difference between a systematic and a narrative literature search?",
+          "completed": false
+        },
+        {
+          "id": 10,
+          "title": "Homework: Do second-pass reading (full abstract + methodology + results) on 8 of the 15 papers.",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 7,
+      "title": "Literature Review, Reference Management, RQs",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "Objectives: Produce a structured literature review draft and formal research questions.",
+          "completed": false
+        },
+        {
+          "id": 2,
+          "title": "Concepts: Annotated bibliography, thematic synthesis, reference managers (Zotero/Mendeley), writing research questions and hypotheses.",
+          "completed": false
+        },
+        {
+          "id": 3,
+          "title": "Reading: Zotero quick-start guide; any \"how to write research questions\" academic guide.",
+          "completed": false
+        },
+        {
+          "id": 4,
+          "title": "Tasks: Set up Zotero with all 15 papers tagged by theme; write a 1-page synthesized literature review; draft 2 research questions and 1 hypothesis.",
+          "completed": false
+        },
+        {
+          "id": 5,
+          "title": "Deliverables: Zotero library, 1-page lit review draft, RQs + hypothesis.",
+          "completed": false
+        },
+        {
+          "id": 6,
+          "title": "Time: 6 hrs.",
+          "completed": false
+        },
+        {
+          "id": 7,
+          "title": "Checklist: Zotero populated with correct metadata? RQs are specific, answerable, and non-trivial?",
+          "completed": false
+        },
+        {
+          "id": 8,
+          "title": "Common mistakes: RQs too broad (\"How can we improve UX?\") instead of specific and testable (\"Does X reduce task completion time compared to Y?\").",
+          "completed": false
+        },
+        {
+          "id": 9,
+          "title": "Review questions: What makes a research question testable vs. merely interesting?",
+          "completed": false
+        },
+        {
+          "id": 10,
+          "title": "Weekly milestone check: By end of Day 7, you must have a finalized topic, 15+ organized references, a gap statement, and 1–2 clear RQs — **do not proceed to Week 2 until this is solid.**",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 8,
+      "title": "Research Methodology Overview",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "Objectives: Choose the right method for your RQs.",
+          "completed": false
+        },
+        {
+          "id": 2,
+          "title": "Concepts: Quantitative vs. qualitative vs. mixed methods, experimental design, between-subjects vs. within-subjects design, controlled experiments.",
+          "completed": false
+        },
+        {
+          "id": 3,
+          "title": "Reading: Lazar et al., Ch.2–3 \"Experimental research\" and \"Experimental design\"  [sciencedirect](https://www.sciencedirect.com/book/9780128053904/research-methods-in-human-computer-interaction).",
+          "completed": false
+        },
+        {
+          "id": 4,
+          "title": "Tasks: Decide your study design (recommend: mixed-methods usability study — heuristic evaluation + task-based usability test + survey).",
+          "completed": false
+        },
+        {
+          "id": 5,
+          "title": "Deliverables: 1-page methodology justification.",
+          "completed": false
+        },
+        {
+          "id": 6,
+          "title": "Time: 5 hrs.",
+          "completed": false
+        },
+        {
+          "id": 7,
+          "title": "Checklist: Method matches RQ? Sample size roughly planned (even if small, e.g., n=10-15)?",
+          "completed": false
+        },
+        {
+          "id": 8,
+          "title": "Common mistakes: Choosing a method because it's \"easy\" rather than because it answers the RQ.",
+          "completed": false
+        },
+        {
+          "id": 9,
+          "title": "Review questions: Why might a between-subjects design introduce confounds that within-subjects avoids?",
+          "completed": false
+        },
+        {
+          "id": 10,
+          "title": "Homework: Draft your study's independent and dependent variables.",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 9,
+      "title": "Surveys & Questionnaires",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "Objectives: Design a valid survey instrument.",
+          "completed": false
+        },
+        {
+          "id": 2,
+          "title": "Concepts: Likert scales, System Usability Scale (SUS), question wording bias, validity/reliability.",
+          "completed": false
+        },
+        {
+          "id": 3,
+          "title": "Reading: Lazar et al., Ch.5 \"Surveys\"  [sciencedirect](https://www.sciencedirect.com/book/9780128053904/research-methods-in-human-computer-interaction); SUS scale reference.",
+          "completed": false
+        },
+        {
+          "id": 4,
+          "title": "Tasks: Draft a 10-item questionnaire (mix of SUS-style and open-ended questions) for your study.",
+          "completed": false
+        },
+        {
+          "id": 5,
+          "title": "Deliverables: Draft questionnaire in Google Forms.",
+          "completed": false
+        },
+        {
+          "id": 6,
+          "title": "Time: 5 hrs.",
+          "completed": false
+        },
+        {
+          "id": 7,
+          "title": "Checklist: No leading/double-barreled questions? Consistent Likert scale direction?",
+          "completed": false
+        },
+        {
+          "id": 8,
+          "title": "Common mistakes: Asking two things in one question (\"Was it easy and fast?\").",
+          "completed": false
+        },
+        {
+          "id": 9,
+          "title": "Review questions: Why is SUS widely used as a benchmark in usability papers?",
+          "completed": false
+        },
+        {
+          "id": 10,
+          "title": "Homework: Pilot-test the questionnaire on 2 friends and note confusing items.",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 10,
+      "title": "Interviews & Usability Testing",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "Objectives: Design a semi-structured interview protocol and usability test tasks.",
+          "completed": false
+        },
+        {
+          "id": 2,
+          "title": "Concepts: Think-aloud protocol, task-based usability testing, interview types, moderator bias.",
+          "completed": false
+        },
+        {
+          "id": 3,
+          "title": "Reading: Lazar et al., Ch.8 & Ch.10 \"Interviews and focus groups\" / \"Usability testing\"  [sciencedirect](https://www.sciencedirect.com/book/9780128053904/research-methods-in-human-computer-interaction).",
+          "completed": false
+        },
+        {
+          "id": 4,
+          "title": "Tasks: Write 5 usability test tasks and a 6-question interview guide.",
+          "completed": false
+        },
+        {
+          "id": 5,
+          "title": "Deliverables: Usability test script + interview guide.",
+          "completed": false
+        },
+        {
+          "id": 6,
+          "title": "Time: 5 hrs.",
+          "completed": false
+        },
+        {
+          "id": 7,
+          "title": "Checklist: Tasks are realistic, time-boxed, and measurable (success/fail, time-on-task)?",
+          "completed": false
+        },
+        {
+          "id": 8,
+          "title": "Common mistakes: Leading participants during think-aloud (\"Do you find this confusing?\" instead of \"What are you thinking right now?\").",
+          "completed": false
+        },
+        {
+          "id": 9,
+          "title": "Review questions: Why does think-aloud sometimes alter natural behavior (reactivity)?",
+          "completed": false
+        },
+        {
+          "id": 10,
+          "title": "Homework: Recruit 2–3 pilot participants for next week.",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 11,
+      "title": "Quantitative & Qualitative Analysis Concepts",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "Objectives: Understand how raw data becomes evidence.",
+          "completed": false
+        },
+        {
+          "id": 2,
+          "title": "Concepts: Coding qualitative data (open/axial coding), thematic analysis, quantitative metrics (task time, error rate, SUS score).",
+          "completed": false
+        },
+        {
+          "id": 3,
+          "title": "Reading: Lazar et al., Ch.11 \"Analyzing qualitative data\"  [sciencedirect](https://www.sciencedirect.com/book/9780128053904/research-methods-in-human-computer-interaction).",
+          "completed": false
+        },
+        {
+          "id": 4,
+          "title": "Tasks: Practice coding a sample transcript (use any public usability study transcript) into 3–5 themes.",
+          "completed": false
+        },
+        {
+          "id": 5,
+          "title": "Deliverables: Coded transcript sample + codebook.",
+          "completed": false
+        },
+        {
+          "id": 6,
+          "title": "Time: 5 hrs.",
+          "completed": false
+        },
+        {
+          "id": 7,
+          "title": "Checklist: Codes are consistent and non-overlapping?",
+          "completed": false
+        },
+        {
+          "id": 8,
+          "title": "Common mistakes: Cherry-picking quotes that confirm assumptions instead of systematic coding.",
+          "completed": false
+        },
+        {
+          "id": 9,
+          "title": "Review questions: What's inter-rater reliability and why does it matter for qualitative rigor?",
+          "completed": false
+        },
+        {
+          "id": 10,
+          "title": "Homework: Read about basic descriptive statistics (mean, median, mode, standard deviation).",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 12,
+      "title": "Statistics for HCI (Part 1)",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "Objectives: Learn descriptive stats and confidence intervals with HCI examples.",
+          "completed": false
+        },
+        {
+          "id": 2,
+          "title": "Concepts: Mean, median, standard deviation, confidence intervals — e.g., \"average task completion time = 45s, SD = 8s\" tells you spread of user performance.",
+          "completed": false
+        },
+        {
+          "id": 3,
+          "title": "Reading: Lazar et al., Ch.4 \"Statistical analysis\"  [sciencedirect](https://www.sciencedirect.com/book/9780128053904/research-methods-in-human-computer-interaction); any intro statistics for HCI tutorial.",
+          "completed": false
+        },
+        {
+          "id": 4,
+          "title": "Tasks: Generate a mock dataset (20 fake task times) in Google Sheets/Excel; calculate mean, median, SD, 95% CI.",
+          "completed": false
+        },
+        {
+          "id": 5,
+          "title": "Deliverables: Excel sheet with formulas + 1-paragraph interpretation.",
+          "completed": false
+        },
+        {
+          "id": 6,
+          "title": "Time: 5 hrs.",
+          "completed": false
+        },
+        {
+          "id": 7,
+          "title": "Checklist: Formulas correct? Interpretation ties numbers back to usability meaning?",
+          "completed": false
+        },
+        {
+          "id": 8,
+          "title": "Common mistakes: Reporting mean without SD (hides variability, e.g., one very slow user skewing results).",
+          "completed": false
+        },
+        {
+          "id": 9,
+          "title": "Review questions: Why report both mean and SD in HCI results?",
+          "completed": false
+        },
+        {
+          "id": 10,
+          "title": "Homework: Learn what a p-value represents (conceptually, not formula-heavy).",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 13,
+      "title": "Statistics for HCI (Part 2)",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "Objectives: Learn inferential stats: t-test, ANOVA, correlation, effect size.",
+          "completed": false
+        },
+        {
+          "id": 2,
+          "title": "Concepts: t-test (comparing 2 designs' task times), ANOVA (comparing 3+ conditions), correlation (does SUS score correlate with task success?), effect size (Cohen's d) — practical significance beyond p-values.",
+          "completed": false
+        },
+        {
+          "id": 3,
+          "title": "Reading: Lazar et al., Ch.4 (continued)  [sciencedirect](https://www.sciencedirect.com/book/9780128053904/research-methods-in-human-computer-interaction).",
+          "completed": false
+        },
+        {
+          "id": 4,
+          "title": "Tasks: Run a t-test on your mock data (two conditions) using Excel's Data Analysis Toolpak or Google Sheets formulas.",
+          "completed": false
+        },
+        {
+          "id": 5,
+          "title": "Deliverables: t-test output + 1-paragraph result interpretation (\"Design A was significantly faster than Design B, t(18)=2.3, p<.05, d=0.7\").",
+          "completed": false
+        },
+        {
+          "id": 6,
+          "title": "Time: 5 hrs.",
+          "completed": false
+        },
+        {
+          "id": 7,
+          "title": "Checklist: Correct test chosen for your data type? p-value AND effect size reported?",
+          "completed": false
+        },
+        {
+          "id": 8,
+          "title": "Common mistakes: Confusing statistical significance with practical importance — always report effect size alongside p-value.",
+          "completed": false
+        },
+        {
+          "id": 9,
+          "title": "Review questions: When would you use ANOVA instead of a t-test?",
+          "completed": false
+        },
+        {
+          "id": 10,
+          "title": "Homework: Quiz yourself: match 5 HCI scenarios to the correct statistical test.",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 14,
+      "title": "Tools Setup: Overleaf, LaTeX, Zotero Integration",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "Objectives: Set up your entire writing/reference pipeline.",
+          "completed": false
+        },
+        {
+          "id": 2,
+          "title": "Concepts: LaTeX basics, IEEE/ACM LaTeX templates, Overleaf–Zotero integration, BibTeX citation management.",
+          "completed": false
+        },
+        {
+          "id": 3,
+          "title": "Reading: Overleaf's ACM/IEEE template documentation; Zotero-Overleaf sync guide.",
+          "completed": false
+        },
+        {
+          "id": 4,
+          "title": "Tasks: Create an Overleaf project using the ACM template (sigconf); import your Zotero library as .bib; write a placeholder title and abstract stub.",
+          "completed": false
+        },
+        {
+          "id": 5,
+          "title": "Deliverables: Overleaf project with working template, compiling with 3 test citations.",
+          "completed": false
+        },
+        {
+          "id": 6,
+          "title": "Time: 5 hrs.",
+          "completed": false
+        },
+        {
+          "id": 7,
+          "title": "Checklist: Document compiles without errors? Citations render correctly in ACM format?",
+          "completed": false
+        },
+        {
+          "id": 8,
+          "title": "Common mistakes: Mixing citation styles or leaving broken BibTeX entries.",
+          "completed": false
+        },
+        {
+          "id": 9,
+          "title": "Review questions: Why do most HCI venues require specific LaTeX templates (formatting consistency, page limits)?",
+          "completed": false
+        },
+        {
+          "id": 10,
+          "title": "Weekly milestone check: By end of Day 14 you must have: finalized methodology, instruments (survey + interview guide + tasks), a working stats understanding, and a compiling Overleaf project.",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 15,
+      "title": "Pilot Data Collection & Analysis",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "Objectives: Run your actual (or realistic mock) pilot study.",
+          "completed": false
+        },
+        {
+          "id": 2,
+          "title": "Concepts: Pilot testing purpose, data cleaning, triangulating qual + quant findings.",
+          "completed": false
+        },
+        {
+          "id": 3,
+          "title": "Reading: Review your own Day 9–11 instruments.",
+          "completed": false
+        },
+        {
+          "id": 4,
+          "title": "Tasks: Run usability test + survey + interview with 2–3 real or simulated participants; clean and tabulate data.",
+          "completed": false
+        },
+        {
+          "id": 5,
+          "title": "Deliverables: Raw data spreadsheet + cleaned dataset.",
+          "completed": false
+        },
+        {
+          "id": 6,
+          "title": "Time: 6 hrs.",
+          "completed": false
+        },
+        {
+          "id": 7,
+          "title": "Checklist: Data logged consistently? Consent obtained (even informally, for pilot)?",
+          "completed": false
+        },
+        {
+          "id": 8,
+          "title": "Common mistakes: Not recording timestamps or task outcomes systematically during sessions.",
+          "completed": false
+        },
+        {
+          "id": 9,
+          "title": "Review questions: What's the purpose of a pilot study before a full study?",
+          "completed": false
+        },
+        {
+          "id": 10,
+          "title": "Homework: Begin coding interview responses into themes.",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 16,
+      "title": "Full Analysis",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "Objectives: Complete statistical and thematic analysis.",
+          "completed": false
+        },
+        {
+          "id": 2,
+          "title": "Concepts: Combining descriptive stats, t-test/correlation results, and 3–4 qualitative themes into a coherent results narrative.",
+          "completed": false
+        },
+        {
+          "id": 3,
+          "title": "Reading: Re-read Lazar et al. Ch.4 and Ch.11 as needed  [sciencedirect](https://www.sciencedirect.com/book/9780128053904/research-methods-in-human-computer-interaction).",
+          "completed": false
+        },
+        {
+          "id": 4,
+          "title": "Tasks: Finalize all statistical tests; finalize thematic codebook and representative quotes.",
+          "completed": false
+        },
+        {
+          "id": 5,
+          "title": "Deliverables: Results summary document (numbers + themes + quotes).",
+          "completed": false
+        },
+        {
+          "id": 6,
+          "title": "Time: 6 hrs.",
+          "completed": false
+        },
+        {
+          "id": 7,
+          "title": "Checklist: Every RQ has a corresponding result?",
+          "completed": false
+        },
+        {
+          "id": 8,
+          "title": "Common mistakes: Reporting results without linking back to RQs/hypotheses.",
+          "completed": false
+        },
+        {
+          "id": 9,
+          "title": "Review questions: How do you decide which qualitative quotes to feature in a paper?",
+          "completed": false
+        },
+        {
+          "id": 10,
+          "title": "Homework: Sketch a rough outline of your Results section.",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 17,
+      "title": "Figures, Tables, Diagrams",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "Objectives: Create publication-quality visuals.",
+          "completed": false
+        },
+        {
+          "id": 2,
+          "title": "Concepts: Architecture diagrams (system design), user-flow diagrams, bar/box plots for results, table formatting conventions.",
+          "completed": false
+        },
+        {
+          "id": 3,
+          "title": "Reading: Any \"figures in academic papers\" style guide (e.g., from IEEE author resources).",
+          "completed": false
+        },
+        {
+          "id": 4,
+          "title": "Tasks: Use Figma for architecture/user-flow diagrams; use Excel/Google Sheets or Python (matplotlib) for result graphs (bar chart with error bars for task time comparison).",
+          "completed": false
+        },
+        {
+          "id": 5,
+          "title": "Deliverables: 2–3 diagrams + 1–2 result charts + 1 results table.",
+          "completed": false
+        },
+        {
+          "id": 6,
+          "title": "Time: 6 hrs.",
+          "completed": false
+        },
+        {
+          "id": 7,
+          "title": "Checklist: Axes labeled, legends present, consistent color scheme, export as vector/high-res PNG?",
+          "completed": false
+        },
+        {
+          "id": 8,
+          "title": "Common mistakes: Charts without error bars or units; illegible small fonts.",
+          "completed": false
+        },
+        {
+          "id": 9,
+          "title": "Review questions: Why include error bars in a bar chart comparing two designs?",
+          "completed": false
+        },
+        {
+          "id": 10,
+          "title": "Homework: Caption every figure and table properly (self-contained captions).",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 18,
+      "title": "Writing Introduction, Related Work, Methodology",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "Objectives: Draft the paper's first three sections.",
+          "completed": false
+        },
+        {
+          "id": 2,
+          "title": "Concepts: Funnel structure for Introduction (broad → gap → contribution), synthesizing related work thematically (not paper-by-paper), writing reproducible methodology.",
+          "completed": false
+        },
+        {
+          "id": 3,
+          "title": "Reading: Any \"how to write a CHI paper\" guide; review 2 of your Day 6 papers as structural models.",
+          "completed": false
+        },
+        {
+          "id": 4,
+          "title": "Tasks: Write full drafts of Introduction, Related Work, Methodology sections.",
+          "completed": false
+        },
+        {
+          "id": 5,
+          "title": "Deliverables: ~1500–2000 words drafted across 3 sections.",
+          "completed": false
+        },
+        {
+          "id": 6,
+          "title": "Time: 6 hrs.",
+          "completed": false
+        },
+        {
+          "id": 7,
+          "title": "Checklist: Introduction states contribution explicitly? Related Work grouped by theme, not by paper?",
+          "completed": false
+        },
+        {
+          "id": 8,
+          "title": "Common mistakes: Related Work as a list of summaries (\"Paper A did X. Paper B did Y.\") instead of synthesis showing the gap.",
+          "completed": false
+        },
+        {
+          "id": 9,
+          "title": "Review questions: What's the difference between summarizing and synthesizing literature?",
+          "completed": false
+        },
+        {
+          "id": 10,
+          "title": "Homework: Get one peer or mentor to read your Introduction and flag unclear sentences.",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 19,
+      "title": "Writing Results, Discussion, Abstract, Title",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "Objectives: Draft remaining core sections.",
+          "completed": false
+        },
+        {
+          "id": 2,
+          "title": "Concepts: Results = facts only (no interpretation); Discussion = interpretation, implications, limitations; Abstract written last, summarizing all sections in ~150–250 words; Title as a precise, keyword-rich claim.",
+          "completed": false
+        },
+        {
+          "id": 3,
+          "title": "Reading: Any abstract-writing guide from ACM/IEEE author resources.",
+          "completed": false
+        },
+        {
+          "id": 4,
+          "title": "Tasks: Write Results, Discussion (including explicit \"Limitations\" and \"Future Work\" subsections), draft 3 title options, write the Abstract.",
+          "completed": false
+        },
+        {
+          "id": 5,
+          "title": "Deliverables: Full Results + Discussion sections, Abstract, shortlisted title.",
+          "completed": false
+        },
+        {
+          "id": 6,
+          "title": "Time: 6 hrs.",
+          "completed": false
+        },
+        {
+          "id": 7,
+          "title": "Checklist: Discussion explicitly addresses limitations? Abstract mentions problem, method, key finding?",
+          "completed": false
+        },
+        {
+          "id": 8,
+          "title": "Common mistakes: Mixing interpretation into Results, or omitting limitations (reviewers always flag this).",
+          "completed": false
+        },
+        {
+          "id": 9,
+          "title": "Review questions: Why must limitations be stated explicitly rather than implied?",
+          "completed": false
+        },
+        {
+          "id": 10,
+          "title": "Homework: Compile full reference list in Zotero and verify formatting consistency.",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 20,
+      "title": "Full Draft Assembly & Self-Review",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "Objectives: Assemble a complete, internally consistent draft.",
+          "completed": false
+        },
+        {
+          "id": 2,
+          "title": "Concepts: Coherence checking, citation completeness, formatting compliance (page limits, template rules), self-review using reviewer mindset.",
+          "completed": false
+        },
+        {
+          "id": 3,
+          "title": "Reading: IEEE/ACM submission checklist for your target venue.",
+          "completed": false
+        },
+        {
+          "id": 4,
+          "title": "Tasks: Merge all sections in Overleaf; run a full read-through as if you were a peer reviewer; check every citation resolves; check figures/tables are referenced in text.",
+          "completed": false
+        },
+        {
+          "id": 5,
+          "title": "Deliverables: Complete compiled PDF draft.",
+          "completed": false
+        },
+        {
+          "id": 6,
+          "title": "Time: 6 hrs.",
+          "completed": false
+        },
+        {
+          "id": 7,
+          "title": "Checklist: No \"TODO\" placeholders remain? All citations resolve in bibliography? Page count within venue limits?",
+          "completed": false
+        },
+        {
+          "id": 8,
+          "title": "Common mistakes: Orphaned figures (not referenced in text) or citations without matching bibliography entries.",
+          "completed": false
+        },
+        {
+          "id": 9,
+          "title": "Review questions: If you were a reviewer, what's the weakest section of your own paper, and why?",
+          "completed": false
+        },
+        {
+          "id": 10,
+          "title": "Homework: Get feedback from at least one professor/mentor/peer before finalizing.",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 21,
+      "title": "Publication Roadmap & Presentation Prep",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "Objectives: Finalize the draft and plan where/how to submit.",
+          "completed": false
+        },
+        {
+          "id": 2,
+          "title": "Concepts: Conference vs. journal tradeoffs (conferences = faster, prestige for HCI like CHI/DIS; journals = longer review, deeper venues like ACM TOCHI, IJHCS), IEEE vs. ACM formatting differences, revision/response-to-reviewers process, camera-ready requirements, presentation slide basics.",
+          "completed": false
+        },
+        {
+          "id": 3,
+          "title": "Reading: Target venue's call-for-papers page; author guidelines for 2–3 candidate venues (consider student-friendly or workshop tracks, national IEEE/ACM student conferences in India as realistic first targets).",
+          "completed": false
+        },
+        {
+          "id": 4,
+          "title": "Tasks: Finalize draft based on feedback; shortlist 3 suitable venues (workshop, student track, or regional conference) with deadlines; draft a 5-slide presentation summary.",
+          "completed": false
+        },
+        {
+          "id": 5,
+          "title": "Deliverables: Final PDF draft, submission roadmap document (venue, deadline, format requirements), 5-slide summary deck.",
+          "completed": false
+        },
+        {
+          "id": 6,
+          "title": "Time: 6 hrs.",
+          "completed": false
+        },
+        {
+          "id": 7,
+          "title": "Checklist: Draft matches target venue's template exactly? Roadmap includes at least 2 backup venues?",
+          "completed": false
+        },
+        {
+          "id": 8,
+          "title": "Common mistakes: Submitting to a mismatched venue (e.g., a systems paper to a pure-design venue) or missing submission deadlines.",
+          "completed": false
+        },
+        {
+          "id": 9,
+          "title": "Review questions: How would you respond professionally to a reviewer who rejects your paper with harsh but fair criticism?",
+          "completed": false
+        },
+        {
+          "id": 10,
+          "title": "Homework (ongoing): Submit to your top-choice venue and prepare for possible major/minor revisions.",
+          "completed": false
+        }
+      ]
+    }
+  ]
+},
+ {
+  "title": "21 Day Toy Language in C++",
+  "days": [
+    {
+      "day": 1,
+      "title": "create project skeleton, compile a hello target, and write a",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "create project skeleton, compile a hello target, and write a hand-coded lexer loop that recognizes integers and a few single-character operators. Challenge: tokenize `\"12 + (3 * 4)\"`. [craftinginterpreters](https://craftinginterpreters.com/scanning.html)",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 2,
+      "title": "add identifiers and keywords like `var`, `if`, `else`, `whil",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "add identifiers and keywords like `var`, `if`, `else`, `while`, `fun`, `return`, `true`, `false`, `nil`. Introduce a keyword lookup map instead of a huge if-else chain.",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 3,
+      "title": "handle whitespace, `//` comments, and line counting. Add a s",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "handle whitespace, `//` comments, and line counting. Add a small `LexerError` path that stores message + line number instead of just printing immediately.",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 4,
+      "title": "write tests. Even if you don’t use a framework yet, a tiny h",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "write tests. Even if you don’t use a framework yet, a tiny homemade test runner is enough. For compilers, tests save huge time because every later stage depends on lexer correctness. [craftinginterpreters](https://craftinginterpreters.com/scanning.html)",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 5,
+      "title": "start recursive descent parsing using one function per gramm",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "start recursive descent parsing using one function per grammar layer, which is the classic structure for small LL-style parsers. First support literals, parentheses, unary minus, and `+ - * /`. [geeksforgeeks](https://www.geeksforgeeks.org/compiler-design/recursive-descent-parser/)",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 6,
+      "title": "encode precedence by grammar shape, for example:",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "encode precedence by grammar shape, for example:",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 7,
+      "title": "make AST debug output such as parenthesized formatting:",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "make AST debug output such as parenthesized formatting:",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 8,
+      "title": "parse statements:",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "parse statements:",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 9,
+      "title": "add `if (cond) stmt else stmt` and `while (cond) stmt`. The ",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "add `if (cond) stmt else stmt` and `while (cond) stmt`. The parser should now build a complete syntax tree for simple programs, not just expressions.",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 10,
+      "title": "refactor AST representation. You have two main paths:",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "refactor AST representation. You have two main paths:",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 11,
+      "title": "build a tree-walking interpreter that evaluates expressions ",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "build a tree-walking interpreter that evaluates expressions by recursively traversing the AST, which is the classic first interpreter approach before a VM. Start with numbers, booleans, strings, unary ops, and binary ops. [chidiwilliams](https://www.chidiwilliams.com/posts/crafting-interpreters-a-review)",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 12,
+      "title": "add environments for variables and blocks. Typical design:",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "add environments for variables and blocks. Typical design:",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 13,
+      "title": "add functions:",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "add functions:",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 15,
+      "title": "improve runtime errors. Instead of “bad operand,” say:",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "improve runtime errors. Instead of “bad operand,” say:",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 16,
+      "title": "add:",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "add:",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 17,
+      "title": "design VM opcodes. A minimal stack VM might include:",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "design VM opcodes. A minimal stack VM might include:",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 18,
+      "title": "compile a subset of AST to bytecode. Start with just express",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "compile a subset of AST to bytecode. Start with just expressions and globals. Don’t try to compile every language feature at once.",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 19,
+      "title": "write the stack VM:",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "write the stack VM:",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 20,
+      "title": "choose one extra:",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "choose one extra:",
+          "completed": false
+        }
+      ]
+    },
+    {
+      "day": 21,
+      "title": "package it properly:",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "package it properly:",
+          "completed": false
+        }
+      ]
+    }
+  ]
+}];
+
         const QUOTES = [
             "Habits are the compound interest of self-improvement.",
             "Every action is a vote for who you wish to become.",
@@ -205,8 +1614,33 @@
             "The greatest threat to success is not failure, but boredom."
         ];
 
+        const toTitleCase = (str) => {
+            return String(str || "").replace(/_/g, " ").toLowerCase().split(" ").map(word =>
+                word.charAt(0).toUpperCase() + word.slice(1)
+            ).join(" ");
+        };
+
+        const normalizePlans = (rawPlans) => {
+            const plans = Array.isArray(rawPlans) ? rawPlans : [rawPlans];
+
+            return plans.map(plan => ({
+                id: crypto.randomUUID(),
+                title: toTitleCase(plan.title || "Untitled Plan"),
+                days: (plan.days || []).map((day, dayIndex) => ({
+                    ...day,
+                    day: day.day || dayIndex + 1,
+                    tasks: (day.tasks || []).map((task, taskIndex) => ({
+                        ...task,
+                        id: task.id || taskIndex + 1,
+                        title: toTitleCase(task.title || "")
+                    }))
+                })),
+                currentDayIndex: 0
+            }));
+        };
+
         function App() {
-            const [plans, setPlans] = useState([]);
+            const [plans, setPlans] = useState(() => normalizePlans(DEFAULT_PRELOAD_PLANS));
             const [showIntro, setShowIntro] = useState(true);
             const [shockDate, setShockDate] = useState(false);
             const [introQuote] = useState(() => {
@@ -236,13 +1670,6 @@
                 };
             }, []);
 
-            // Helper to format title case for "This Ok" casing
-            const toTitleCase = (str) => {
-                return str.replace(/_/g, " ").toLowerCase().split(" ").map(word =>
-                    word.charAt(0).toUpperCase() + word.slice(1)
-                ).join(" ");
-            };
-
             const handleFileUpload = (event) => {
                 const file = event.target.files[0];
                 if (!file) return;
@@ -251,16 +1678,7 @@
                 reader.onload = (e) => {
                     try {
                         const json = JSON.parse(e.target.result);
-                        let newPlans = Array.isArray(json) ? json : [json];
-                        newPlans = newPlans.map(plan => ({
-                            id: crypto.randomUUID(),
-                            title: toTitleCase(plan.title || "Untitled Plan"),
-                            days: (plan.days || []).map(d => ({
-                                ...d,
-                                tasks: (d.tasks || []).map(t => ({ ...t, title: toTitleCase(t.title || "") }))
-                            })),
-                            currentDayIndex: 0
-                        }));
+                        const newPlans = normalizePlans(json);
                         setPlans(prev => [...prev, ...newPlans]);
                     } catch (err) {
                         console.error(err);
@@ -271,11 +1689,10 @@
             };
 
             const downloadSampleJSON = () => {
-                const sample = { title: "7_Day_Pushup_Protocol", days: [{ day: 1, tasks: [{ id: 1, title: "Warmup_Stretch", completed: false }] }] };
-                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(sample, null, 2));
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(DEFAULT_PRELOAD_PLANS, null, 2));
                 const a = document.createElement("a");
                 a.href = dataStr;
-                a.download = "plan.json";
+                a.download = "sample-plans.json";
                 a.click();
             };
 
