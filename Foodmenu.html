@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full dark scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Hostel Mess Menu</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            te: {
+              bg: '#EBE9E1',
+              darkbg: '#141416',
+              panel: '#F4F2EC',
+              darkpanel: '#1E1E22',
+              orange: '#FF4E00',
+              yellow: '#FFC700',
+              green: '#00D66C',
+              darkText: '#18181A',
+              lightText: '#EEEEF0',
+              gray: '#8E8E93',
+              glass: 'rgba(255, 255, 255, 0.55)',
+              glassDark: 'rgba(30, 30, 34, 0.70)'
+            }
+          },
+          fontFamily: {
+            mono: ['"Space Mono"', 'monospace'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif']
+          },
+          boxShadow: {
+            'te-btn': '0px 3px 0px 0px rgba(0, 0, 0, 0.15), inset 0px 1px 0px 0px rgba(255,255,255,0.6)',
+            'te-card': '0 8px 32px 0 rgba(0, 0, 0, 0.06), inset 0 1px 1px 0 rgba(255, 255, 255, 0.6)',
+            'te-card-dark': '0 8px 32px 0 rgba(0, 0, 0, 0.37), inset 0 1px 1px 0 rgba(255, 255, 255, 0.1)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(142, 142, 147, 0.4); border-radius: 99px; }
+    
+    .glass-effect {
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .tactile-btn {
+      transition: all 0.08s cubic-bezier(0.2, 0, 0, 1);
+    }
+    .tactile-btn:active {
+      transform: translateY(2px);
+    }
+  </style>
+</head>
+
+<body class="bg-te-darkbg text-te-lightText font-sans min-h-full transition-colors duration-200 antialiased select-none pb-16">
+
+  <main class="max-w-5xl mx-auto px-4 pt-6 space-y-6">
+
+    <!-- DAY SELECTOR STRIP (TACTILE SYNTH PADS) -->
+    <section class="space-y-2.5">
+      <div class="flex items-center justify-between px-1">
+        <span class="font-mono text-xs font-bold text-te-gray uppercase tracking-wider flex items-center gap-1.5">
+          <i data-lucide="calendar" class="w-3.5 h-3.5 text-te-orange"></i> SELECT DAY
+        </span>
+        <button onclick="selectToday(true)" class="font-mono text-[11px] font-bold text-te-orange hover:underline flex items-center gap-1">
+          <i data-lucide="rotate-ccw" class="w-3 h-3"></i> TODAY
+        </button>
+      </div>
+
+      <div class="grid grid-cols-7 gap-1.5 sm:gap-2">
+        <button onclick="setDay('Monday')" class="day-btn tactile-btn py-3 rounded-2xl font-mono text-xs font-bold border border-white/10 bg-te-darkpanel flex flex-col items-center justify-center transition" data-day="Monday">
+          <span class="text-[10px] opacity-60">MON</span>
+        </button>
+        <button onclick="setDay('Tuesday')" class="day-btn tactile-btn py-3 rounded-2xl font-mono text-xs font-bold border border-white/10 bg-te-darkpanel flex flex-col items-center justify-center transition" data-day="Tuesday">
+          <span class="text-[10px] opacity-60">TUE</span>
+        </button>
+        <button onclick="setDay('Wednesday')" class="day-btn tactile-btn py-3 rounded-2xl font-mono text-xs font-bold border border-white/10 bg-te-darkpanel flex flex-col items-center justify-center transition" data-day="Wednesday">
+          <span class="text-[10px] opacity-60">WED</span>
+        </button>
+        <button onclick="setDay('Thursday')" class="day-btn tactile-btn py-3 rounded-2xl font-mono text-xs font-bold border border-white/10 bg-te-darkpanel flex flex-col items-center justify-center transition" data-day="Thursday">
+          <span class="text-[10px] opacity-60">THU</span>
+        </button>
+        <button onclick="setDay('Friday')" class="day-btn tactile-btn py-3 rounded-2xl font-mono text-xs font-bold border border-white/10 bg-te-darkpanel flex flex-col items-center justify-center transition" data-day="Friday">
+          <span class="text-[10px] opacity-60">FRI</span>
+        </button>
+        <button onclick="setDay('Saturday')" class="day-btn tactile-btn py-3 rounded-2xl font-mono text-xs font-bold border border-white/10 bg-te-darkpanel flex flex-col items-center justify-center transition" data-day="Saturday">
+          <span class="text-[10px] opacity-60">SAT</span>
+        </button>
+        <button onclick="setDay('Sunday')" class="day-btn tactile-btn py-3 rounded-2xl font-mono text-xs font-bold border border-white/10 bg-te-darkpanel flex flex-col items-center justify-center transition" data-day="Sunday">
+          <span class="text-[10px] opacity-60">SUN</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- MEAL CARDS DISPLAY -->
+    <section class="space-y-4">
+      <div class="flex items-center justify-between px-1">
+        <h2 id="viewing-day-heading" class="font-mono font-bold text-sm tracking-wider uppercase flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-te-orange"></span> TODAY'S MENU
+        </h2>
+      </div>
+
+      <!-- Meal Cards Grid -->
+      <div id="meal-cards-container" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Dynamic JS insertion -->
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // Exact Hostel Menu Dataset
+    const WEEKLY_MENU = {
+      Monday: {
+        breakfast: "Dosa, Chutney",
+        lunch: "Rice, Veg Fry, Pappu, Chutney, Papad, Curd",
+        dinner: "Rice, Pulka / Chapati, Veg Curry (Chole/Rajma/Double Beans), Rasam, Curd"
+      },
+      Tuesday: {
+        breakfast: "Poori, Aloo Curry",
+        lunch: "Vegetable Biryani / Jeera Rice / Green Peas Pulao, Aloo Korma, Raitha",
+        dinner: "Rice, Pulka / Chapati, Egg Curry, Veg Curry, Curd"
+      },
+      Wednesday: {
+        breakfast: "Idly, Chutney, Sambar",
+        lunch: "Rice, Sambar, Veg Fry, Curd",
+        dinner: "Bagara Rice, Chicken Curry, Veg Curry, Curd"
+      },
+      Thursday: {
+        breakfast: "Bonda / Mysore Bajji, Chutney",
+        lunch: "Rice, Vegetable Curry, Veg Fry, Curd",
+        dinner: "Rice, Pulka / Chapati, Veg Curry, Rasam, Curd"
+      },
+      Friday: {
+        breakfast: "Chapati / Paratha, Aloo Curry",
+        lunch: "Rice, Leaf Dal, Veg Fry, Curd",
+        dinner: "Egg Fried Rice / Egg Noodles, Raitha"
+      },
+      Saturday: {
+        breakfast: "Utappam, Chutney, Banana",
+        lunch: "Coconut Rice / Lemon / Pulihora / Mango Rice, Dal Curry, Curd",
+        dinner: "Sweet, Rice, Pulka / Chapathi, Veg Curry, Sambar, Curd"
+      },
+      Sunday: {
+        breakfast: "Upma + Pongal, Chutney",
+        lunch: "Chicken Dum Biryani / Paneer Biryani / Veg Biryani, Raitha",
+        dinner: "Rice, Dal, Rasam, Curd"
+      }
+    };
+
+    const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    let currentSelectedDay = "";
+
+    // Web Audio Synthesizer Tactile Clicks
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    function playTactileClick() {
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(750, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(350, audioCtx.currentTime + 0.04);
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.04);
+      } catch (e) {}
+    }
+
+    // Initialize Page
+    window.addEventListener('DOMContentLoaded', () => {
+      selectToday(true);
+      lucide.createIcons();
+    });
+
+    function getTodayName() {
+      const dayIndex = new Date().getDay();
+      return DAYS[dayIndex];
+    }
+
+    function selectToday(shouldScroll = false) {
+      const today = getTodayName();
+      setDay(today, shouldScroll);
+    }
+
+    function setDay(day, autoScroll = false) {
+      playTactileClick();
+      currentSelectedDay = day;
+      const todayName = getTodayName();
+
+      // Update Day Buttons UI
+      document.querySelectorAll('.day-btn').forEach(btn => {
+        const btnDay = btn.getAttribute('data-day');
+        if (btnDay === day) {
+          btn.className = "day-btn tactile-btn py-3 rounded-2xl font-mono text-xs font-bold border-2 border-te-orange bg-te-orange text-white flex flex-col items-center justify-center transition shadow-md";
+        } else {
+          btn.className = "day-btn tactile-btn py-3 rounded-2xl font-mono text-xs font-bold border border-white/10 bg-te-darkpanel text-te-lightText flex flex-col items-center justify-center transition hover:bg-white/5";
+        }
+      });
+
+      // Update Section Heading
+      const heading = document.getElementById('viewing-day-heading');
+      if (day === todayName) {
+        heading.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-te-green animate-pulse"></span> TODAY'S MENU (${day.toUpperCase()})`;
+      } else {
+        heading.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-te-orange"></span> SCHEDULE FOR ${day.toUpperCase()}`;
+      }
+
+      renderMealCards(day, autoScroll);
+    }
+
+    function renderMealCards(day, autoScroll = false) {
+      const container = document.getElementById('meal-cards-container');
+      const menu = WEEKLY_MENU[day];
+      if (!menu) return;
+
+      const now = new Date();
+      const currentHour = now.getHours();
+      const isToday = day === getTodayName();
+
+      // Service Windows
+      const isBreakfastActive = isToday && (currentHour >= 6 && currentHour < 10);
+      const isLunchActive = isToday && (currentHour >= 12 && currentHour < 14);
+      const isDinnerActive = isToday && (currentHour >= 17 && currentHour < 21);
+
+      // Determine Target Meal Card for Auto-Scroll
+      let targetMealId = null;
+      if (isToday) {
+        if (isBreakfastActive || currentHour < 10) {
+          targetMealId = "card-breakfast";
+        } else if (isLunchActive || (currentHour >= 10 && currentHour < 14)) {
+          targetMealId = "card-lunch";
+        } else {
+          targetMealId = "card-dinner";
+        }
+      }
+
+      container.innerHTML = `
+        <!-- BREAKFAST CARD -->
+        <div id="card-breakfast" class="rounded-3xl bg-te-glassDark border ${isBreakfastActive ? 'border-2 border-te-orange shadow-lg' : 'border-white/10'} glass-effect p-5 shadow-te-card-dark flex flex-col justify-between space-y-4 relative overflow-hidden transition-all duration-300">
+          ${isBreakfastActive ? `<div class="absolute top-0 right-0 bg-te-orange text-white text-[9px] font-mono font-bold px-3 py-1 rounded-bl-xl uppercase">ACTIVE NOW</div>` : ''}
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-mono font-bold bg-te-yellow/20 text-te-yellow border border-te-yellow/30">
+                <i data-lucide="coffee" class="w-3.5 h-3.5"></i> BREAKFAST
+              </span>
+              <span class="font-mono text-[11px] text-te-gray font-bold">06:00 - 10:00</span>
+            </div>
+
+            <div class="pt-1">
+              <h3 class="font-bold text-base tracking-tight leading-snug text-te-lightText">
+                ${formatMenuItems(menu.breakfast)}
+              </h3>
+            </div>
+          </div>
+        </div>
+
+        <!-- LUNCH CARD -->
+        <div id="card-lunch" class="rounded-3xl bg-te-glassDark border ${isLunchActive ? 'border-2 border-te-orange shadow-lg' : 'border-white/10'} glass-effect p-5 shadow-te-card-dark flex flex-col justify-between space-y-4 relative overflow-hidden transition-all duration-300">
+          ${isLunchActive ? `<div class="absolute top-0 right-0 bg-te-orange text-white text-[9px] font-mono font-bold px-3 py-1 rounded-bl-xl uppercase">ACTIVE NOW</div>` : ''}
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-mono font-bold bg-te-orange/20 text-te-orange border border-te-orange/30">
+                <i data-lucide="sun" class="w-3.5 h-3.5"></i> LUNCH
+              </span>
+              <span class="font-mono text-[11px] text-te-gray font-bold">12:00 - 14:00</span>
+            </div>
+
+            <div class="pt-1">
+              <h3 class="font-bold text-base tracking-tight leading-snug text-te-lightText">
+                ${formatMenuItems(menu.lunch)}
+              </h3>
+            </div>
+          </div>
+        </div>
+
+        <!-- DINNER CARD -->
+        <div id="card-dinner" class="rounded-3xl bg-te-glassDark border ${isDinnerActive ? 'border-2 border-te-orange shadow-lg' : 'border-white/10'} glass-effect p-5 shadow-te-card-dark flex flex-col justify-between space-y-4 relative overflow-hidden transition-all duration-300">
+          ${isDinnerActive ? `<div class="absolute top-0 right-0 bg-te-orange text-white text-[9px] font-mono font-bold px-3 py-1 rounded-bl-xl uppercase">ACTIVE NOW</div>` : ''}
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-mono font-bold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+                <i data-lucide="moon" class="w-3.5 h-3.5"></i> DINNER
+              </span>
+              <span class="font-mono text-[11px] text-te-gray font-bold">17:00 - 21:00</span>
+            </div>
+
+            <div class="pt-1">
+              <h3 class="font-bold text-base tracking-tight leading-snug text-te-lightText">
+                ${formatMenuItems(menu.dinner)}
+              </h3>
+            </div>
+          </div>
+        </div>
+      `;
+
+      lucide.createIcons();
+
+      // Trigger Smooth Scroll to Active/Target Meal
+      if (autoScroll && targetMealId) {
+        setTimeout(() => {
+          const targetCard = document.getElementById(targetMealId);
+          if (targetCard) {
+            targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 100);
+      }
+    }
+
+    // Formats item list into clean tags
+    function formatMenuItems(text) {
+      const items = text.split(',');
+      return items.map(item => `<span class="inline-block bg-white/10 px-2.5 py-1 rounded-xl my-0.5 mr-1 text-xs sm:text-sm font-medium border border-white/5">${item.trim()}</span>`).join('');
+    }
+  </script>
+</body>
+</html>
+
+  
