@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="MarkCraft Studio — animated dark-mode logo design studio landing page." />
+<title>Bharat Brandings — Brand identities with presence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#0a0a0c; --bg-soft:#111114; --ink:#f4f2ec; --muted:#9a97a6;
+    --accent:#ff5e3a; --accent-2:#8affc1; --line:rgba(244,242,236,.12);
+    --card:#141417; --serif:'Fraunces',serif; --sans:'Space Grotesk',sans-serif; --mono:'JetBrains Mono',monospace;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);overflow-x:hidden;cursor:default;}
+  a{color:inherit;text-decoration:none;}
+  ::selection{background:var(--accent);color:#0a0a0c;}
+  .shell{width:min(1180px,calc(100% - 40px));margin:auto;position:relative;}
+  .noise{position:fixed;inset:0;pointer-events:none;z-index:2;opacity:.035;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+  .cursor-dot{position:fixed;width:10px;height:10px;border-radius:50%;background:var(--accent);pointer-events:none;z-index:999;transform:translate(-50%,-50%);transition:transform .15s ease,opacity .3s;mix-blend-mode:difference;}
+  .cursor-ring{position:fixed;width:38px;height:38px;border:1px solid var(--ink);border-radius:50%;pointer-events:none;z-index:998;transform:translate(-50%,-50%);transition:width .3s,height .3s,transform .12s ease,border-color .3s;opacity:.7;}
+  @media(hover:none){.cursor-dot,.cursor-ring{display:none;}}
+  .eyebrow{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.18em;font-size:.68rem;color:var(--accent-2);}
+  .eyebrow .bar{width:26px;height:1px;background:var(--accent-2);}
+  .reveal{opacity:0;transform:translateY(36px);transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1);}
+  .reveal.in{opacity:1;transform:none;}
+  .reveal-delay-1.in{transition-delay:.1s;} .reveal-delay-2.in{transition-delay:.2s;} .reveal-delay-3.in{transition-delay:.3s;} .reveal-delay-4.in{transition-delay:.4s;}
+  header{height:96px;display:flex;align-items:center;position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(10,10,12,.55);border-bottom:1px solid transparent;transition:border-color .4s;}
+  header.scrolled{border-color:var(--line);}
+  .nav{display:flex;justify-content:space-between;align-items:center;width:100%;}
+  .brand{display:flex;align-items:center;gap:10px;font-family:var(--serif);font-weight:600;font-size:1.3rem;font-style:italic;}
+  .brand-mark{width:32px;height:32px;display:grid;place-items:center;border-radius:50%;background:var(--accent);color:#0a0a0c;font-family:var(--sans);font-weight:700;font-style:normal;animation:spin 9s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .links{display:flex;gap:34px;font-size:.9rem;color:var(--muted);}
+  .links a{position:relative;transition:color .3s;}
+  .links a:after{content:"";position:absolute;left:0;bottom:-4px;width:0;height:1px;background:var(--ink);transition:width .35s cubic-bezier(.16,1,.3,1);}
+  .links a:hover{color:var(--ink);}
+  .links a:hover:after{width:100%;}
+  .btn{position:relative;display:inline-flex;align-items:center;gap:10px;padding:14px 24px;border-radius:999px;font-size:.88rem;font-weight:600;cursor:pointer;overflow:hidden;isolation:isolate;border:1px solid var(--ink);}
+  .btn span{position:relative;z-index:1;}
+  .btn:before{content:"";position:absolute;inset:0;background:var(--accent);transform:translateY(101%);transition:transform .4s cubic-bezier(.65,0,.35,1);z-index:0;}
+  .btn:hover:before{transform:translateY(0);}
+  .btn:hover{color:#0a0a0c;}
+  .btn-solid{background:var(--ink);color:#0a0a0c;border-color:var(--ink);}
+  .btn-solid:hover{color:#0a0a0c;}
+  .menu-btn{display:none;background:none;border:0;color:var(--ink);font-size:1.5rem;cursor:pointer;}
+  .section{padding:150px 0;position:relative;}
+  h1,h2,h3{margin:0;font-family:var(--serif);letter-spacing:-.02em;line-height:1.02;}
+  h2{font-size:clamp(2.4rem,5.6vw,4.6rem);max-width:780px;margin-bottom:22px;font-weight:600;}
+  h2 em{font-style:italic;color:var(--accent);}
+  .section-copy{max-width:520px;color:var(--muted);font-size:1.05rem;line-height:1.75;}
+  .hero{padding:70px 0 90px;min-height:88vh;display:flex;align-items:center;position:relative;}
+  .hero-glow{position:absolute;top:-200px;right:-160px;width:640px;height:640px;background:radial-gradient(circle,rgba(255,94,58,.28),transparent 70%);filter:blur(10px);animation:float 10s ease-in-out infinite;pointer-events:none;}
+  .hero-glow-2{position:absolute;bottom:-260px;left:-180px;width:520px;height:520px;background:radial-gradient(circle,rgba(138,255,193,.16),transparent 70%);animation:float 13s ease-in-out infinite reverse;pointer-events:none;}
+  @keyframes float{0%,100%{transform:translate(0,0);}50%{transform:translate(-30px,40px);}}
+  .hero-inner{position:relative;z-index:1;}
+  .hero h1{font-size:clamp(3.4rem,8.6vw,7.4rem);max-width:920px;font-weight:600;}
+  .hero h1 .line{display:block;overflow:hidden;}
+  .hero h1 .line span{display:inline-block;transform:translateY(110%);animation:lineUp .9s cubic-bezier(.16,1,.3,1) forwards;}
+  .hero h1 .line:nth-child(1) span{animation-delay:.15s;}
+  .hero h1 .line:nth-child(2) span{animation-delay:.32s;color:var(--accent);font-style:italic;}
+  .hero h1 .line:nth-child(3) span{animation-delay:.48s;}
+  @keyframes lineUp{to{transform:translateY(0);}}
+  .hero-copy{max-width:520px;color:var(--muted);font-size:1.1rem;line-height:1.75;margin-top:26px;opacity:0;animation:fadeUp .8s ease forwards;animation-delay:.75s;}
+  .hero-actions{display:flex;gap:14px;margin-top:36px;flex-wrap:wrap;opacity:0;animation:fadeUp .8s ease forwards;animation-delay:.9s;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+  .marquee-wrap{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:22px 0;overflow:hidden;background:var(--bg-soft);}
+  .marquee{display:flex;width:max-content;animation:scroll 26s linear infinite;gap:60px;}
+  .marquee span{font-family:var(--mono);font-size:.95rem;color:var(--muted);white-space:nowrap;display:flex;align-items:center;gap:60px;}
+  .marquee span em{color:var(--accent-2);font-style:normal;}
+  @keyframes scroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+  .stats-inner{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:20px;overflow:hidden;}
+  .stat{background:var(--bg);padding:36px 26px;transition:background .35s;}
+  .stat:hover{background:var(--bg-soft);}
+  .stat strong{display:block;font-family:var(--serif);font-size:clamp(1.7rem,3.2vw,2.7rem);font-weight:600;}
+  .stat span{font-family:var(--mono);font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+  .steps{margin-top:60px;display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border-radius:20px;overflow:hidden;border:1px solid var(--line);}
+  .step{background:var(--bg);padding:34px 26px;min-height:240px;position:relative;transition:background .4s,transform .4s;}
+  .step:hover{background:var(--card);transform:translateY(-6px);}
+  .step-no{font-family:var(--mono);color:var(--accent);font-size:.85rem;}
+  .step h3{font-family:var(--serif);font-weight:500;font-size:1.45rem;margin:44px 0 12px;}
+  .step p{color:var(--muted);font-size:.9rem;line-height:1.6;margin:0;}
+  .portfolio-head{display:flex;justify-content:space-between;align-items:end;gap:30px;flex-wrap:wrap;}
+  .filters{display:flex;gap:8px;flex-wrap:wrap;}
+  .filter{padding:9px 16px;border:1px solid var(--line);border-radius:999px;background:none;color:var(--muted);cursor:pointer;font-size:.82rem;font-family:var(--mono);transition:.3s;}
+  .filter.active,.filter:hover{border-color:var(--ink);color:var(--ink);}
+  .projects{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;margin-top:48px;}
+  .project{position:relative;grid-column:span 4;min-height:260px;border-radius:20px;overflow:hidden;padding:24px;color:#0a0a0c;display:flex;flex-direction:column;justify-content:space-between;transition:transform .5s cubic-bezier(.16,1,.3,1);}
+  .project:hover{transform:translateY(-10px) rotate(-.4deg);}
+  .project:nth-child(1){background:var(--accent-2);}
+  .project:nth-child(2){background:var(--accent);color:#fff;grid-column:span 5;}
+  .project:nth-child(3){background:#e8e4d8;grid-column:span 7;}
+  .project:nth-child(4){background:#c9c3ff;}
+  .project:nth-child(5){background:var(--ink);}
+  .project-tag{align-self:flex-start;font-family:var(--mono);font-size:.68rem;padding:6px 10px;border:1px solid currentColor;border-radius:99px;text-transform:uppercase;letter-spacing:.05em;}
+  .logo-word{font-family:var(--serif);font-style:italic;font-size:clamp(1.8rem,4vw,3.2rem);font-weight:600;}
+  .testimonials{background:var(--bg-soft);}
+  .reviews{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-top:52px;background:var(--line);border:1px solid var(--line);border-radius:20px;overflow:hidden;}
+  .review{background:var(--bg);padding:30px;transition:background .35s;}
+  .review:hover{background:var(--card);}
+  .stars{color:var(--accent-2);font-family:var(--mono);letter-spacing:3px;font-size:.8rem;}
+  .review blockquote{margin:20px 0;font-family:var(--serif);font-style:italic;font-size:1.15rem;line-height:1.55;font-weight:400;}
+  .review footer{color:var(--muted);font-family:var(--mono);font-size:.75rem;}
+  .faq-grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:80px;}
+  .faq-list{border-top:1px solid var(--line);}
+  details{border-bottom:1px solid var(--line);padding:24px 0;}
+  summary{list-style:none;display:flex;justify-content:space-between;gap:20px;cursor:pointer;font-family:var(--serif);font-size:1.15rem;}
+  summary::-webkit-details-marker{display:none;}
+  summary .plus{font-family:var(--sans);font-size:1.3rem;transition:transform .35s;}
+  details[open] .plus{transform:rotate(135deg);color:var(--accent);}
+  details p{color:var(--muted);line-height:1.7;padding-right:28px;margin:16px 0 4px;font-size:.94rem;max-height:0;overflow:hidden;animation:expand .35s ease forwards;}
+  @keyframes expand{from{max-height:0;opacity:0;}to{max-height:200px;opacity:1;}}
+  .cta{padding:100px 0;}
+  .cta-box{position:relative;overflow:hidden;background:linear-gradient(135deg,#151417,#0a0a0c);border:1px solid var(--line);border-radius:28px;padding:80px clamp(26px,7vw,90px);text-align:center;}
+  .cta-box .eyebrow{justify-content:center;}
+  .cta-box h2{margin:22px auto 18px;}
+  .cta-box p{margin:0 auto 30px;color:var(--muted);max-width:480px;}
+  .cta-orb{position:absolute;width:400px;height:400px;background:radial-gradient(circle,rgba(255,94,58,.22),transparent 70%);top:-140px;left:50%;transform:translateX(-50%);animation:pulse 5s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:.6;}50%{opacity:1;}}
+  footer{padding:40px 0 50px;color:var(--muted);font-size:.85rem;font-family:var(--mono);}
+  .footer-row{display:flex;justify-content:space-between;gap:20px;padding-top:26px;border-top:1px solid var(--line);flex-wrap:wrap;}
+  .modal{display:none;position:fixed;z-index:200;inset:0;padding:20px;background:rgba(10,10,12,.75);backdrop-filter:blur(6px);place-items:center;}
+  .modal.open{display:grid;}
+  .modal-card{position:relative;width:min(600px,100%);max-height:90vh;overflow:auto;padding:40px;border-radius:24px;background:var(--card);border:1px solid var(--line);animation:pop .35s cubic-bezier(.16,1,.3,1);}
+  @keyframes pop{from{opacity:0;transform:scale(.94) translateY(16px);}to{opacity:1;transform:none;}}
+  .close{position:absolute;right:20px;top:16px;background:none;border:0;color:var(--ink);cursor:pointer;font-size:1.7rem;}
+  .modal-card h2{font-size:2.1rem;margin-bottom:10px;}
+  form{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:26px;}
+  .wide{grid-column:1/-1;}
+  label{display:grid;gap:8px;font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);}
+  input,select,textarea{width:100%;padding:13px 14px;border:1px solid var(--line);outline:0;border-radius:10px;color:var(--ink);background:var(--bg);font-family:var(--sans);transition:border-color .3s;}
+  input:focus,select:focus,textarea:focus{border-color:var(--accent);}
+  textarea{resize:vertical;min-height:90px;}
+  .form-note{display:none;grid-column:1/-1;padding:14px;color:#0a0a0c;background:var(--accent-2);border-radius:10px;font-size:.9rem;}
+  @media(max-width:820px){
+    .links,header .btn{display:none;} .menu-btn{display:block;}
+    .hero-grid,.faq-grid{grid-template-columns:1fr;}
+    .stats-inner,.steps{grid-template-columns:repeat(2,1fr);}
+    .reviews{grid-template-columns:1fr;}
+    .project,.project:nth-child(2),.project:nth-child(3){grid-column:span 6;}
+    .section{padding:96px 0;}
+  }
+  @media(max-width:540px){
+    .stats-inner,.steps{grid-template-columns:1fr;}
+    .project,.project:nth-child(2),.project:nth-child(3){grid-column:span 12;}
+    form{grid-template-columns:1fr;}
+    .cta-box{padding:56px 24px;}
+  }
+</style>
+</head>
+<body>
+<div class="noise"></div>
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<header id="siteHeader">
+  <div class="shell nav">
+    <a class="brand" href="#top"><span class="brand-mark">M</span>markcraft</a>
+    <div class="links">
+      <a href="#process">Process</a><a href="#work">Work</a><a href="#reviews">Reviews</a><a href="#faq">FAQ</a>
+    </div>
+    <button class="btn btn-solid open-form"><span>Start a project ↗</span></button>
+    <button class="menu-btn">☰</button>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero shell">
+    <div class="hero-glow"></div>
+    <div class="hero-glow-2"></div>
+    <div class="hero-inner">
+      <div class="eyebrow"><span class="bar"></span>Independent identity design studio</div>
+      <h1 style="margin-top:20px;">
+        <span class="line"><span>Brands that</span></span>
+        <span class="line"><span>feel inevitable,</span></span>
+        <span class="line"><span>not invented.</span></span>
+      </h1>
+      <p class="hero-copy">We design considered logo identities for founders who refuse to look like everyone else. Slow, deliberate craft — delivered on a timeline that respects your launch.</p>
+      <div class="hero-actions">
+        <button class="btn btn-solid open-form"><span>Get your logo ↗</span></button>
+        <a class="btn" href="#work"><span>See selected work ↓</span></a>
+      </div>
+    </div>
+  </section>
+
+  <div class="marquee-wrap">
+    <div class="marquee">
+      <span>Identity design <em>·</em> Brand systems <em>·</em> Logo craft <em>·</em> Visual strategy <em>·</em> Founder-first process <em>·</em></span>
+      <span>Identity design <em>·</em> Brand systems <em>·</em> Logo craft <em>·</em> Visual strategy <em>·</em> Founder-first process <em>·</em></span>
+    </div>
+  </div>
+
+  <section class="section shell">
+    <div class="stats-inner reveal">
+      <div class="stat"><strong>1,200+</strong><span>Identities delivered</span></div>
+      <div class="stat"><strong>4.9 / 5</strong><span>Average rating</span></div>
+      <div class="stat"><strong>3 days</strong><span>To first directions</span></div>
+      <div class="stat"><strong>100%</strong><span>Yours on approval</span></div>
+    </div>
+  </section>
+
+  <section id="process" class="section shell">
+    <div class="eyebrow reveal"><span class="bar"></span>How we work</div>
+    <h2 class="reveal reveal-delay-1">A quiet, deliberate process — <em>built for clarity</em>.</h2>
+    <p class="section-copy reveal reveal-delay-1">No jargon, no black box. You stay close to the work at every stage that matters.</p>
+    <div class="steps">
+      <article class="step reveal reveal-delay-1"><span class="step-no">01 / brief</span><h3>Tell your story</h3><p>A focused creative brief about your business, audience, and taste.</p></article>
+      <article class="step reveal reveal-delay-2"><span class="step-no">02 / explore</span><h3>We explore</h3><p>Two distinct directions shaped around your brief, not a template.</p></article>
+      <article class="step reveal reveal-delay-3"><span class="step-no">03 / refine</span><h3>You refine</h3><p>Choose a direction. We refine it until it feels unmistakably right.</p></article>
+      <article class="step reveal reveal-delay-4"><span class="step-no">04 / launch</span><h3>Launch proudly</h3><p>Polished files, colour specs, and guidance for using them well.</p></article>
+    </div>
+  </section>
+
+  <section id="work" class="section shell">
+    <div class="portfolio-head">
+      <div><div class="eyebrow reveal"><span class="bar"></span>Selected work</div><h2 class="reveal reveal-delay-1">Built to be <em>remembered</em>.</h2></div>
+      <div class="filters reveal reveal-delay-1">
+        <button class="filter active">All work</button><button class="filter">Food & drink</button><button class="filter">Technology</button><button class="filter">Lifestyle</button>
+      </div>
+    </div>
+    <div class="projects">
+      <article class="project reveal"><span class="project-tag">Technology</span><span class="logo-word">orbit.</span></article>
+      <article class="project reveal reveal-delay-1"><span class="project-tag">Coffee & culture</span><span class="logo-word">Moro</span></article>
+      <article class="project reveal reveal-delay-2"><span class="project-tag">Wellness</span><span class="logo-word">mira</span></article>
+      <article class="project reveal reveal-delay-3"><span class="project-tag">Food & drink</span><span class="logo-word">Tallow</span></article>
+      <article class="project reveal reveal-delay-4"><span class="project-tag">Creative tools</span><span class="logo-word">prism/</span></article>
+    </div>
+  </section>
+
+  <section id="reviews" class="section testimonials">
+    <div class="shell">
+      <div class="eyebrow reveal"><span class="bar"></span>Client notes</div>
+      <h2 class="reveal reveal-delay-1">Good design is <em>felt</em> before it's explained.</h2>
+      <div class="reviews">
+        <article class="review reveal"><div class="stars">★★★★★</div><blockquote>“They turned scattered notes into a mark that feels like it always belonged to us. The process was exceptionally clear.”</blockquote><footer>Rhea S. — Founder, Coastline</footer></article>
+        <article class="review reveal reveal-delay-1"><div class="stars">★★★★★</div><blockquote>“I expected a logo. What I got was confidence in how our product shows up in front of customers.”</blockquote><footer>Daniel M. — Product lead, Orbit</footer></article>
+        <article class="review reveal reveal-delay-2"><div class="stars">★★★★★</div><blockquote>“Fast, kind, and remarkably detail-oriented. Every file was ready for web, packaging, and social.”</blockquote><footer>Nadia K. — Owner, Moro Coffee</footer></article>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq" class="section shell">
+    <div class="faq-grid">
+      <div><div class="eyebrow reveal"><span class="bar"></span>Questions</div><h2 class="reveal reveal-delay-1">Everything you <em>need to know</em>.</h2><p class="section-copy reveal reveal-delay-1">Still unsure? Send a brief — it's obligation-free and we'll point you in the right direction.</p></div>
+      <div class="faq-list reveal reveal-delay-1">
+        <details open><summary>What will I receive at the end?<span class="plus">+</span></summary><p>Your approved primary logo, supporting versions, colour values, and export files for web and print — SVG, PDF, PNG, and JPG.</p></details>
+        <details><summary>How long does a project take?<span class="plus">+</span></summary><p>First directions usually arrive within three business days of a complete brief. Final timelines depend on feedback speed.</p></details>
+        <details><summary>Can I request revisions?<span class="plus">+</span></summary><p>Yes — your chosen direction is refined collaboratively, focused on your goals so every round moves forward.</p></details>
+        <details><summary>Will I own the final logo?<span class="plus">+</span></summary><p>Once the project is paid and complete, the approved identity is yours. Font or asset licences are discussed upfront.</p></details>
+        <details><summary>What does a project cost?<span class="plus">+</span></summary><p>Quoted by scope and application count. Start with a brief and we'll send a clear recommendation and price.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta shell">
+    <div class="cta-box">
+      <div class="cta-orb"></div>
+      <div class="eyebrow reveal">Your next chapter starts here</div>
+      <h2 class="reveal reveal-delay-1">Give the business you believe in a mark that <em>earns attention</em>.</h2>
+      <p class="reveal reveal-delay-2">Share a few details about your business — we'll reply with the right package, timeline, and next step.</p>
+      <button class="btn btn-solid open-form reveal reveal-delay-3"><span>Start your project ↗</span></button>
+    </div>
+  </section>
+</main>
+
+<footer class="shell">
+  <div class="footer-row">
+    <a class="brand" href="#top"><span class="brand-mark">M</span>markcraft</a>
+    <span>© 2026 MarkCraft Studio — Original demo concept</span>
+    <span>Made for memorable brands</span>
+  </div>
+</footer>
+
+<div class="modal" id="project-modal" role="dialog" aria-modal="true">
+  <div class="modal-card">
+    <button class="close" aria-label="Close">×</button>
+    <h2>Tell us what you're building.</h2>
+    <p class="section-copy">This demo form shows a success state in-browser. Connect it to Formspree, EmailJS, or your own API for production.</p>
+    <form id="brief-form">
+      <label>Your name<input required placeholder="Arshad Khan" /></label>
+      <label>Email address<input required type="email" placeholder="you@example.com" /></label>
+      <label>Business name<input required placeholder="Your business" /></label>
+      <label>Industry<select required><option value="">Choose one</option><option>Technology</option><option>Food & beverage</option><option>Fashion & lifestyle</option><option>Education</option><option>Other</option></select></label>
+      <label class="wide">Tell us about your brand<textarea required placeholder="What do you do, who is it for, and what should it feel like?"></textarea></label>
+      <div class="form-note" id="form-note">Thanks — your project brief was captured in this demo. Connect a backend or email service to receive real submissions.</div>
+      <button class="btn btn-solid wide" type="submit"><span>Send project brief ↗</span></button>
+    </form>
+  </div>
+</div>
+
+<script>
+  const dot = document.getElementById('cursorDot');
+  const ring = document.getElementById('cursorRing');
+  let mx=0,my=0,rx=0,ry=0;
+  window.addEventListener('mousemove', e=>{ mx=e.clientX; my=e.clientY; dot.style.left=mx+'px'; dot.style.top=my+'px'; });
+  function animRing(){ rx += (mx-rx)*0.15; ry += (my-ry)*0.15; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(animRing); }
+  animRing();
+  document.querySelectorAll('a,button,.filter,summary').forEach(el=>{
+    el.addEventListener('mouseenter', ()=>{ ring.style.width='60px'; ring.style.height='60px'; ring.style.borderColor='var(--accent)'; });
+    el.addEventListener('mouseleave', ()=>{ ring.style.width='38px'; ring.style.height='38px'; ring.style.borderColor='var(--ink)'; });
+  });
+
+  const header = document.getElementById('siteHeader');
+  window.addEventListener('scroll', ()=> header.classList.toggle('scrolled', window.scrollY > 20));
+
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); } });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+  const modal = document.getElementById('project-modal');
+  const openModal = ()=>{ modal.classList.add('open'); document.body.style.overflow='hidden'; };
+  const closeModal = ()=>{ modal.classList.remove('open'); document.body.style.overflow=''; };
+  document.querySelectorAll('.open-form').forEach(b=>b.addEventListener('click', openModal));
+  document.querySelector('.close').addEventListener('click', closeModal);
+  modal.addEventListener('click', e=>{ if(e.target===modal) closeModal(); });
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+
+  document.getElementById('brief-form').addEventListener('submit', e=>{
+    e.preventDefault();
+    document.getElementById('form-note').style.display='block';
+    e.currentTarget.querySelector('button[type="submit"] span').textContent='Brief submitted ✓';
+  });
+
+  document.querySelectorAll('.filter').forEach(f=>f.addEventListener('click', ()=>{
+    document.querySelector('.filter.active').classList.remove('active');
+    f.classList.add('active');
+  }));
+</script>
+</body>
+</html>
