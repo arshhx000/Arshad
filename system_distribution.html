@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#111210" />
+<title>DISTRIBUTION</title>
+<style>
+:root{--bg:#111210;--panel:#191a17;--panel2:#20211d;--line:#383a32;--text:#f2f0e8;--muted:#9a9b8e;--acid:#d8ff3e;--orange:#ff784d;--blue:#8fd8ff;--radius:14px}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif;min-height:100vh;overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.12;background-image:radial-gradient(#aeb39a .6px,transparent .6px);background-size:5px 5px;z-index:-1}
+body:after{content:"";position:fixed;inset:-35%;pointer-events:none;z-index:-1;background:radial-gradient(ellipse at 15% 20%,#d8ff3e0b,transparent 30%),radial-gradient(ellipse at 85% 70%,#8fd8ff0a,transparent 28%);animation:ambientDrift 18s ease-in-out infinite alternate}
+::selection{background:var(--acid);color:#111210}
+:focus-visible{outline:2px solid var(--acid);outline-offset:3px}
+button,input,textarea{font:inherit}button{cursor:pointer}
+.shell{max-width:1440px;margin:auto;padding:24px clamp(16px,3.5vw,52px) 42px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:1px solid var(--line);padding-bottom:18px}
+.brand{display:flex;align-items:center;gap:12px;font-size:12px;font-weight:800;letter-spacing:.16em}.brand-mark{width:34px;height:34px;background:var(--acid);color:#151610;display:grid;place-items:center;font-size:21px;font-weight:900;border-radius:8px;transform:rotate(-4deg)}
+.top-meta{display:flex;gap:18px;align-items:center;color:var(--muted);font:11px ui-monospace,SFMono-Regular,monospace;letter-spacing:.08em;text-transform:uppercase}.live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--acid);margin-right:7px;box-shadow:0 0 10px #d8ff3e70}
+.hero{padding:58px 0 35px;display:grid;grid-template-columns:1fr auto;gap:30px;align-items:end}
+.eyebrow{font:11px ui-monospace,monospace;letter-spacing:.17em;color:var(--acid);text-transform:uppercase;margin-bottom:17px}
+h1{font-size:clamp(44px,7vw,96px);letter-spacing:-.075em;line-height:.88;margin:0;font-weight:900;text-transform:uppercase;max-width:850px}
+h1 span{color:var(--acid)}.hero-copy{color:var(--muted);max-width:430px;line-height:1.6;font-size:14px;margin:22px 0 0}
+.hero-stat{min-width:170px;border:1px solid var(--line);padding:17px;border-radius:var(--radius);background:linear-gradient(145deg,#1d1f1a,#141512);animation:floatIn .65s ease both,pulseGlow 5s ease-in-out 1s infinite;transition:border-color .25s,transform .25s}.hero-stat:hover{transform:translateY(-3px);border-color:#d8ff3e66}
+.stat-label{color:var(--muted);font:10px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase}.stat-number{font-size:47px;letter-spacing:-.07em;font-weight:900;margin:8px 0 3px}.stat-number small{font-size:16px;color:var(--muted);letter-spacing:0}.stat-foot{font-size:11px;color:var(--acid)}
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:22px}
+.section-label{font:11px ui-monospace,monospace;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}.section-label strong{color:var(--text)}
+.actions{display:flex;gap:9px;flex-wrap:wrap}.btn{border:1px solid var(--line);background:transparent;color:var(--text);padding:11px 14px;border-radius:8px;font-size:12px;font-weight:700;transition:transform .18s,border-color .18s,background .18s}.btn:hover{transform:translateY(-2px);border-color:var(--acid);box-shadow:0 5px 22px #d8ff3e12}.btn:active{transform:translateY(0) scale(.98)}.btn-primary{background:var(--acid);border-color:var(--acid);color:#141510}.btn-primary:hover{background:#e6ff75}.btn .plus{font-size:17px;vertical-align:-1px;margin-right:7px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.challenge{position:relative;overflow:hidden;min-height:265px;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px;display:flex;flex-direction:column;transition:transform .22s,border-color .22s;animation:cardIn .5s both;isolation:isolate}
+.challenge:hover{transform:translateY(-5px);border-color:#72775b;box-shadow:0 16px 40px #0004}.challenge:hover:before{transform:scale(1.12);border-color:#d8ff3e18}.challenge:before,.challenge:after{transition:transform .5s,border-color .5s}.challenge:before{content:"";position:absolute;width:160px;height:160px;border:1px solid #ffffff09;border-radius:50%;right:-70px;top:-75px;z-index:-1}.challenge:after{content:"";position:absolute;width:100px;height:100px;border:1px solid #ffffff08;border-radius:50%;right:-40px;top:-45px;z-index:-1}
+.card-top{display:flex;align-items:center;justify-content:space-between;gap:10px}.tag{font:10px ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);padding:6px 8px;border-radius:5px;color:var(--muted)}.tag.active{border-color:#d8ff3e55;color:var(--acid)}.card-menu{border:0;background:none;color:var(--muted);font-size:20px;padding:0 4px}.card-menu:hover{color:var(--orange)}
+.card-icon{font-size:26px;margin:22px 0 10px}.challenge h2{font-size:23px;letter-spacing:-.045em;margin:0 0 8px;line-height:1.05}.description{font-size:12px;color:var(--muted);line-height:1.55;margin:0;max-width:95%}
+.card-bottom{margin-top:auto;padding-top:22px}.progress-meta{display:flex;justify-content:space-between;align-items:center;font:10px ui-monospace,monospace;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:9px}.progress-meta b{color:var(--text);font-size:12px}.progress-track{height:5px;background:#34362e;border-radius:20px;overflow:hidden}.progress-fill{height:100%;width:0;background:linear-gradient(90deg,#bce92d,var(--acid));border-radius:20px;transition:width 1s cubic-bezier(.2,.8,.2,1);position:relative;overflow:hidden}.progress-fill:after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 20%,#ffffff66 48%,transparent 70%);transform:translateX(-100%);animation:shine 2.8s ease-in-out infinite}.card-footer{display:flex;justify-content:space-between;align-items:center;margin-top:14px;color:var(--muted);font:10px ui-monospace,monospace;text-transform:uppercase}.card-footer strong{color:var(--text);font-size:11px}.empty{grid-column:1/-1;text-align:center;border:1px dashed var(--line);padding:70px 20px;border-radius:var(--radius);color:var(--muted)}.empty .empty-icon{font-size:32px;color:var(--acid);margin-bottom:12px}.empty h3{color:var(--text);font-size:20px;margin:0 0 8px}.empty p{font-size:13px;line-height:1.6;margin:0 auto 18px;max-width:380px}
+.footer{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-top:24px;margin-top:28px;border-top:1px solid var(--line);font:10px ui-monospace,monospace;letter-spacing:.08em;color:var(--muted);text-transform:uppercase}.footer span:last-child{color:var(--acid)}
+/* modal */
+.overlay{position:fixed;inset:0;background:#000b;backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:18px;z-index:10}.overlay.open{display:flex;animation:fade .18s ease}.modal{width:min(650px,100%);max-height:90vh;overflow:auto;background:#171814;border:1px solid #4b4e40;border-radius:16px;padding:24px;box-shadow:0 25px 100px #0009;animation:modalIn .25s ease}
+.modal-head{display:flex;justify-content:space-between;align-items:start;gap:15px;margin-bottom:9px}.modal h2{font-size:27px;letter-spacing:-.06em;margin:0}.close{background:none;color:var(--muted);border:1px solid var(--line);border-radius:7px;width:34px;height:34px;font-size:19px}.modal-sub{color:var(--muted);font-size:12px;line-height:1.55;margin:0 0 18px}.field-label{display:block;color:var(--acid);font:10px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;margin:16px 0 8px}
+textarea{width:100%;min-height:250px;resize:vertical;background:#10110f;color:#e8e9df;border:1px solid #3c3e35;border-radius:9px;padding:14px;font:12px/1.65 ui-monospace,SFMono-Regular,monospace;outline:none}textarea:focus{border-color:var(--acid)}.modal-actions{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap}.hint{font-size:10px;color:var(--muted);line-height:1.5;max-width:310px}.error{display:none;color:#ff9479;font-size:12px;margin-top:10px}.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:var(--acid);color:#151610;font-size:12px;font-weight:800;padding:12px 18px;border-radius:8px;z-index:20;transition:.25s}.toast.show{opacity:1;transform:translate(-50%,0)}
+@keyframes cardIn{from{opacity:0;transform:translateY(16px) scale(.985);filter:blur(3px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
+@keyframes ambientDrift{from{transform:translate3d(-1%,0,0) rotate(0deg)}to{transform:translate3d(1%,1%,0) rotate(3deg)}}
+@keyframes shine{0%,45%{transform:translateX(-110%)}75%,100%{transform:translateX(110%)}}
+@keyframes pulseGlow{0%,100%{box-shadow:0 0 0 0 #d8ff3e00}50%{box-shadow:0 0 24px 1px #d8ff3e14}}
+@keyframes numberIn{from{opacity:.4;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}@keyframes floatIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}@keyframes fade{from{opacity:0}to{opacity:1}}@keyframes modalIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hero{padding-top:42px}}@media(max-width:600px){.shell{padding:16px 14px 28px}.top-meta .meta-extra{display:none}.hero{grid-template-columns:1fr;gap:22px;padding:40px 0 25px}.hero-stat{max-width:220px}.toolbar{align-items:flex-start;flex-direction:column}.actions{width:100%}.actions .btn{flex:1}.grid{grid-template-columns:1fr}.challenge{min-height:245px}.topbar{align-items:flex-start}.brand{font-size:10px}.modal{padding:18px}textarea{min-height:220px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+</style>
+<style id="product-redesign">
+:root{--bg:#0A0A0A;--sidebar:#0D0D0D;--panel:#141414;--panel2:#1A1A1A;--line:#292929;--text:#F2F2F2;--muted:#929292;--muted2:#626262;--acid:#C8FF3D;--success:#A3E635;--warning:#FFBF69;--error:#FF6B6B;--radius:10px}
+*{box-sizing:border-box}body{background:var(--bg);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:-.01em}body:before,body:after{display:none}.app-shell{min-height:100vh}.brand{gap:10px;font-size:12px;letter-spacing:.13em;text-transform:uppercase}.brand-mark{width:28px;height:28px;background:var(--acid);border-radius:5px;font-size:17px;transform:none}.workspace{min-width:0;padding:0 clamp(20px,4vw,64px) 36px}.shell{max-width:1400px;padding:0;margin:0 auto}.topbar{min-height:78px;padding:0;border-bottom:1px solid var(--line)}.workspace .topbar>.brand{display:none}.top-meta{gap:18px;color:var(--muted2);font-size:10px}.top-meta #syncStatus{color:var(--success)}.hero{padding:58px 0 42px;grid-template-columns:1fr 230px;gap:32px;align-items:end}.eyebrow{color:var(--muted2);letter-spacing:.14em;margin-bottom:14px}.eyebrow:before{content:"/ ";color:var(--acid)}h1{max-width:none;font-size:clamp(42px,5vw,72px);line-height:.94;letter-spacing:-.07em;text-transform:none}h1 span{color:var(--acid)}.hero-copy{font-size:14px;color:var(--muted);max-width:510px;margin:18px 0 0;line-height:1.65}.hero-stat{min-width:0;padding:18px;border-color:var(--line);border-radius:var(--radius);background:var(--panel);box-shadow:none;animation:none}.hero-stat:hover{transform:none;border-color:#454545}.stat-label,.section-label{color:var(--muted2);font-size:10px;letter-spacing:.12em}.stat-number{font-size:44px;margin:8px 0 4px;letter-spacing:-.065em}.stat-foot{color:var(--success);font-size:10px;letter-spacing:.06em}.toolbar{padding:15px 0;margin-bottom:18px;border-color:var(--line)}.section-label strong{color:var(--text);font-weight:650}.btn{border-radius:7px;border-color:var(--line);padding:10px 13px;background:var(--panel);font-size:11px;letter-spacing:.04em}.btn:hover{transform:none;border-color:#595959;background:var(--panel2);box-shadow:none}.btn-primary{background:var(--acid);border-color:var(--acid);color:#121212}.btn-primary:hover{background:#D6FF6A;border-color:#D6FF6A}.grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.challenge{min-height:294px;padding:18px;background:var(--panel);border-color:var(--line);border-radius:var(--radius);animation:none}.challenge:before,.challenge:after{display:none}.challenge:hover{transform:translateY(-2px);border-color:#474747;box-shadow:none}.tag{padding:5px 7px;border-radius:4px;border-color:#363636;color:var(--muted2);font-size:9px}.tag.active{border-color:#45532c;color:var(--acid)}.card-menu{font-size:17px;color:var(--muted2)}.card-menu:hover{color:var(--error)}.card-icon{font-size:23px;margin:25px 0 13px;color:var(--acid)}.challenge h2{font-size:21px;line-height:1.08;letter-spacing:-.04em;margin-bottom:8px}.description{font-size:12px;color:var(--muted);line-height:1.55}.card-bottom{padding-top:20px}.progress-meta,.card-footer{color:var(--muted2);font-size:9px;letter-spacing:.08em}.progress-meta b,.card-footer strong{color:var(--text)}.progress-track{height:4px;background:#252525}.progress-fill{background:var(--acid);transition:width .35s ease}.progress-fill:after{display:none}.card-footer{margin-top:12px}.empty{border-color:var(--line);border-radius:var(--radius);background:var(--panel);padding:76px 20px}.empty .empty-icon{color:var(--acid)}.empty h3{font-size:19px}.empty p{color:var(--muted)}.footer{margin-top:34px;padding-top:16px;border-color:var(--line);color:var(--muted2)}.footer span:last-child{color:var(--muted)}.overlay{background:#000c;backdrop-filter:blur(12px)}.modal{background:var(--panel);border-color:#3B3B3B;border-radius:var(--radius);box-shadow:0 24px 70px #0008}.modal h2{font-size:25px}.modal-sub,.hint{color:var(--muted)}.field-label{color:var(--muted2)}textarea{background:#0D0D0D;color:var(--text);border-color:var(--line);border-radius:7px}textarea:focus{border-color:var(--acid)}.close{border-color:var(--line);color:var(--muted);border-radius:6px}.toast{background:var(--acid);border-radius:6px;color:#0A0A0A}.error{color:var(--error)}
+@media(max-width:900px){.app-shell{grid-template-columns:1fr}.sidebar{position:relative;height:auto;padding:16px 18px;border-right:0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:auto 1fr;align-items:center;gap:18px}.side-kicker,.side-footer{display:none}.side-nav{display:flex;justify-content:flex-end}.side-nav a{padding:7px 9px}.workspace{padding:0 20px 28px}.hero{grid-template-columns:1fr 210px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.sidebar{display:block}.side-nav{margin-top:15px;justify-content:flex-start;overflow:auto}.side-nav a{white-space:nowrap}.side-nav a:not(.active){display:none}.workspace{padding:0 14px 24px}.topbar{min-height:61px}.top-meta{width:100%;justify-content:space-between}.hero{grid-template-columns:1fr;gap:24px;padding:42px 0 30px}.hero-stat{max-width:245px}.grid{grid-template-columns:1fr}.toolbar{align-items:flex-start;flex-direction:column}.actions,.actions .btn{width:100%}.challenge{min-height:270px}}
+</style>
+<style>
+#passwordInput{width:100%;padding:13px 14px;background:#0D0D0D;color:var(--text);border:1px solid var(--line);border-radius:7px;font:14px/1.4 ui-monospace,SFMono-Regular,monospace;outline:none}#passwordInput:focus{border-color:var(--acid)}.login-modal{width:min(430px,100%)}
+#statusInput,.status-select{width:100%;padding:11px 12px;background:#0D0D0D;color:var(--text);border:1px solid var(--line);border-radius:7px;font:12px ui-monospace,SFMono-Regular,monospace;letter-spacing:.05em;outline:none}#statusInput:focus,.status-select:focus{border-color:var(--acid)}.card-top{align-items:flex-start}.card-tags{display:flex;gap:6px;flex-wrap:wrap}.tag.status{border-color:#3c3c3c;color:var(--muted)}.tag.status.completed{border-color:#4b6821;color:var(--success)}
+</style>
+<style>.hero{grid-template-columns:1fr}</style>
+<style>
+.summary-row{display:flex;justify-content:space-between;gap:14px;padding:11px 0;border-bottom:1px solid var(--line);font-size:12px}.summary-row>div:first-child{display:grid;gap:3px}.summary-row small{color:var(--muted2);font:9px ui-monospace,SFMono-Regular,monospace;letter-spacing:.05em}.summary-values{display:grid;gap:3px;text-align:right;white-space:nowrap}.summary-values strong{font-size:12px}.summary-values span{color:var(--muted);font:9px ui-monospace,SFMono-Regular,monospace;letter-spacing:.04em}@media(max-width:420px){.summary-row{gap:8px}.summary-values{white-space:normal}}
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <div class="workspace">
+    <div class="shell">
+      <header class="topbar">
+        <div class="brand"><div class="brand-mark">/</div><div>Distribution</div></div>
+        <div class="top-meta"><span id="syncStatus">CONNECTING…</span><span class="meta-extra" id="today">-- / -- / ----</span></div>
+      </header>
+      <section class="hero" id="today">
+        <div>
+          <div class="eyebrow">Personal operating system</div>
+          <h1>Build the <span>ordinary.</span></h1>
+          <p class="hero-copy">A quiet place to direct your attention, keep promises to yourself, and make progress visible.</p>
+        </div>
+      </section>
+      <section class="toolbar" id="challenges">
+        <div class="section-label"><strong>Active challenges</strong> <span id="challengeCount">— 00 ITEMS</span></div>
+        <div class="actions"><button class="btn" id="downloadSampleBtn">↓ SAMPLE JSON</button><button class="btn btn-primary" id="addBtn"><span class="plus">＋</span>ADD CHALLENGE</button></div>
+      </section>
+      <main class="grid" id="challengeGrid"></main>
+      <footer class="footer"><span>Distribution / personal progress index</span><span>Data syncs privately to your workspace</span></footer>
+    </div>
+  </div>
+</div>
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal">
+    <div class="modal-head"><h2 id="modalTitle">Add a challenge<span style="color:var(--acid)">.</span></h2><button class="close" id="closeModal" aria-label="Close">×</button></div>
+    <p class="modal-sub">Paste your challenge JSON.</p>
+    <label class="field-label" for="statusInput">Challenge status</label>
+    <select id="statusInput" aria-label="Challenge status"><option value="IN PROGRESS">IN PROGRESS</option><option value="COMPLETED">COMPLETED</option></select>
+    <label class="field-label" for="jsonInput">Challenge JSON</label>
+    <textarea id="jsonInput" spellcheck="false" aria-label="Challenge JSON"></textarea>
+    <div class="error" id="error"></div>
+    <div class="modal-actions"><span class="hint">Saved privately to your cloud index.</span><button class="btn btn-primary" id="saveBtn">SAVE CHALLENGE ↗</button></div>
+  </div>
+</div>
+<div class="overlay open" id="loginOverlay" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+  <div class="modal login-modal">
+    <div class="modal-head"><div><div class="eyebrow">Private workspace</div><h2 id="loginTitle">Welcome back<span style="color:var(--acid)">.</span></h2></div></div>
+    <p class="modal-sub">Enter your password to access your personal progress index.</p>
+    <form id="loginForm">
+      <label class="field-label" for="passwordInput">Password</label>
+      <input id="passwordInput" type="password" autocomplete="current-password" required autofocus aria-describedby="loginError">
+      <div class="error" id="loginError" role="alert"></div>
+      <div class="modal-actions"><span class="hint">Your data is protected by Firebase Authentication.</span><button class="btn btn-primary" type="submit" id="loginBtn">UNLOCK DASHBOARD ↗</button></div>
+    </form>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+import { getFirestore, collection, deleteDoc, doc, getDocs, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC1Yqeigl0nQlPaKEi2D2MsYg8lqCp9nhM",
+  authDomain: "distribution-system-a3c37.firebaseapp.com",
+  projectId: "distribution-system-a3c37",
+  storageBucket: "distribution-system-a3c37.firebasestorage.app",
+  messagingSenderId: "49693586947",
+  appId: "1:49693586947:web:3e28824b16a77294da4036",
+  measurementId: "G-3BNE0HR50K"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const DASHBOARD_EMAIL = "armanalam12386@gmail.com";
+const STORAGE_KEY = "challenge-index-v1";
+const example = {
+  "id": "pushup-30",
+  "title": "30-Day Push-up Challenge",
+  "description": "Build consistency and upper-body strength, one session at a time.",
+  "category": "FITNESS",
+  "icon": "↗",
+  "duration": "30 DAYS",
+  "tasks": [
+    {"name": "Day 01 — Start strong", "done": true},
+    {"name": "Day 02 — Stay consistent", "done": true},
+    {"name": "Day 03 — Keep showing up", "done": false},
+    {"name": "Day 04 — Build momentum", "done": false},
+    {"name": "Day 05 — No excuses", "done": false}
+  ]
+};
+const SAMPLE_CHALLENGE = {
+  id:"my-30-day-challenge",title:"My 30-Day Challenge",category:"PERSONAL",status:"IN PROGRESS",duration:"30 DAYS",description:"A sample challenge you can edit and import.",icon:"✳",
+  tasks:[
+    {name:"Read for 30 minutes",done:false},
+    {name:"Walk 8,000 steps",done:false},
+    {name:"Push-ups",total:300,completed:0,unit:"reps"},
+    {name:"Study",total:40,completed:0,unit:"hours"}
+  ]
+};
+const INITIAL_CHALLENGE = {
+  "id":"challenge-28-sep-11-oct",
+  "title":"28 Sep to 11 Oct",
+  "category":"PERSONAL PROGRESS",
+  "duration":"14 DAYS",
+  "description":"Total vs completed",
+  "tasks":[
+    {"name":"Pushup","total":700,"completed":260,"unit":"reps","completion_percentage":37.14},
+    {"name":"Pullups","total":350,"completed":220,"unit":"reps","completion_percentage":62.86},
+    {"name":"Milk","total":14,"completed":3.3,"unit":"litres","completion_percentage":23.57},
+    {"name":"Study","total":112,"completed":34,"unit":"hours","completion_percentage":30.36},
+    {"name":"Masturbation","total":2,"completed":8,"unit":"count","completion_percentage":25},
+    {"name":"Eggs","total":42,"completed":18,"unit":"eggs","completion_percentage":42.86},
+    {"name":"Books","total":14,"completed":0,"unit":"books","completion_percentage":0},
+    {"name":"Steps count","total":140000,"completed":73000,"unit":"steps","completion_percentage":52.14}
+  ]
+};
+const SEPTEMBER_SUMMARY_CHALLENGE = {
+  id:"september-2026-habit-summary",title:"September Habit Summary",category:"PERSONAL PROGRESS",status:"COMPLETED",duration:"28 DAYS",description:"1–28 September 2026 · totals and averages",tasks:[{name:"28-day log complete",done:true}],
+  summary:[
+    {name:"Tracked days",total:28,average:1,unit:"days",averageUnit:"day/day"},
+    {name:"Fruit",total:23,average:.82,unit:"days",averageUnit:"days/day"},{name:"Facewash",total:27,average:.96,unit:"days",averageUnit:"days/day"},{name:"Milk",total:6.5,average:.23,unit:"litres",averageUnit:"litres/day"},{name:"Boiled eggs",total:28,average:1,unit:"eggs",averageUnit:"eggs/day"},
+    {name:"Chia seed",total:5,average:.18,unit:"days",averageUnit:"days/day"},{name:"Chana / moong",total:14,average:.5,unit:"days",averageUnit:"days/day"},{name:"Face serum",total:8,average:.29,unit:"days",averageUnit:"days/day"},{name:"Scrubbing",total:8,average:.29,unit:"days",averageUnit:"days/day"},{name:"Sugar",total:8,average:.29,unit:"days",averageUnit:"days/day"},
+    {name:"Pencil exercise",total:11,average:.39,unit:"days",averageUnit:"days/day"},{name:"Vecline",total:10,average:.36,unit:"days",averageUnit:"days/day"},{name:"Sun exposure",total:8,average:.29,unit:"days",averageUnit:"days/day"},{name:"Workout",total:15,average:.54,unit:"days",averageUnit:"days/day"},
+    {name:"Average MT W",total:5.88,average:.42,unit:"total",averageUnit:"/ logged day",records:14},{name:"Screen time",total:11373,average:631.83,unit:"minutes",averageUnit:"min / logged day",records:18},{name:"Sleep",total:80,average:6.67,unit:"hours",averageUnit:"hrs / logged day",records:12},{name:"Study",total:13.5,average:1.23,unit:"hours",averageUnit:"hrs / logged day",records:11},{name:"Work",total:11.5,average:1.05,unit:"hours",averageUnit:"hrs / logged day",records:11},
+    {name:"Steps",total:105.5,average:5.28,unit:"K steps",averageUnit:"K / logged day",records:20},{name:"Water",total:66,average:3.88,unit:"bottles",averageUnit:"bottles / logged day",records:17},{name:"Masturbation",total:17,average:.61,unit:"days",averageUnit:"days/day"}
+  ]
+};
+function cloneChallenge(challenge){return JSON.parse(JSON.stringify(challenge))}
+let challenges = loadLocal();
+let userId = null;
+let unsubscribeCloud = null;
+let connectingUserId = null;
+let authenticatedSession = false;
+function loadLocal(){try{const parsed=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");return Array.isArray(parsed)?parsed:[]}catch{return []}}
+function persist(){localStorage.setItem(STORAGE_KEY,JSON.stringify(challenges))}
+function setSyncStatus(message){document.getElementById("syncStatus").textContent=message}
+function cloudMessage(code){return ({
+  "permission-denied":"PUBLISH FIRESTORE RULES",
+  "unauthenticated":"ENABLE ANONYMOUS AUTH",
+  "failed-precondition":"CREATE FIRESTORE DATABASE",
+  "unavailable":"DATABASE UNAVAILABLE"
+}[code]||`DATABASE ERROR: ${code||"UNKNOWN"}`)}
+function cloudChallenges(){return collection(db,"users",userId,"challenges")}
+function saveCloud(challenge){
+  if(!userId)return;
+  setDoc(doc(db,"users",userId,"challenges",challenge.id),{...challenge,updatedAt:Date.now()})
+    .catch(error=>{console.error(error);setSyncStatus("SYNC ERROR");toast("COULD NOT SAVE TO CLOUD")});
+}
+function deleteCloud(id){
+  if(!userId)return;
+  deleteDoc(doc(db,"users",userId,"challenges",id))
+    .catch(error=>{console.error(error);setSyncStatus("SYNC ERROR");toast("COULD NOT REMOVE CLOUD ITEM")});
+}
+async function connectCloud(user){
+  if(connectingUserId===user.uid || (userId===user.uid && unsubscribeCloud))return;
+  if(unsubscribeCloud){unsubscribeCloud();unsubscribeCloud=null}
+  connectingUserId=user.uid;
+  userId=user.uid;
+  const cloud=cloudChallenges();
+  try{
+    const existing=await getDocs(cloud);
+    const existingIds=new Set(existing.docs.map(item=>item.id));
+    if(existing.empty && challenges.length){
+      await Promise.all(challenges.map(challenge=>setDoc(doc(db,"users",userId,"challenges",challenge.id),{...challenge,updatedAt:Date.now()})));
+    }
+    for(const starter of [INITIAL_CHALLENGE,SEPTEMBER_SUMMARY_CHALLENGE]){
+      if(existingIds.has(starter.id))continue;
+      const challenge=cloneChallenge(starter);
+      await setDoc(doc(db,"users",userId,"challenges",challenge.id),{...challenge,updatedAt:Date.now()});
+    }
+    unsubscribeCloud=onSnapshot(cloud,snapshot=>{
+      challenges=snapshot.docs.map(item=>item.data()).sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+      persist();render();setSyncStatus("CLOUD SYNCED");
+    },error=>{console.error(error);const message=cloudMessage(error.code);setSyncStatus(message);toast(message)});
+  }catch(error){console.error(error);const message=cloudMessage(error.code);setSyncStatus(message);render();toast(message)}
+  finally{connectingUserId=null}
+}
+function escapeHTML(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function normalize(input){
+  if(!input||typeof input!=="object"||Array.isArray(input))throw new Error("Paste a JSON object, not an array.");
+  if(!String(input.title||"").trim())throw new Error('The JSON needs a "title" field.');
+  if(!Array.isArray(input.tasks))throw new Error('Add a "tasks" array with either numeric progress (total/completed) or checkbox tasks.');
+  const tasks=input.tasks.map((t,i)=>{
+    if(typeof t==="string")return {name:t,done:false};
+    if(!t||typeof t!=="object"||!String(t.name||t.title||"").trim())throw new Error(`Item ${i+1} needs a name.`);
+    const hasNumbers=t.total!==undefined || t.completed!==undefined;
+    if(hasNumbers){
+      const total=Number(t.total), completed=Number(t.completed);
+      if(!Number.isFinite(total)||total<0||!Number.isFinite(completed)||completed<0)throw new Error(`Item ${i+1} needs valid non-negative total and completed numbers.`);
+      return {name:String(t.name||t.title),total,completed,unit:String(t.unit||""),done:total>0&&completed>=total};
+    }
+    return {name:String(t.name||t.title),done:Boolean(t.done)};
+  });
+  const status=String(input.status||"IN PROGRESS").toUpperCase();
+  if(!["IN PROGRESS","COMPLETED"].includes(status))throw new Error('Status must be "IN PROGRESS" or "COMPLETED".');
+  return {id:String(input.id||("challenge-"+Date.now()+"-"+Math.random().toString(36).slice(2,7))),title:String(input.title).trim(),description:String(input.description||""),category:String(input.category||"PERSONAL"),status,icon:String(input.icon||"✳"),duration:String(input.duration||"ONGOING"),tasks};
+}
+function isMetricChallenge(c){return c.tasks.some(t=>t.total!==undefined&&t.completed!==undefined)}
+function taskPercent(task){return task.total>0?Math.max(0,task.completed/task.total*100):0}
+function challengeStats(c){
+  if(isMetricChallenge(c)){
+    const items=c.tasks.filter(t=>t.total!==undefined&&t.completed!==undefined);
+    const total=items.reduce((s,t)=>s+t.total,0), completed=items.reduce((s,t)=>s+t.completed,0);
+    return {count:items.length,done:items.filter(t=>t.total>0&&t.completed>=t.total).length,percent:total?Math.round(completed/total*100):0,total,completed};
+  }
+  const done=c.tasks.filter(t=>t.done).length,count=c.tasks.length;
+  return {count,done,percent:count?Math.round(done/count*100):0,total:count,completed:done};
+}
+function totals(){
+  let total=0,completed=0,count=0,done=0;
+  challenges.forEach(c=>{const s=challengeStats(c);total+=s.total;completed+=s.completed;count+=s.count;done+=s.done});
+  return {all:count,done,percent:total?Math.round(completed/total*100):0};
+}
+function challengeStatus(challenge,stats){return challenge.status||((stats||challengeStats(challenge)).percent>=100?"COMPLETED":"IN PROGRESS")}
+function render(){
+  const grid=document.getElementById("challengeGrid");
+  document.getElementById("challengeCount").textContent=`— ${String(challenges.length).padStart(2,"0")} ITEMS`;
+  if(!challenges.length){grid.innerHTML=`<div class="empty"><div class="empty-icon">＋</div><h3>No challenges yet.</h3><button class="btn btn-primary" onclick="openModal()">ADD CHALLENGE ↗</button></div>`;return}
+  grid.innerHTML=challenges.map((c,i)=>{
+    const stats=challengeStats(c), metric=isMetricChallenge(c), status=challengeStatus(c,stats);
+    const summaryRows=(Array.isArray(c.summary)?c.summary:[]).map(item=>{
+      const total=Number(item.total).toLocaleString(undefined,{maximumFractionDigits:2}),average=Number(item.average).toLocaleString(undefined,{maximumFractionDigits:2});
+      return `<div class="summary-row"><div><span>${escapeHTML(item.name)}</span>${item.records?`<small>${item.records} logged days</small>`:''}</div><div class="summary-values"><strong>${total} ${escapeHTML(item.unit||'')}</strong><span>AVG ${average} ${escapeHTML(item.averageUnit||'')}</span></div></div>`;
+    }).join("");
+    const detailRows=c.tasks.map((task,j)=>{
+      if(metric && task.total!==undefined && task.completed!==undefined){
+        const pct=taskPercent(task), completedDisplay=task.completed.toLocaleString(undefined,{maximumFractionDigits:2}), totalDisplay=task.total.toLocaleString(undefined,{maximumFractionDigits:2});
+        return `<div style="padding:10px 0;border-bottom:1px solid var(--line)"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:12px;margin-bottom:8px"><span>${escapeHTML(task.name)}</span><strong style="white-space:nowrap">${pct.toFixed( pct%1 ? 1:0)}%</strong></div><div class="progress-track"><div class="progress-fill" style="width:${Math.min(100,pct)}%"></div></div><div class="card-footer"><span>${completedDisplay} / ${totalDisplay}${task.unit?' '+escapeHTML(task.unit):''}</span><span>${pct>=100?'COMPLETE':'IN PROGRESS'}</span></div></div>`;
+      }
+      return `<label style="display:flex;gap:9px;align-items:flex-start;padding:8px 0;font-size:12px;color:${task.done?'var(--muted)':'var(--text)'};cursor:pointer"><input type="checkbox" ${task.done?'checked':''} onchange="toggleTask('${escapeHTML(c.id)}',${j},this.checked)" style="accent-color:var(--acid);margin-top:1px"><span style="${task.done?'text-decoration:line-through;':''}">${escapeHTML(task.name)}</span></label>`;
+    }).join("");
+    const metricSummary=`${stats.done} OF ${stats.count} COMPLETED`;
+    return `<article class="challenge" style="animation-delay:${Math.min(i*.07,.35)}s">
+      <div class="card-top"><div class="card-tags"><span class="tag active">${escapeHTML(c.category)}</span><span class="tag status ${status==='COMPLETED'?'completed':''}">${status}</span></div></div>
+      <div class="card-icon">${escapeHTML(c.icon)}</div><h2>${escapeHTML(c.title)}</h2>${c.description?`<p class="description">${escapeHTML(c.description)}</p>`:''}
+      <div class="card-bottom"><div class="progress-meta"><span>Progress</span><b>${stats.percent}%</b></div><div class="progress-track"><div class="progress-fill" style="width:${stats.percent}%"></div></div>
+      <div class="card-footer"><span>${escapeHTML(c.duration)}</span><strong>${metricSummary}</strong></div>
+      <button class="btn" style="width:100%;margin-top:14px" onclick="toggleTasks('${escapeHTML(c.id)}')">${metric?'VIEW METRICS':'VIEW / UPDATE TASKS'} ↗</button>
+      <div id="tasks-${escapeHTML(c.id)}" style="display:none;margin-top:12px;border-top:1px solid var(--line);padding-top:10px"><label class="field-label" style="margin-top:0" for="status-${escapeHTML(c.id)}">Status</label><select id="status-${escapeHTML(c.id)}" onchange="updateStatus('${escapeHTML(c.id)}',this.value)"><option value="IN PROGRESS" ${status==='IN PROGRESS'?'selected':''}>IN PROGRESS</option><option value="COMPLETED" ${status==='COMPLETED'?'selected':''}>COMPLETED</option></select>${summaryRows}${detailRows||'<p class="description">No items yet.</p>'}</div></div></article>`;
+  }).join("");
+}
+function openModal(){document.getElementById("overlay").classList.add("open");document.getElementById("error").style.display="none";document.getElementById("statusInput").value="IN PROGRESS";setTimeout(()=>document.getElementById("jsonInput").focus(),50)}
+function closeModal(){document.getElementById("overlay").classList.remove("open")}
+function showError(message){const e=document.getElementById("error");e.textContent=message;e.style.display="block"}
+function toast(message){const el=document.getElementById("toast");el.textContent=message;el.classList.add("show");setTimeout(()=>el.classList.remove("show"),2200)}
+function loginMessage(code){return ({
+  "auth/operation-not-allowed":"Enable Email/Password in Firebase Authentication → Sign-in method.",
+  "auth/unauthorized-domain":"Add this GitHub Pages domain under Firebase Authentication → Settings → Authorized domains.",
+  "auth/network-request-failed":"Network error. Check your connection and try again.",
+  "auth/too-many-requests":"Too many attempts. Wait a few minutes, then try again.",
+  "auth/user-disabled":"This Firebase account has been disabled.",
+  "auth/invalid-credential":"Firebase did not accept these sign-in details. Confirm the Email/Password user exists.",
+  "auth/wrong-password":"Firebase did not accept these sign-in details. Confirm the Email/Password user exists.",
+  "auth/user-not-found":"Firebase did not accept these sign-in details. Confirm the Email/Password user exists."
+}[code]||`Firebase sign-in failed (${code||"unknown error"}).`)}
+function downloadSample(){const blob=new Blob([JSON.stringify(SAMPLE_CHALLENGE,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),link=document.createElement("a");link.href=url;link.download="challenge-sample.json";document.body.appendChild(link);link.click();link.remove();URL.revokeObjectURL(url);toast("SAMPLE JSON DOWNLOADED")}
+function saveChallenge(){
+  try{const input=JSON.parse(document.getElementById("jsonInput").value);input.status=document.getElementById("statusInput").value;const challenge=normalize(input);
+    if(challenges.some(c=>c.id===challenge.id)){challenge.id += "-"+Date.now()}
+    challenges.unshift(challenge);persist();saveCloud(challenge);render();closeModal();toast("CHALLENGE ADDED TO YOUR INDEX");document.getElementById("jsonInput").value="";
+  }catch(err){showError("JSON ERROR: "+err.message)}
+}
+function removeChallenge(id){const c=challenges.find(x=>x.id===id);if(!c)return;if(confirm(`Remove "${c.title}" from your challenges?`)){challenges=challenges.filter(x=>x.id!==id);persist();deleteCloud(id);render();toast("CHALLENGE REMOVED")}}
+function toggleTasks(id){const el=document.getElementById("tasks-"+id);if(el)el.style.display=el.style.display==="none"?"block":"none"}
+function toggleTask(id,index,done){const c=challenges.find(x=>x.id===id);if(!c||!c.tasks[index])return;c.tasks[index].done=done;persist();saveCloud(c);render();const el=document.getElementById("tasks-"+id);if(el)el.style.display="block"}
+function updateStatus(id,status){const c=challenges.find(x=>x.id===id);if(!c)return;c.status=status;persist();saveCloud(c);render();const el=document.getElementById("tasks-"+id);if(el)el.style.display="block";toast("CHALLENGE STATUS UPDATED")}
+Object.assign(window,{openModal,removeChallenge,toggleTasks,toggleTask,updateStatus});
+document.getElementById("addBtn").addEventListener("click",openModal);
+document.getElementById("downloadSampleBtn").addEventListener("click",downloadSample);
+document.getElementById("closeModal").addEventListener("click",closeModal);
+document.getElementById("saveBtn").addEventListener("click",saveChallenge);
+document.getElementById("overlay").addEventListener("click",e=>{if(e.target.id==="overlay")closeModal()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal();if((e.ctrlKey||e.metaKey)&&e.key==="Enter"&&document.getElementById("overlay").classList.contains("open"))saveChallenge()});
+document.getElementById("loginForm").addEventListener("submit",async event=>{
+  event.preventDefault();
+  const password=document.getElementById("passwordInput").value;
+  const button=document.getElementById("loginBtn"), error=document.getElementById("loginError");
+  button.disabled=true;button.textContent="UNLOCKING…";error.style.display="none";
+  try{
+    const credential=await signInWithEmailAndPassword(auth,DASHBOARD_EMAIL,password);
+    authenticatedSession=true;
+    document.getElementById("loginOverlay").classList.remove("open");
+    connectCloud(credential.user);
+    document.getElementById("passwordInput").value="";
+  }catch(loginError){
+    console.error(loginError);error.textContent=loginMessage(loginError.code);error.style.display="block";
+  }finally{button.disabled=false;button.textContent="UNLOCK DASHBOARD ↗"}
+});
+document.getElementById("today").textContent=new Intl.DateTimeFormat("en-IN",{day:"2-digit",month:"short",year:"numeric"}).format(new Date()).toUpperCase();
+render();
+onAuthStateChanged(auth,user=>{
+  if(user){
+    authenticatedSession=true;
+    document.getElementById("loginOverlay").classList.remove("open");
+    connectCloud(user);
+  }else if(!authenticatedSession){
+    setSyncStatus("LOCKED");
+    document.getElementById("loginOverlay").classList.add("open");
+    setTimeout(()=>document.getElementById("passwordInput").focus(),50);
+  }
+});
+</script>
+</body>
+</html>
