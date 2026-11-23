@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>yt-dlp 1080p Command Generator</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 selection:bg-rose-500 selection:text-white">
+
+    <!-- Main Container -->
+    <main class="w-full max-w-3xl bg-slate-900/80 border border-slate-800 rounded-2xl shadow-2xl backdrop-blur-sm overflow-hidden">
+        
+        <!-- Header Section -->
+        <header class="p-6 sm:p-8 border-b border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500 shrink-0">
+                    <!-- Terminal / Play Icon -->
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-white">yt-dlp 1080p Generator</h1>
+                    <p class="text-xs sm:text-sm text-slate-400">Clean YouTube links & generate terminal download commands</p>
+                </div>
+            </div>
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 self-start sm:self-center">
+                Max 1080p • Client-Side
+            </span>
+        </header>
+
+        <!-- Tool Body -->
+        <div class="p-6 sm:p-8 space-y-6">
+            
+            <!-- URL Input Group -->
+            <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                    <label for="urlInput" class="block text-sm font-medium text-slate-300">
+                        YouTube Video URL
+                    </label>
+                    <button id="clearBtn" type="button" class="text-xs text-slate-400 hover:text-rose-400 transition-colors hidden">
+                        Clear URL
+                    </button>
+                </div>
+                <div class="relative flex items-center">
+                    <input 
+                        type="text" 
+                        id="urlInput" 
+                        placeholder="Paste URL here (e.g. https://youtu.be/dQw4w9WgXcQ?si=...)" 
+                        class="w-full bg-slate-950 border border-slate-700/80 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 rounded-xl py-3.5 pl-4 pr-24 text-sm sm:text-base text-white placeholder-slate-500 outline-none transition-all"
+                        autocomplete="off"
+                        spellcheck="false"
+                    >
+                    <button 
+                        id="pasteBtn" 
+                        type="button" 
+                        class="absolute right-2 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-medium rounded-lg border border-slate-700 transition-colors"
+                    >
+                        Paste
+                    </button>
+                </div>
+                <!-- Cleaned URL Status Indicator -->
+                <div id="urlStatus" class="text-xs text-slate-400 flex items-center gap-1.5 min-h-[1.25rem]">
+                    <span class="w-1.5 h-1.5 rounded-full bg-slate-600"></span>
+                    <span>Waiting for a valid YouTube link...</span>
+                </div>
+            </div>
+
+            <!-- Options Grid -->
+            <div class="space-y-3">
+                <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-400">Download & Formatting Options</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    
+                    <!-- Option 1: Merge as MP4 -->
+                    <label class="flex items-start gap-3 p-3.5 rounded-xl bg-slate-950/60 border border-slate-800/80 hover:border-slate-700 cursor-pointer transition-colors select-none">
+                        <input type="checkbox" id="optMp4" checked class="mt-0.5 w-4 h-4 rounded border-slate-700 bg-slate-900 text-rose-500 focus:ring-rose-500/30 focus:ring-offset-0">
+                        <div class="text-sm">
+                            <span class="font-medium text-slate-200 block">Merge as MP4</span>
+                            <span class="text-xs text-slate-400 font-mono">--merge-output-format mp4</span>
+                        </div>
+                    </label>
+
+                    <!-- Option 2: Best Audio Fallback -->
+                    <label class="flex items-start gap-3 p-3.5 rounded-xl bg-slate-950/60 border border-slate-800/80 hover:border-slate-700 cursor-pointer transition-colors select-none">
+                        <input type="checkbox" id="optAudioFallback" checked class="mt-0.5 w-4 h-4 rounded border-slate-700 bg-slate-900 text-rose-500 focus:ring-rose-500/30 focus:ring-offset-0">
+                        <div class="text-sm">
+                            <span class="font-medium text-slate-200 block">Best Audio Fallback</span>
+                            <span class="text-xs text-slate-400">Allows Opus/WebM audio if M4A isn't 1080p</span>
+                        </div>
+                    </label>
+
+                    <!-- Option 3: Embed Subtitles -->
+                    <label class="flex items-start gap-3 p-3.5 rounded-xl bg-slate-950/60 border border-slate-800/80 hover:border-slate-700 cursor-pointer transition-colors select-none">
+                        <input type="checkbox" id="optSubs" class="mt-0.5 w-4 h-4 rounded border-slate-700 bg-slate-900 text-rose-500 focus:ring-rose-500/30 focus:ring-offset-0">
+                        <div class="text-sm">
+                            <span class="font-medium text-slate-200 block">Embed Subtitles</span>
+                            <span class="text-xs text-slate-400 font-mono">--embed-subs</span>
+                        </div>
+                    </label>
+
+                    <!-- Option 4: Embed Thumbnail -->
+                    <label class="flex items-start gap-3 p-3.5 rounded-xl bg-slate-950/60 border border-slate-800/80 hover:border-slate-700 cursor-pointer transition-colors select-none">
+                        <input type="checkbox" id="optThumb" class="mt-0.5 w-4 h-4 rounded border-slate-700 bg-slate-900 text-rose-500 focus:ring-rose-500/30 focus:ring-offset-0">
+                        <div class="text-sm">
+                            <span class="font-medium text-slate-200 block">Embed Thumbnail</span>
+                            <span class="text-xs text-slate-400 font-mono">--embed-thumbnail</span>
+                        </div>
+                    </label>
+
+                    <!-- Option 5: Keep Playlist -->
+                    <label class="flex items-start gap-3 p-3.5 rounded-xl bg-slate-950/60 border border-slate-800/80 hover:border-slate-700 cursor-pointer transition-colors select-none sm:col-span-2">
+                        <input type="checkbox" id="optPlaylist" class="mt-0.5 w-4 h-4 rounded border-slate-700 bg-slate-900 text-rose-500 focus:ring-rose-500/30 focus:ring-offset-0">
+                        <div class="text-sm">
+                            <span class="font-medium text-slate-200 block">Keep Playlist Parameter (<code class="text-xs text-slate-300">?list=...</code>)</span>
+                            <span class="text-xs text-slate-400">When unchecked, strips playlist IDs so only the single video downloads</span>
+                        </div>
+                    </label>
+
+                    <!-- Option 6: Output Directory (Default E:\) -->
+                    <div class="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800/80 sm:col-span-2 space-y-2">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                            <label for="savePathInput" class="text-sm font-medium text-slate-200 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-rose-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+                                </svg>
+                                Output Directory (<code class="text-xs text-slate-300">-P</code>)
+                            </label>
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" data-preset="E:\" class="path-preset px-2 py-0.5 text-[11px] font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 transition-colors">E:\</button>
+                                <button type="button" data-preset="E:\Downloads" class="path-preset px-2 py-0.5 text-[11px] font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 transition-colors">E:\Downloads</button>
+                                <button type="button" data-preset="E:\Videos" class="path-preset px-2 py-0.5 text-[11px] font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 transition-colors">E:\Videos</button>
+                            </div>
+                        </div>
+                        <input 
+                            type="text" 
+                            id="savePathInput" 
+                            value="E:\" 
+                            placeholder="E:\" 
+                            class="w-full bg-slate-900 border border-slate-700/80 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 rounded-lg py-2 px-3 font-mono text-xs sm:text-sm text-white placeholder-slate-500 outline-none transition-all"
+                            spellcheck="false"
+                        >
+                        <p class="text-[11px] text-slate-400">Saves directly to your E: drive (or any custom subfolder you enter).</p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Terminal Output Box -->
+            <div class="space-y-2.5 pt-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Generated Terminal Command</span>
+                    <span class="text-xs text-slate-500">Requires yt-dlp & ffmpeg</span>
+                </div>
+                
+                <div class="relative bg-slate-950 border border-slate-800 rounded-xl p-4 sm:p-5 group">
+                    <!-- Decorative Window Dots -->
+                    <div class="flex items-center gap-1.5 mb-3 pb-2.5 border-b border-slate-800/80">
+                        <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
+                        <span class="ml-2 text-[11px] font-mono text-slate-500">bash / zsh / powershell</span>
+                    </div>
+
+                    <!-- Command Display -->
+                    <div class="overflow-x-auto pb-1">
+                        <code id="commandOutput" class="font-mono text-xs sm:text-sm text-emerald-400 whitespace-pre-wrap break-all leading-relaxed block select-all">yt-dlp -f "bestvideo[height<=1080]+bestaudio/best[height<=1080]/best" --merge-output-format mp4 -P "E:/" "https://www.youtube.com/watch?v=VIDEO_ID"</code>
+                    </div>
+                </div>
+
+                <!-- Action Button -->
+                <button 
+                    id="copyBtn" 
+                    type="button" 
+                    class="w-full py-3.5 px-6 rounded-xl bg-rose-600 hover:bg-rose-500 active:bg-rose-700 text-white font-semibold text-sm sm:text-base shadow-lg shadow-rose-600/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
+                >
+                    <svg id="copyIcon" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                    </svg>
+                    <svg id="checkIcon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span id="copyBtnText">Copy Command</span>
+                </button>
+            </div>
+
+        </div>
+
+        <!-- Footer & Raw HTML Source Viewer Toggle -->
+        <footer class="bg-slate-950/60 border-t border-slate-800/80 px-6 py-4">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
+                <p>Tip: Press <kbd class="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-300">Ctrl+S</kbd> to save this tool offline.</p>
+                <button id="toggleSourceBtn" type="button" class="text-slate-300 hover:text-rose-400 underline underline-offset-4 transition-colors">
+                    View / Copy Page HTML Source
+                </button>
+            </div>
+
+            <!-- Collapsible Raw HTML Viewer -->
+            <div id="sourceContainer" class="hidden mt-4 pt-4 border-t border-slate-800/80 space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-medium text-slate-300">Complete Single-File HTML Source</span>
+                    <button id="copySourceBtn" type="button" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-md text-xs transition-colors">
+                        Copy HTML
+                    </button>
+                </div>
+                <textarea id="rawSourceArea" readonly rows="8" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 font-mono text-xs text-slate-400 focus:outline-none"></textarea>
+            </div>
+        </footer>
+
+    </main>
+
+    <!-- Hidden textarea for reliable clipboard fallback -->
+    <textarea id="clipboardHelper" class="sr-only" aria-hidden="true"></textarea>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // DOM Elements
+            const urlInput = document.getElementById('urlInput');
+            const pasteBtn = document.getElementById('pasteBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const urlStatus = document.getElementById('urlStatus');
+            
+            const optMp4 = document.getElementById('optMp4');
+            const optAudioFallback = document.getElementById('optAudioFallback');
+            const optSubs = document.getElementById('optSubs');
+            const optThumb = document.getElementById('optThumb');
+            const optPlaylist = document.getElementById('optPlaylist');
+            const savePathInput = document.getElementById('savePathInput');
+            const pathPresets = document.querySelectorAll('.path-preset');
+            
+            const commandOutput = document.getElementById('commandOutput');
+            const copyBtn = document.getElementById('copyBtn');
+            const copyBtnText = document.getElementById('copyBtnText');
+            const copyIcon = document.getElementById('copyIcon');
+            const checkIcon = document.getElementById('checkIcon');
+            
+            const toggleSourceBtn = document.getElementById('toggleSourceBtn');
+            const sourceContainer = document.getElementById('sourceContainer');
+            const rawSourceArea = document.getElementById('rawSourceArea');
+            const copySourceBtn = document.getElementById('copySourceBtn');
+            const clipboardHelper = document.getElementById('clipboardHelper');
+
+            /**
+             * Extracts the first valid YouTube URL from a raw string (handles pasted full commands or extra text).
+             */
+            function extractYouTubeUrlFromText(text) {
+                const ytRegex = /(?:https?:\/\/)?(?:www\.|m\.|music\.)?(?:youtube\.com\/(?:watch\?[^\s"'<>]+|shorts\/[^\s"'<>]+|live\/[^\s"'<>]+|embed\/[^\s"'<>]+|playlist\?[^\s"'<>]+)|youtu\.be\/[^\s"'<>]+)/i;
+                const match = text.match(ytRegex);
+                return match ? match[0] : null;
+            }
+
+            /**
+             * Parses and cleans a YouTube URL.
+             * Supports standard watch URLs, youtu.be, shorts, live, and embed links, even inside pasted commands.
+             * Strips tracking params (?si=, &t=, &feature=, etc.) while preserving playlist ID if requested.
+             */
+            function cleanYouTubeUrl(rawInput, keepPlaylist) {
+                const trimmed = rawInput.trim();
+                if (!trimmed) {
+                    return { valid: false, cleanUrl: 'https://www.youtube.com/watch?v=VIDEO_ID', message: 'Waiting for a valid YouTube link...', isPlaceholder: true };
+                }
+
+                // Extract URL if user accidentally pasted a full yt-dlp command or surrounding quotes/text
+                const extracted = extractYouTubeUrlFromText(trimmed) || trimmed.replace(/^["']+|["']+$/g, '');
+
+                // Prepend protocol if user pasted without https://
+                let normalized = extracted;
+                if (!/^https?:\/\//i.test(normalized)) {
+                    normalized = 'https://' + normalized;
+                }
+
+                try {
+                    const urlObj = new URL(normalized);
+                    const hostname = urlObj.hostname.replace(/^www\./, '').toLowerCase();
+                    let videoId = null;
+                    const listId = urlObj.searchParams.get('list');
+
+                    // Case 1: youtu.be/VIDEO_ID
+                    if (hostname === 'youtu.be') {
+                        videoId = urlObj.pathname.split('/').filter(Boolean)[0];
+                    } 
+                    // Case 2: youtube.com or m.youtube.com
+                    else if (hostname === 'youtube.com' || hostname === 'm.youtube.com' || hostname === 'music.youtube.com') {
+                        if (urlObj.pathname === '/watch') {
+                            videoId = urlObj.searchParams.get('v');
+                        } else if (urlObj.pathname.startsWith('/shorts/')) {
+                            videoId = urlObj.pathname.split('/')[2];
+                        } else if (urlObj.pathname.startsWith('/live/')) {
+                            videoId = urlObj.pathname.split('/')[2];
+                        } else if (urlObj.pathname.startsWith('/embed/')) {
+                            videoId = urlObj.pathname.split('/')[2];
+                        } else if (urlObj.pathname === '/playlist' && listId) {
+                            return {
+                                valid: true,
+                                cleanUrl: `https://www.youtube.com/playlist?list=${listId}`,
+                                message: 'Playlist URL detected & cleaned.',
+                                isPlaceholder: false
+                            };
+                        }
+                    }
+
+                    if (videoId) {
+                        // Strip any accidental trailing characters or quotes
+                        videoId = videoId.split('&')[0].split('?')[0].replace(/["']/g, '');
+                        let cleanUrl = `https://www.youtube.com/watch?v=${videoId}`;
+                        let msg = `Cleaned video ID: ${videoId}`;
+
+                        if (keepPlaylist && listId) {
+                            const cleanListId = listId.replace(/["']/g, '');
+                            cleanUrl += `&list=${cleanListId}`;
+                            msg += ` (with playlist)`;
+                        }
+
+                        return { valid: true, cleanUrl, message: msg, isPlaceholder: false };
+                    }
+
+                    // Fallback if URL is valid syntax but not recognized as standard YouTube video
+                    return {
+                        valid: false,
+                        cleanUrl: extracted,
+                        message: 'Unrecognized YouTube URL format — using extracted input.',
+                        isPlaceholder: false
+                    };
+                } catch (e) {
+                    // Not a valid URL yet
+                    return {
+                        valid: false,
+                        cleanUrl: extracted,
+                        message: 'Invalid URL format — using sanitized input.',
+                        isPlaceholder: false
+                    };
+                }
+            }
+
+            /**
+             * Formats a Windows/Unix directory path safely for quoted terminal arguments.
+             * Prevents trailing backslash issues in Windows CMD (e.g. "E:\" -> "E:/" so \" isn't parsed as an escaped quote).
+             */
+            function formatSafeCmdPath(rawPath) {
+                let cleaned = rawPath.trim().replace(/^["']+|["']+$/g, '');
+                if (!cleaned) return '';
+
+                // If path ends with a single backslash (like E:\ or E:\Downloads\), convert trailing backslash to forward slash
+                if (/\\+$/.test(cleaned)) {
+                    cleaned = cleaned.replace(/\\+$/, '/');
+                }
+                return cleaned;
+            }
+
+            /**
+             * Builds the yt-dlp command based on active checkboxes and cleaned URL.
+             */
+            function updateCommand() {
+                const raw = urlInput.value;
+                clearBtn.classList.toggle('hidden', raw.length === 0);
+
+                const { valid, cleanUrl, message, isPlaceholder } = cleanYouTubeUrl(raw, optPlaylist.checked);
+
+                // Update status indicator
+                if (isPlaceholder) {
+                    urlStatus.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-slate-600"></span><span>${message}</span>`;
+                } else if (valid) {
+                    urlStatus.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span><span class="text-emerald-400">${message}</span>`;
+                } else {
+                    urlStatus.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span><span class="text-amber-400">${message}</span>`;
+                }
+
+                // Format selection string
+                let formatSelector = '';
+                if (optAudioFallback.checked) {
+                    // Flexible 1080p: gets best <=1080p video + best audio regardless of container, falls back to combined <=1080p
+                    formatSelector = 'bestvideo[height<=1080]+bestaudio/best[height<=1080]/best';
+                } else {
+                    // Strict MP4/M4A 1080p preference
+                    formatSelector = 'bestvideo[height<=1080][ext=mp4]+bestaudio[ext=m4a]/best[height<=1080][ext=mp4]/best[height<=1080]';
+                }
+
+                const parts = ['yt-dlp', `-f "${formatSelector}"`];
+
+                if (optMp4.checked) {
+                    parts.push('--merge-output-format mp4');
+                }
+                if (optSubs.checked) {
+                    parts.push('--embed-subs');
+                }
+                if (optThumb.checked) {
+                    parts.push('--embed-thumbnail');
+                }
+
+                // Append Windows CMD-safe Output Directory (-P)
+                const safeSavePath = formatSafeCmdPath(savePathInput.value);
+                if (safeSavePath) {
+                    parts.push(`-P "${safeSavePath}"`);
+                }
+
+                // Wrap clean URL in double quotes to protect ? and & in terminal shells
+                parts.push(`"${cleanUrl}"`);
+
+                commandOutput.textContent = parts.join(' ');
+            }
+
+            /**
+             * Copies text to clipboard using reliable fallback compatible with iframes.
+             */
+            function copyTextToClipboard(text, onSuccess) {
+                clipboardHelper.value = text;
+                clipboardHelper.select();
+                clipboardHelper.setSelectionRange(0, 99999);
+                try {
+                    document.execCommand('copy');
+                    if (onSuccess) onSuccess();
+                } catch (err) {
+                    console.error('Copy failed:', err);
+                }
+                window.getSelection().removeAllRanges();
+            }
+
+            // Event Listeners for Inputs & Checkboxes
+            urlInput.addEventListener('input', updateCommand);
+            savePathInput.addEventListener('input', updateCommand);
+            [optMp4, optAudioFallback, optSubs, optThumb, optPlaylist].forEach(checkbox => {
+                checkbox.addEventListener('change', updateCommand);
+            });
+
+            // Quick Path Preset Buttons
+            pathPresets.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    savePathInput.value = btn.dataset.preset;
+                    updateCommand();
+                });
+            });
+
+            // Clear Button
+            clearBtn.addEventListener('click', () => {
+                urlInput.value = '';
+                urlInput.focus();
+                updateCommand();
+            });
+
+            // Paste Button
+            pasteBtn.addEventListener('click', async () => {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    if (text) {
+                        urlInput.value = text;
+                        updateCommand();
+                    }
+                } catch (err) {
+                    // If clipboard permission is blocked in iframe, focus input so user can Ctrl+V
+                    urlInput.focus();
+                    pasteBtn.textContent = 'Press Ctrl+V';
+                    setTimeout(() => { pasteBtn.textContent = 'Paste'; }, 2000);
+                }
+            });
+
+            // Copy Command Button
+            let copyTimeout;
+            copyBtn.addEventListener('click', () => {
+                copyTextToClipboard(commandOutput.textContent, () => {
+                    clearTimeout(copyTimeout);
+                    copyBtn.classList.remove('bg-rose-600', 'hover:bg-rose-500');
+                    copyBtn.classList.add('bg-emerald-600', 'hover:bg-emerald-500');
+                    copyIcon.classList.add('hidden');
+                    checkIcon.classList.remove('hidden');
+                    copyBtnText.textContent = 'Copied!';
+
+                    copyTimeout = setTimeout(() => {
+                        copyBtn.classList.remove('bg-emerald-600', 'hover:bg-emerald-500');
+                        copyBtn.classList.add('bg-rose-600', 'hover:bg-rose-500');
+                        copyIcon.classList.remove('hidden');
+                        checkIcon.classList.add('hidden');
+                        copyBtnText.textContent = 'Copy Command';
+                    }, 2000);
+                });
+            });
+
+            // Toggle Raw HTML Viewer
+            toggleSourceBtn.addEventListener('click', () => {
+                const isHidden = sourceContainer.classList.contains('hidden');
+                if (isHidden) {
+                    rawSourceArea.value = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+                    sourceContainer.classList.remove('hidden');
+                    toggleSourceBtn.textContent = 'Hide Page HTML Source';
+                } else {
+                    sourceContainer.classList.add('hidden');
+                    toggleSourceBtn.textContent = 'View / Copy Page HTML Source';
+                }
+            });
+
+            // Copy Raw HTML Source
+            copySourceBtn.addEventListener('click', () => {
+                copyTextToClipboard(rawSourceArea.value, () => {
+                    const orig = copySourceBtn.textContent;
+                    copySourceBtn.textContent = 'Copied HTML!';
+                    setTimeout(() => { copySourceBtn.textContent = orig; }, 2000);
+                });
+            });
+
+            // Initialize default output on load
+            updateCommand();
+        });
+    </script>
+</body>
+</html>
