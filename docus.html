@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DocuS — Document Editor</title>
+<!-- Document conversion libraries. These load from CDNs, so DOCX/PDF conversion and PDF export require internet access. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://unpkg.com/docx@8.5.0/build/index.umd.js"></script>
+<style>
+:root{--bg:#e9e9e6;--panel:#f7f7f4;--ink:#171817;--muted:#777a74;--line:#d9dad4;--accent:#f36b35;--paper:#fff;--shadow:0 14px 40px #17181716;--page-top:72px;--page-right:72px;--page-bottom:72px;--page-left:72px}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.4 Inter,Arial,sans-serif;height:100vh;overflow:hidden}
+button,input,select{font:inherit}button{cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:7px;padding:7px 10px;transition:.15s}button:hover{border-color:#999;background:#f1f1ed}button:active{transform:translateY(1px)}button.active{background:#202320;color:#fff;border-color:#202320}.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:650}.primary:hover{background:#df5926;color:white}.quiet{border-color:transparent;background:transparent}.danger:hover{color:#c33;border-color:#e6baba}
+.app{height:100vh;display:grid;grid-template-rows:58px 52px 1fr 30px}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:#f8f8f5;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:850;letter-spacing:-.7px;font-size:18px}.mark{width:26px;height:26px;background:var(--accent);border-radius:6px;display:grid;place-items:center;color:#fff;font-size:15px;font-weight:900}.brand small{font-size:9px;letter-spacing:1.5px;color:var(--muted);font-weight:700;margin-left:2px}
+.top-actions{display:flex;align-items:center;gap:8px}.save-state{color:var(--muted);font-size:11px;margin-right:8px}.toolbar{display:flex;align-items:center;gap:6px;padding:0 16px;background:#f2f2ee;border-bottom:1px solid var(--line);overflow-x:auto;white-space:nowrap}.toolgroup{display:flex;gap:4px;align-items:center;padding-right:9px;margin-right:3px;border-right:1px solid var(--line)}.toolgroup:last-child{border:0}.toolbar button{min-width:31px;height:31px;padding:4px 8px}.toolbar select{height:31px;border:1px solid var(--line);border-radius:6px;background:white;padding:0 7px;color:#333}.toolbar input[type=color]{width:31px;height:31px;padding:3px;border:1px solid var(--line);border-radius:6px;background:#fff}
+.workspace{display:grid;grid-template-columns:250px 1fr;min-height:0}.sidebar{background:#f6f6f2;border-right:1px solid var(--line);padding:16px 12px;display:flex;flex-direction:column;min-height:0}.side-head{display:flex;align-items:center;justify-content:space-between;padding:0 7px 12px;color:var(--muted);font-size:10px;font-weight:800;letter-spacing:1.3px}.newdoc{width:100%;text-align:left;display:flex;align-items:center;gap:9px;padding:10px;margin-bottom:13px}.newdoc b{font-size:18px;color:var(--accent)}.doc-list{overflow:auto;display:flex;flex-direction:column;gap:4px}.doc-item{display:flex;align-items:center;gap:8px;padding:9px 8px;border-radius:7px;color:#555;cursor:pointer;min-width:0}.doc-item:hover{background:#ecece7}.doc-item.selected{background:#e6e6df;color:#171817;font-weight:650}.doc-item .doc-icon{color:var(--accent)}.doc-item .doc-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}.doc-item .more{opacity:0;border:0;background:transparent;padding:2px 5px}.doc-item:hover .more{opacity:1}.side-bottom{margin-top:auto;border-top:1px solid var(--line);padding:12px 7px 0;color:var(--muted);font-size:11px;line-height:1.6}.side-bottom strong{color:#333}
+.main{min-width:0;display:flex;flex-direction:column;overflow:hidden}.docbar{height:48px;display:flex;align-items:center;justify-content:center;gap:9px;color:var(--muted);font-size:11px}.doc-title{border:0;background:transparent;font-size:12px;font-weight:650;color:#555;max-width:260px;text-align:center;padding:5px}.doc-title:focus{outline:1px solid var(--accent);border-radius:4px}.canvas{flex:1;overflow:auto;padding:22px 20px 55px;display:flex;align-items:flex-start;justify-content:center;background:#e7e7e3}.paper{width:816px;min-height:1056px;background:var(--paper);box-shadow:var(--shadow);padding:var(--page-top) var(--page-right) var(--page-bottom) var(--page-left);position:relative;outline:none;overflow-wrap:anywhere}.paper.bordered{outline:1px solid #222;outline-offset:-18px}.paper[contenteditable=true]:empty:before{content:"Start writing here…";color:#b8bab4}.paper h1{font-size:2em}.paper h2{font-size:1.5em}.paper h3{font-size:1.17em}.paper img{max-width:100%;height:auto;cursor:pointer}.paper img.selected-image{outline:2px solid var(--accent);outline-offset:2px}.paper table{border-collapse:collapse;max-width:100%}.paper td,.paper th{border:1px solid #aaa;padding:6px}.statusbar{display:flex;align-items:center;justify-content:space-between;padding:0 14px;background:#f8f8f5;border-top:1px solid var(--line);font-size:10px;color:var(--muted)}.status-left,.status-right{display:flex;gap:14px;align-items:center}.dot{width:6px;height:6px;background:#63a77c;border-radius:50%;display:inline-block;margin-right:5px}
+.overlay{position:fixed;inset:0;background:#1118;display:none;align-items:center;justify-content:center;z-index:10}.dialog{width:min(430px,calc(100vw - 32px));background:#fafaf7;border-radius:12px;padding:20px;box-shadow:0 20px 80px #0003}.dialog h3{margin:0 0 14px}.dialog input{width:100%;padding:10px;border:1px solid var(--line);border-radius:7px;margin:6px 0 14px}.dialog-actions{display:flex;justify-content:flex-end;gap:8px}.small-note{color:var(--muted);font-size:11px;line-height:1.5}.findbar{display:none;align-items:center;gap:6px;padding:7px 12px;background:#fff;border-bottom:1px solid var(--line)}.findbar input{width:160px;padding:6px;border:1px solid var(--line);border-radius:5px}.findbar button{padding:5px 8px}
+@media(max-width:760px){.workspace{grid-template-columns:1fr}.sidebar{display:none}.topbar{padding:0 10px}.save-state{display:none}.toolbar{padding:0 8px}.canvas{padding:12px 8px}.paper{width:100%;min-height:900px;padding:45px 35px}.docbar{height:40px}}
+@media print{body{height:auto;overflow:visible;background:white}.app{display:block;height:auto}.topbar,.toolbar,.sidebar,.docbar,.statusbar,.findbar{display:none!important}.workspace,.main,.canvas{display:block;overflow:visible;background:white;padding:0}.paper{width:auto;min-height:0;box-shadow:none;margin:0;padding:var(--page-top) var(--page-right) var(--page-bottom) var(--page-left);outline:none!important}.paper img{max-width:100%;page-break-inside:avoid}h1,h2,h3{break-after:avoid}p,li{orphans:2;widows:2}@page{size:A4;margin:0}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+ <div class="brand"><span class="mark">D</span> DocuS <small>DOCUMENT STUDIO</small></div>
+ <div class="top-actions"><span class="save-state" id="saveState">● All changes saved</span><button class="quiet" id="renameBtn" title="Rename document">Rename</button><button id="importBtn">↥ Import</button><button class="primary" id="exportBtn">Save PDF ↓</button>
+ <select id="wordFormat" title="Word format" style="height:32px;border:1px solid var(--line);border-radius:7px;background:#fff;padding:0 7px"><option value="docx">.DOCX</option><option value="doc">.DOC</option></select>
+ <button id="wordExportBtn">Save Word ↓</button></div>
+</header>
+<nav class="toolbar" aria-label="Formatting toolbar">
+ <div class="toolgroup"><button id="undo" title="Undo (Ctrl+Z)">↶</button><button id="redo" title="Redo (Ctrl+Y)">↷</button></div>
+ <div class="toolgroup"><select id="blockFormat" title="Paragraph style"><option value="p">Paragraph</option><option value="h1">Heading 1</option><option value="h2">Heading 2</option><option value="h3">Heading 3</option><option value="blockquote">Quote</option></select><select id="fontName" title="Font family"><option>Arial</option><option>Georgia</option><option>Times New Roman</option><option>Verdana</option><option>Courier New</option></select><select id="fontSize" title="Font size"><option value="2">10 pt</option><option value="3" selected>12 pt</option><option value="4">14 pt</option><option value="5">18 pt</option><option value="6">24 pt</option><option value="7">32 pt</option></select></div>
+ <div class="toolgroup"><button data-cmd="bold" title="Bold"><b>B</b></button><button data-cmd="italic" title="Italic"><i>I</i></button><button data-cmd="underline" title="Underline"><u>U</u></button><button data-cmd="strikeThrough" title="Strikethrough"><s>S</s></button></div>
+ <div class="toolgroup"><button data-cmd="insertUnorderedList" title="Bulleted list">☷</button><button data-cmd="insertOrderedList" title="Numbered list">1.</button><button data-cmd="justifyLeft" title="Align left">≡</button><button data-cmd="justifyCenter" title="Center">☰</button><button data-cmd="justifyRight" title="Align right">≣</button><button data-cmd="justifyFull" title="Justify">▤</button></div>
+ <div class="toolgroup"><label title="Text color"><input id="textColor" type="color" value="#171817"></label><label title="Highlight color"><input id="highlightColor" type="color" value="#fff19a"></label><button id="imageBtn" title="Insert image">▧ Image</button></div>
+ <div class="toolgroup"><button id="findBtn" title="Find and replace">⌕ Find</button><button id="borderBtn" title="Toggle page border">▢ Border</button><button id="layoutBtn" title="Page margins">Margins</button></div>
+</nav>
+<div class="findbar" id="findbar"><input id="findText" placeholder="Find text"><input id="replaceText" placeholder="Replace with"><button id="findNext">Next</button><button id="replaceOne">Replace</button><button id="replaceAll">Replace all</button><button id="closeFind">✕</button></div>
+<div class="workspace">
+ <aside class="sidebar"><div class="side-head"><span>YOUR DOCUMENTS</span><span id="docCount">01</span></div><button class="newdoc" id="newDoc"><b>＋</b> New document</button><div class="doc-list" id="docList"></div><div class="side-bottom"><strong>LOCAL WORKSPACE</strong><br>Documents stay on this device.<br><span id="storageInfo">IndexedDB storage active</span></div></aside>
+ <main class="main"><div class="docbar"><span>DOC /</span><input class="doc-title" id="docTitle" value="Untitled document" aria-label="Document title"><span>·</span><span id="modified">Just now</span></div><div class="canvas"><article class="paper" id="editor" contenteditable="true" spellcheck="true"><h1>Untitled document</h1><p>Start writing your ideas here. Select text to format it, or use the toolbar above.</p></article></div></main>
+</div>
+<footer class="statusbar"><div class="status-left"><span><i class="dot"></i><span id="saveStatus">Saved locally</span></span><span id="wordCount">0 words</span><span id="charCount">0 characters</span></div><div class="status-right"><span>A4 · Portrait</span><span>DocuS 1.0</span></div></footer>
+</div>
+<div class="overlay" id="dialogOverlay"><div class="dialog"><h3 id="dialogTitle">Page settings</h3><div id="dialogBody"></div><div class="dialog-actions"><button id="dialogCancel">Cancel</button><button class="primary" id="dialogApply">Apply</button></div></div></div>
+<input type="file" id="fileInput" accept=".txt,.html,.htm,.docx,.pdf,image/*" hidden>
+<input type="file" id="imageInput" accept="image/*" hidden>
+<script>
+(()=>{
+const $=id=>document.getElementById(id), editor=$('editor');
+let docs=[],activeId=null,saveTimer=null,history=[],historyIndex=-1,selectionRange=null,settings={top:72,right:72,bottom:72,left:72,border:false};
+const DB='docus-db',STORE='documents';
+function openDB(){return new Promise((resolve,reject)=>{if(!('indexedDB'in window)){resolve(null);return}let req=indexedDB.open(DB,1);req.onupgradeneeded=()=>req.result.createObjectStore(STORE,{keyPath:'id'});req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)})}
+let dbPromise=openDB().catch(()=>null);
+async function allDocs(){let db=await dbPromise;if(!db)return JSON.parse(localStorage.getItem('docus-fallback')||'[]');return new Promise(r=>{let q=db.transaction(STORE).objectStore(STORE).getAll();q.onsuccess=()=>r(q.result||[]);q.onerror=()=>r([])})}
+async function putDoc(d){let db=await dbPromise;if(!db){localStorage.setItem('docus-fallback',JSON.stringify(docs));return}return new Promise(r=>{let tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).put(d);tx.oncomplete=()=>r();tx.onerror=()=>r()})}
+async function deleteDoc(id){let db=await dbPromise;if(!db){localStorage.setItem('docus-fallback',JSON.stringify(docs));return}return new Promise(r=>{let tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).delete(id);tx.oncomplete=()=>r()})}
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+function current(){return docs.find(d=>d.id===activeId)}
+function safeTitle(s){return (s||'Untitled document').replace(/[<>:"/\\|?*]/g,'').trim().slice(0,90)||'Untitled document'}
+function renderList(){let list=$('docList');list.innerHTML='';docs.sort((a,b)=>b.updated-a.updated).forEach(d=>{let el=document.createElement('div');el.className='doc-item'+(d.id===activeId?' selected':'');el.innerHTML='<span class="doc-icon">▤</span><span class="doc-name"></span><button class="more" title="Delete">···</button>';el.querySelector('.doc-name').textContent=d.title;el.onclick=()=>switchDoc(d.id);el.querySelector('.more').onclick=e=>{e.stopPropagation();if(confirm('Delete “'+d.title+'”?'))removeDoc(d.id)};list.append(el)});$('docCount').textContent=String(docs.length).padStart(2,'0')}
+async function init(){docs=await allDocs();if(!docs.length){let d={id:uid(),title:'Untitled document',content:'<h1>Untitled document</h1><p>Start writing your ideas here. Select text to format it, or use the toolbar above.</p>',updated:Date.now()};docs=[d];await putDoc(d)}switchDoc(docs[0].id)}
+function switchDoc(id){saveNow();activeId=id;let d=current();if(!d)return;editor.innerHTML=d.content;$('docTitle').value=d.title;$('modified').textContent='Saved';history=[];historyIndex=-1;pushHistory();renderList();updateStats();applySettings()}
+function createDoc(){saveNow();let d={id:uid(),title:'Untitled document',content:'<h1>Untitled document</h1><p><br></p>',updated:Date.now()};docs.unshift(d);putDoc(d);switchDoc(d.id)}
+function removeDoc(id){docs=docs.filter(d=>d.id!==id);deleteDoc(id);if(!docs.length){let d={id:uid(),title:'Untitled document',content:'<p><br></p>',updated:Date.now()};docs=[d];putDoc(d)}switchDoc(docs[0].id)}
+function saveNow(){let d=current();if(!d)return;d.title=safeTitle($('docTitle').value);d.content=editor.innerHTML;d.updated=Date.now();putDoc(d);$('saveState').textContent='● All changes saved';$('saveStatus').textContent='Saved locally';$('modified').textContent='Just now';renderList()}
+function scheduleSave(){ $('saveState').textContent='● Saving…';$('saveStatus').textContent='Saving';clearTimeout(saveTimer);saveTimer=setTimeout(saveNow,550);updateStats()}
+function updateStats(){let text=editor.innerText||'';let words=text.trim()?text.trim().split(/\s+/).length:0;$('wordCount').textContent=words+' words';$('charCount').textContent=text.length+' characters'}
+function pushHistory(){let val=editor.innerHTML;if(history[historyIndex]===val)return;history=history.slice(0,historyIndex+1);history.push(val);if(history.length>80)history.shift();historyIndex=history.length-1}
+function restoreHistory(i){if(i<0||i>=history.length)return;historyIndex=i;editor.innerHTML=history[i];scheduleSave()}
+function exec(cmd,val=null){editor.focus();document.execCommand(cmd,false,val);scheduleSave()}
+document.querySelectorAll('[data-cmd]').forEach(b=>b.onclick=()=>exec(b.dataset.cmd));
+$('blockFormat').onchange=e=>exec('formatBlock','<'+e.target.value+'>');
+$('fontName').onchange=e=>exec('fontName',e.target.value);
+$('fontSize').onchange=e=>exec('fontSize',e.target.value);
+$('textColor').oninput=e=>exec('foreColor',e.target.value);
+$('highlightColor').oninput=e=>exec('hiliteColor',e.target.value);
+$('undo').onclick=()=>{if(historyIndex>0)restoreHistory(historyIndex-1);else exec('undo')};
+$('redo').onclick=()=>{if(historyIndex<history.length-1)restoreHistory(historyIndex+1);else exec('redo')};
+editor.addEventListener('input',()=>{scheduleSave();clearTimeout(window.histTimer);window.histTimer=setTimeout(pushHistory,350)});
+editor.addEventListener('keyup',updateStats);editor.addEventListener('mouseup',updateStats);
+$('docTitle').onchange=()=>{let d=current();if(d){d.title=safeTitle($('docTitle').value);$('docTitle').value=d.title;scheduleSave()}};
+$('newDoc').onclick=createDoc;
+$('renameBtn').onclick=()=>{$('docTitle').focus();$('docTitle').select()};
+$('importBtn').onclick=()=>$('fileInput').click();
+$('fileInput').onchange=async e=>{let f=e.target.files[0];if(!f)return;let ext=f.name.split('.').pop().toLowerCase();try{if(ext==='txt'){let t=await f.text();editor.innerHTML=t.split(/\r?\n/).map(x=>'<p>'+escapeHTML(x)+'</p>').join('')}else if(ext==='html'||ext==='htm'){let t=await f.text(),p=new DOMParser().parseFromString(t,'text/html');p.querySelectorAll('script,iframe,object,embed,form,link,meta,style').forEach(n=>n.remove());p.body.querySelectorAll('*').forEach(n=>{[...n.attributes].forEach(a=>{if(/^on/i.test(a.name)||((a.name==='href'||a.name==='src')&&/^\s*javascript:/i.test(a.value)))n.removeAttribute(a.name)})});editor.innerHTML=p.body.innerHTML}else{alert('Unsupported file type. Please choose TXT or HTML.');return}let d=current();if(d){d.title=safeTitle(f.name.replace(/\.[^.]+$/,''));$('docTitle').value=d.title;scheduleSave();pushHistory()}}catch(err){console.error(err);alert('Import failed: '+(err.message||'The file may be damaged or unsupported.'))}e.target.value=''};
+function sanitizeImportedHTML(html){
+ const doc=new DOMParser().parseFromString(html,'text/html');
+ doc.querySelectorAll('script,iframe,object,embed,form,link,meta,style').forEach(n=>n.remove());
+ doc.body.querySelectorAll('*').forEach(n=>[...n.attributes].forEach(a=>{
+   if(/^on/i.test(a.name)||((a.name==='href'||a.name==='src')&&/^\\s*javascript:/i.test(a.value)))n.removeAttribute(a.name);
+ }));
+ return doc.body.innerHTML;
+}
+function escapeHTML(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+$('exportBtn').onclick=async()=>{
+ saveNow();
+ if(!window.html2pdf){alert('PDF export library did not load. Check your internet connection and try again.');return}
+ const btn=$('exportBtn');btn.disabled=true;btn.textContent='Creating PDF…';
+ try{
+   const clone=editor.cloneNode(true);clone.removeAttribute('contenteditable');
+   clone.querySelectorAll('.selected-image').forEach(x=>x.classList.remove('selected-image'));
+   const wrap=document.createElement('div');wrap.style.cssText='background:#fff;color:#171817;width:794px;padding:'+settings.top+'px '+settings.right+'px '+settings.bottom+'px '+settings.left+'px;font-family:Arial,sans-serif;box-sizing:border-box;';wrap.innerHTML=clone.innerHTML;
+   if(settings.border)wrap.style.outline='1px solid #222';
+   const name=safeTitle(current()?.title||'document').replace(/\\s+/g,'_');
+   await html2pdf().set({margin:0,filename:name+'.pdf',image:{type:'jpeg',quality:.98},html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff'},jsPDF:{unit:'pt',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy']}}).from(wrap).save();
+ }catch(err){console.error(err);alert('Could not create PDF: '+(err.message||'Unknown error'))}
+ finally{btn.disabled=false;btn.textContent='Save PDF ↓'}
+};
+$('wordExportBtn').onclick=async()=>{
+ saveNow();const format=$('wordFormat').value;const name=safeTitle(current()?.title||'document').replace(/\\s+/g,'_');
+ if(format==='doc'){
+   const html='<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{font-family:Arial,sans-serif}img{max-width:100%}</style></head><body>'+editor.innerHTML+'</body></html>';
+   downloadBlob(new Blob(['\\ufeff',html],{type:'application/msword'}),name+'.doc');
+   alert('Saved as Word-compatible .DOC (HTML-based). For a native Word document, choose .DOCX.');
+   return;
+ }
+ if(!window.docx){alert('DOCX export library did not load. Check your internet connection and try again.');return}
+ const btn=$('wordExportBtn');btn.disabled=true;btn.textContent='Creating…';
+ try{
+   const {Document,Packer,Paragraph,TextRun,HeadingLevel}=docx;
+   const blocks=[...editor.children];const children=[];
+   for(const el of blocks){
+     const text=el.innerText||'';
+     const runs=[new TextRun({text, bold:!!el.querySelector('strong,b'), italics:!!el.querySelector('em,i'), underline:el.querySelector('u')?{}:undefined})];
+     let heading=el.tagName==='H1'?HeadingLevel.HEADING_1:el.tagName==='H2'?HeadingLevel.HEADING_2:el.tagName==='H3'?HeadingLevel.HEADING_3:undefined;
+     if(el.tagName==='LI')children.push(new Paragraph({text:'• '+text}));
+     else children.push(new Paragraph({children:runs,heading,spacing:{after:160}}));
+   }
+   const documentFile=new Document({sections:[{properties:{page:{margin:{top:settings.top*15,bottom:settings.bottom*15,left:settings.left*15,right:settings.right*15}}},children}]});
+   const blob=await Packer.toBlob(documentFile);downloadBlob(blob,name+'.docx');
+ }catch(err){console.error(err);alert('Could not create DOCX: '+(err.message||'Unknown error'))}
+ finally{btn.disabled=false;btn.textContent='Save Word ↓'}
+};
+function downloadBlob(blob,filename){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500)}
+
+$('imageBtn').onclick=()=>{$('imageInput').click()};
+$('imageInput').onchange=async e=>{let f=e.target.files[0];if(!f)return;let data=await new Promise((r,j)=>{let fr=new FileReader();fr.onload=()=>r(fr.result);fr.onerror=j;fr.readAsDataURL(f)});editor.focus();document.execCommand('insertHTML',false,'<p><img src="'+data+'" alt="'+escapeHTML(f.name)+'" style="max-width:100%;height:auto"></p>');scheduleSave();pushHistory();e.target.value=''};
+editor.addEventListener('click',e=>{if(e.target.tagName==='IMG'){document.querySelectorAll('.selected-image').forEach(x=>x.classList.remove('selected-image'));e.target.classList.add('selected-image')}else document.querySelectorAll('.selected-image').forEach(x=>x.classList.remove('selected-image'))});
+editor.addEventListener('keydown',e=>{if(e.key==='Delete'&&document.querySelector('.selected-image')){document.querySelector('.selected-image').remove();scheduleSave()}});
+$('findBtn').onclick=()=>{$('findbar').style.display='flex';$('findText').focus()};
+$('closeFind').onclick=()=>{$('findbar').style.display='none';window.getSelection().removeAllRanges()};
+$('findNext').onclick=()=>{let q=$('findText').value;if(!q)return;let sel=window.getSelection();let range=document.createRange();let walker=document.createTreeWalker(editor,NodeFilter.SHOW_TEXT);let nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);let found=false;for(let n of nodes){let i=n.textContent.toLowerCase().indexOf(q.toLowerCase());if(i>=0){range.setStart(n,i);range.setEnd(n,i+q.length);sel.removeAllRanges();sel.addRange(range);n.parentElement.scrollIntoView({block:'center'});found=true;break}}if(!found)alert('No match found.')};
+$('replaceOne').onclick=()=>{let q=$('findText').value;if(!q)return;let sel=window.getSelection();if(sel.toString().toLowerCase()===q.toLowerCase()){document.execCommand('insertText',false,$('replaceText').value);scheduleSave();pushHistory()}else $('findNext').click()};
+$('replaceAll').onclick=()=>{let q=$('findText').value;if(!q)return;let count=0;const walker=document.createTreeWalker(editor,NodeFilter.SHOW_TEXT);let n;while(n=walker.nextNode()){let re=new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');n.textContent=n.textContent.replace(re,()=>{count++;return $('replaceText').value})}scheduleSave();pushHistory();alert(count+' replacement(s) made.')};
+function applySettings(){document.documentElement.style.setProperty('--page-top',settings.top+'px');document.documentElement.style.setProperty('--page-right',settings.right+'px');document.documentElement.style.setProperty('--page-bottom',settings.bottom+'px');document.documentElement.style.setProperty('--page-left',settings.left+'px');editor.classList.toggle('bordered',settings.border)}
+$('borderBtn').onclick=()=>{settings.border=!settings.border;applySettings();scheduleSave()};
+function openDialog(title,body,apply){$('dialogTitle').textContent=title;$('dialogBody').innerHTML=body;$('dialogOverlay').style.display='flex';$('dialogApply').onclick=()=>{apply();$('dialogOverlay').style.display='none';scheduleSave()};$('dialogCancel').onclick=()=>$('dialogOverlay').style.display='none'}
+$('layoutBtn').onclick=()=>openDialog('Page layout',`<p class="small-note">Adjust the white page padding. Values are in pixels.</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">${['top','right','bottom','left'].map(k=>`<label>${k[0].toUpperCase()+k.slice(1)} margin<input type="number" id="m_${k}" min="0" max="180" value="${settings[k]}"></label>`).join('')}</div>`,()=>{['top','right','bottom','left'].forEach(k=>settings[k]=Math.max(0,Math.min(180,Number($('m_'+k).value)||0)));applySettings()});
+$('dialogOverlay').onclick=e=>{if(e.target===$('dialogOverlay'))$('dialogOverlay').style.display='none'};
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();saveNow()}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='f'){e.preventDefault();$('findBtn').click()}});
+window.addEventListener('beforeunload',saveNow);
+init();
+})();
+</script>
+</body>
+</html>
