@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IEEE Document Editor</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+<style>
+:root{--ink:#172033;--muted:#64748b;--line:#dbe2ea;--blue:#2563eb;--bg:#f1f5f9}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Arial,sans-serif}button,input,select{font:inherit}button{cursor:pointer;border:1px solid var(--line);background:#fff;border-radius:6px;padding:8px 11px;color:#263449}button:hover{background:#eff6ff;border-color:#93c5fd}button.active{background:#dbeafe;color:#1d4ed8;border-color:#93c5fd}.app{max-width:1200px;margin:28px auto;padding:0 18px}.top{background:#fff;border:1px solid var(--line);border-radius:12px 12px 0 0;padding:20px 22px}.topline{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:18px}.brand{font-size:20px;font-weight:700}.status{font-size:12px;color:var(--muted)}.metadata{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field label{display:block;font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--muted);margin-bottom:5px}.field input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:7px}.toolbar{background:#f8fafc;border:1px solid var(--line);border-top:0;padding:10px;display:flex;gap:7px;align-items:center;flex-wrap:wrap}.toolbar .group{display:flex;gap:5px;padding-right:8px;margin-right:3px;border-right:1px solid var(--line)}.toolbar select{padding:8px;border:1px solid var(--line);border-radius:6px;background:#fff}.toolbar .spacer{flex:1}.primary{background:#1d4ed8;color:white;border-color:#1d4ed8}.primary:hover{background:#1e40af;color:white}.danger{color:#b91c1c}.workspace{padding:24px 12px;background:#e2e8f0;border:1px solid var(--line);border-top:0;border-radius:0 0 12px 12px;overflow:auto}.paper{width:8.5in;min-height:11in;margin:0 auto;background:#fff;padding:.28in .30in .65in;box-shadow:0 4px 18px #0f172a18;color:#000;font:10pt/1.2 'Times New Roman',serif;column-count:2;column-gap:.24in;text-align:justify;overflow-wrap:anywhere}.paper-header{column-span:all;text-align:center;margin-bottom:12pt}.paper-title{font-size:24pt;line-height:1.08;font-weight:bold;text-align:center;margin:0 0 12pt}.paper-author{font-size:11pt;text-align:center;margin:0 0 12pt;white-space:pre-line}.paper-body{min-height:650px;outline:none}.paper-body p{margin:0 0 6pt}.paper-body h1{font-size:10pt;text-align:center;text-transform:uppercase;margin:12pt 0 6pt}.paper-body h2{font-size:10pt;text-align:center;font-style:italic;margin:12pt 0 6pt}.paper-body h3{font-size:10pt;text-align:left;font-style:italic;margin:12pt 0 6pt}.paper-body img{max-width:100%;height:auto}.paper-body:empty:before{content:'Start writing your IEEE paper here...';color:#94a3b8}.citation{white-space:nowrap}.hint{max-width:8.5in;margin:12px auto 0;color:#64748b;font-size:12px}.hidden{display:none!important}
+@media(max-width:800px){.app{margin:10px auto;padding:0 8px}.metadata{grid-template-columns:1fr}.topline{align-items:flex-start;flex-direction:column}.workspace{padding:12px 5px}.paper{width:100%;min-height:80vh;padding:28px 22px;column-count:1}.paper-title{font-size:20pt}.toolbar .spacer{display:none}}
+@page{size:letter;margin:0}
+@media print{body{background:#fff}.app{max-width:none;margin:0;padding:0}.top,.toolbar,.hint{display:none!important}.workspace{padding:0;border:0;background:#fff;overflow:visible}.paper{width:8.5in;min-height:11in;margin:0;padding:.28in .30in .65in;box-shadow:none}.paper-body{min-height:0}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="topline"><div class="brand">📄 IEEE Document Editor</div><div class="status" id="saveStatus" aria-live="polite">Ready</div></div>
+    <div class="metadata">
+      <div class="field"><label for="docTitle">PAPER TITLE</label><input id="docTitle" value="Untitled IEEE Paper" placeholder="Enter paper title"></div>
+      <div class="field"><label for="docAuthor">AUTHOR(S)</label><input id="docAuthor" value="Author Name" placeholder="Enter author names"></div>
+    </div>
+  </header>
+  <nav class="toolbar" aria-label="Editor toolbar">
+    <div class="group"><select id="blockFormat" title="Paragraph style"><option value="p">Body text</option><option value="h1">Heading 1</option><option value="h2">Heading 2</option><option value="h3">Heading 3</option></select></div>
+    <div class="group"><select id="fontName" title="Font"><option>Times New Roman</option><option>Arial</option><option>Georgia</option><option>Courier New</option></select><select id="fontSize" title="Font size"><option value="2">10 pt</option><option value="3">12 pt</option><option value="4">14 pt</option><option value="5">18 pt</option><option value="6">24 pt</option></select></div>
+    <div class="group"><button data-cmd="bold" title="Bold"><b>B</b></button><button data-cmd="italic" title="Italic"><i>I</i></button><button data-cmd="underline" title="Underline"><u>U</u></button><button data-cmd="strikeThrough" title="Strike"><s>S</s></button></div>
+    <div class="group"><button data-cmd="justifyLeft" title="Align left">☰</button><button data-cmd="justifyCenter" title="Center">↔</button><button data-cmd="justifyRight" title="Align right">⇥</button><button data-cmd="justifyFull" title="Justify">▤</button></div>
+    <div class="group"><button data-cmd="insertUnorderedList" title="Bulleted list">• List</button><button data-cmd="insertOrderedList" title="Numbered list">1. List</button></div>
+    <button id="insertCitation">[1] Citation</button><button id="insertImage">Image</button><button id="insertRule">Horizontal line</button>
+    <span class="spacer"></span><button id="resetDoc" class="danger">Reset</button><button id="exportPdf" class="primary">Download PDF</button>
+    <input id="imageFile" type="file" accept="image/*" class="hidden">
+  </nav>
+  <main class="workspace">
+    <article class="paper" id="paper">
+      <div class="paper-header"><h1 class="paper-title" id="previewTitle">Untitled IEEE Paper</h1><div class="paper-author" id="previewAuthor">Author Name</div></div>
+      <section class="paper-body" id="editor" contenteditable="true" spellcheck="true"><h1>INTRODUCTION</h1><p>Start writing your IEEE paper here...</p></section>
+    </article>
+    <p class="hint">Your work is saved automatically in this browser. Use <b>Download PDF</b> to export only the paper page(s), without opening the print dialog.</p>
+  </main>
+</div>
+<script>
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const editor = $('editor'), title = $('docTitle'), author = $('docAuthor');
+  const KEY = 'ieee_plain_editor_v1'; let saveTimer;
+  function setStatus(message){ $('saveStatus').textContent = message; }
+  function updatePreview(){ $('previewTitle').textContent = title.value.trim() || 'Untitled IEEE Paper'; $('previewAuthor').textContent = author.value; }
+  function save(){
+    try { localStorage.setItem(KEY, JSON.stringify({title:title.value,author:author.value,content:editor.innerHTML})); setStatus('Saved locally'); }
+    catch(err){ setStatus('Could not save (storage unavailable)'); }
+  }
+  function scheduleSave(){ setStatus('Saving…'); clearTimeout(saveTimer); saveTimer=setTimeout(save,500); }
+  function restore(){
+    try { const data=JSON.parse(localStorage.getItem(KEY)||'null'); if(!data)return;
+      if(typeof data.title==='string')title.value=data.title;
+      if(typeof data.author==='string')author.value=data.author;
+      if(typeof data.content==='string')editor.innerHTML=data.content;
+    } catch(err){ console.warn('Saved document could not be restored:',err); }
+    updatePreview();
+  }
+  function focusEditor(){ editor.focus(); }
+  document.querySelectorAll('[data-cmd]').forEach(btn => btn.addEventListener('click',()=>{focusEditor();document.execCommand(btn.dataset.cmd,false,null);scheduleSave();}));
+  $('fontName').addEventListener('change',e=>{focusEditor();document.execCommand('fontName',false,e.target.value);scheduleSave();});
+  $('fontSize').addEventListener('change',e=>{focusEditor();document.execCommand('fontSize',false,e.target.value);scheduleSave();});
+  $('blockFormat').addEventListener('change',e=>{
+    focusEditor(); const value=e.target.value;
+    document.execCommand('formatBlock',false,value);
+    const selection=window.getSelection(); if(selection&&selection.anchorNode){let node=selection.anchorNode.nodeType===3?selection.anchorNode.parentElement:selection.anchorNode;let block=node.closest('p,h1,h2,h3,div');if(block)delete block.dataset.style;}
+    scheduleSave();
+  });
+  $('insertCitation').addEventListener('click',()=>{const n=prompt('Enter reference number:','1');if(n===null||!n.trim())return;focusEditor();document.execCommand('insertHTML',false,'<span class="citation">['+escapeHtml(n.trim())+']</span>');scheduleSave();});
+  $('insertRule').addEventListener('click',()=>{focusEditor();document.execCommand('insertHorizontalRule');scheduleSave();});
+  $('insertImage').addEventListener('click',()=>$('imageFile').click());
+  $('imageFile').addEventListener('change',e=>{const file=e.target.files&&e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{focusEditor();document.execCommand('insertImage',false,reader.result);scheduleSave();};reader.readAsDataURL(file);e.target.value='';});
+  function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  title.addEventListener('input',()=>{updatePreview();scheduleSave();}); author.addEventListener('input',()=>{updatePreview();scheduleSave();}); editor.addEventListener('input',scheduleSave);
+  $('resetDoc').addEventListener('click',()=>{if(!confirm('Reset the document and remove its saved copy?'))return;title.value='Untitled IEEE Paper';author.value='Author Name';editor.innerHTML='<h1>INTRODUCTION</h1><p>Start writing your IEEE paper here...</p>';try{localStorage.removeItem(KEY);}catch(e){}updatePreview();save();});
+  async function exportPaperPDF(){
+    const button=$('exportPdf');
+    if(!window.html2canvas || !window.jspdf || !window.jspdf.jsPDF){
+      alert('PDF tools could not load. Check your internet connection and try again.');
+      return;
+    }
+    button.disabled=true; const oldLabel=button.textContent; button.textContent='Creating PDF…';
+    try{
+      // Capture only the paper, excluding the toolbar, metadata form and workspace.
+      const sourcePaper=$('paper');
+      // Force the standard letter-page geometry even when the editor is opened on mobile.
+      const paper=sourcePaper.cloneNode(true);
+      paper.style.cssText += ';position:fixed;left:-12000px;top:0;width:8.5in;min-height:11in;height:auto;margin:0;padding:.28in .30in .65in;box-shadow:none;column-count:2;column-gap:.24in;background:#fff;';
+      document.body.appendChild(paper);
+      const canvas=await window.html2canvas(paper,{scale:2,backgroundColor:'#ffffff',useCORS:true,logging:false,windowWidth:paper.scrollWidth,windowHeight:paper.scrollHeight});
+      paper.remove();
+      const {jsPDF}=window.jspdf;
+      const pdf=new jsPDF({orientation:'portrait',unit:'in',format:'letter',compress:true});
+      const pagePixelHeight=Math.floor(canvas.width*(11/8.5));
+      let page=0;
+      for(let y=0;y<canvas.height;y+=pagePixelHeight){
+        const sliceHeight=Math.min(pagePixelHeight,canvas.height-y);
+        const pageCanvas=document.createElement('canvas');
+        pageCanvas.width=canvas.width; pageCanvas.height=pagePixelHeight;
+        const ctx=pageCanvas.getContext('2d');
+        ctx.fillStyle='#fff'; ctx.fillRect(0,0,pageCanvas.width,pageCanvas.height);
+        ctx.drawImage(canvas,0,y,canvas.width,sliceHeight,0,0,canvas.width,sliceHeight);
+        if(page>0) pdf.addPage('letter','portrait');
+        pdf.addImage(pageCanvas.toDataURL('image/jpeg',0.95),'JPEG',0,0,8.5,11,undefined,'FAST');
+        page++;
+      }
+      const safeName=(title.value.trim()||'IEEE_Paper').replace(/[\\/:*?"<>|]+/g,'_').replace(/\s+/g,'_');
+      pdf.save(safeName+'.pdf');
+      setStatus('PDF downloaded');
+    }catch(err){console.error('PDF export failed:',err);alert('Could not create the PDF. Please try again.');}
+    finally{button.disabled=false;button.textContent=oldLabel;}
+  }
+  $('exportPdf').addEventListener('click',exportPaperPDF);
+  restore();
+})();
+</script>
+</body>
+</html>
